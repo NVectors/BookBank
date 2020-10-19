@@ -38,13 +38,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     // Import Firebase
-    implementation platform('com.google.firebase:firebase-bom:25.12.0')
+     implementation platform('com.google.firebase:firebase-bom:25.12.0')
     // Firebase Analytics
-    implementation 'com.google.firebase:firebase-analytics'
+    //implementation 'com.google.firebase:firebase-analytics'
     // Firebase Authentication
     implementation 'com.google.firebase:firebase-auth'
     // Firebase Firestore
-    implementation 'com.google.firebase:firebase-admin:7.0.1'
+    implementation 'com.google.firebase:firebase-firestore'
     // Firebase Storage
     implementation 'com.google.firebase:firebase-storage'
     // Barcode API
