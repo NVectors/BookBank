@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "835261131036",
+    "firebase_url": "https://bookbank-ddffd.firebaseio.com",
+    "project_id": "bookbank-ddffd",
+    "storage_bucket": "bookbank-ddffd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835261131036:android:cd036cb73b63ab773ab2d9",
+        "android_client_info": {
+          "package_name": "com.example.bookbank"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "835261131036-7vjrku0pig2ov6tg1f4qkrk6ttp5uvf0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRqTOCm8e25PbTRHHs9o6UUOwAS69ycqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "835261131036-7vjrku0pig2ov6tg1f4qkrk6ttp5uvf0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
