@@ -37,13 +37,7 @@
 
         <activity
             android:name=".activities.SetLocationActivity"
-            android:label="@string/title_activity_set_location">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/title_activity_set_location"/>
         <activity android:name=".activities.RequestsActivity" />
         <activity android:name=".activities.ScanBarcodeActivity" />
         <activity android:name=".activities.ViewBorrowedBookActivity" />
@@ -59,7 +53,11 @@
         <activity android:name=".activities.SearchBooksActivity" />
         <activity android:name=".activities.SignUpActivity" />
         <activity android:name=".activities.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
