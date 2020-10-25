@@ -13,6 +13,8 @@ import com.example.bookbank.R;
 import com.example.bookbank.models.Book;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class AddBookActivity extends AppCompatActivity {
@@ -22,6 +24,7 @@ public class AddBookActivity extends AppCompatActivity {
     private EditText isbn;
     private EditText author;
     private FirebaseFirestore firestore;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +51,14 @@ public class AddBookActivity extends AppCompatActivity {
                 startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
             }
         });
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
     }
 
     public void addBook(){
-        String ownerId = "";
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        String ownerId = currentUser.getUid();
         String id = "";
         String borrowerId = "";
         firestore.collection("Book").document(id).set(
