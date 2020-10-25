@@ -4,7 +4,7 @@ public class Book {
     private String id;
     private String title;
     private String author;
-    private String isbn;
+    private Integer isbn;
     private String description;
     private String ownerId;
     private String borrowerId;
@@ -13,7 +13,7 @@ public class Book {
         // required for Firestore to be able to convert this object
     }
 
-    public Book(String id, String title, String author, String isbn, String description, String ownerId, String borrowerId) {
+    public Book(String id, String title, String author, Integer isbn, String description, String ownerId, String borrowerId) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -47,11 +47,11 @@ public class Book {
         this.author = author;
     }
 
-    public String getIsbn() {
+    public Integer getIsbn() {
         return isbn;
     }
 
-    public void setIsbn(String isbn) {
+    public void setIsbn(Integer isbn) {
         this.isbn = isbn;
     }
 
