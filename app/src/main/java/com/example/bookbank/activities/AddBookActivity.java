@@ -13,9 +13,12 @@ import com.example.bookbank.R;
 import com.example.bookbank.models.Book;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.UUID;
 
 public class AddBookActivity extends AppCompatActivity {
 
@@ -57,9 +60,14 @@ public class AddBookActivity extends AppCompatActivity {
     }
 
     public void addBook(){
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        String ownerId = currentUser.getUid();
-        String id = "";
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String ownerId = "";
+        if (currentUser != null) {
+            ownerId = currentUser.getUid();
+        }
+        // creating unique id
+        String id = UUID.randomUUID().toString();
+        // borrowerId will be empty string at creating of book
         String borrowerId = "";
         firestore.collection("Book").document(id).set(
                 new Book(
