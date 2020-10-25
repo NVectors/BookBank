@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.bookbank.R;
+import com.example.bookbank.activities.SearchUsernameActivity;
 import com.example.bookbank.models.User;
 
 import java.util.ArrayList;
@@ -17,10 +19,12 @@ import java.util.ArrayList;
 public class SearchUsernameAdapter extends ArrayAdapter {
 
     private ArrayList<User> userList;
+    private Context context;
 
-    public SearchUsernameAdapter(@NonNull Context context, int resource, @NonNull ArrayList<User> userList) {
-        super(context, resource, userList);
+    public SearchUsernameAdapter(@NonNull Context context, @NonNull ArrayList<User> userList) {
+        super(context, 0, userList);
         this.userList = userList;
+        this.context = context;
     }
 
     @NonNull
@@ -31,6 +35,23 @@ public class SearchUsernameAdapter extends ArrayAdapter {
         // LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         // View view = inflater.inflate(R.layout.list_item, null);
 
-        return convertView;
+        View view = convertView;
+
+        if(view == null){
+            view = LayoutInflater.from(context).inflate(R.layout.searched_user_block, parent,false);
+        }
+
+        User user = userList.get(position);
+
+        TextView userName = view.findViewById(R.id.searched_user_name);
+        TextView userPhone = view.findViewById(R.id.searched_user_phone);
+        TextView userAddr = view.findViewById(R.id.searched_user_addr);
+
+        userName.setText(user.getFullname());
+        userPhone.setText(user.getPhoneNumber());
+        userAddr.setText(user.getAddress());
+
+        return view;
+
     }
 }
