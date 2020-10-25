@@ -17,11 +17,13 @@ import java.util.ArrayList;
 
 public class OwnerBooksAdapter extends ArrayAdapter {
 
-    private ArrayList<Book> bookList;
+    private ArrayList<Book> books;
+    private  Context context;
 
-    public OwnerBooksAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Book> bookList) {
-        super(context, resource, bookList);
-        this.bookList = bookList;
+    public OwnerBooksAdapter(Context context, ArrayList<Book> books) {
+        super(context, 0, books);
+        this.books = books;
+        this.context = context;
     }
 
     @NonNull
@@ -32,6 +34,28 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         // LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         // View view = inflater.inflate(R.layout.list_item, null);
 
-        return convertView;
+        View view = convertView;
+
+        if (view == null){
+            view = LayoutInflater.from(context).inflate(R.layout.owner_book_content,parent,false);
+        }
+
+        Book book = books.get(position);
+
+        TextView bookTitle = view.findViewById(R.id.owner_book_title);
+        TextView bookAuthor = view.findViewById(R.id.owner_book_author);
+        TextView bookISBN = view.findViewById(R.id.owner_book_isbn);
+        TextView bookStatus = view.findViewById(R.id.owner_book_status);
+        TextView bookBorrower = view.findViewById(R.id.owner_book_borrower);
+
+        bookTitle.setText(book.getTitle());
+        bookAuthor.setText(book.getAuthor());
+        bookISBN.setText(book.getIsbn());
+        bookStatus.setText(book.getStatus());
+
+        // Get Borrower ID and find in database name?
+        bookBorrower.setText(book.getBorrowerId());
+
+        return view;
     }
 }
