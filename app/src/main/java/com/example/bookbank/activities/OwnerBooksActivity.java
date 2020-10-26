@@ -47,13 +47,13 @@ public class OwnerBooksActivity extends AppCompatActivity {
         }
 
         bookAdapter = new OwnerBooksAdapter(this, bookDataList);
-        bookList.setAdapter(bookAdapter);
+        //bookList.setAdapter(bookAdapter);
 
         /** Get instance of Firestore */
         db = FirebaseFirestore.getInstance();
 
         /** Find reference to the add book button */
-        final FloatingActionButton addBookButton = findViewById(R.id.owner_add_button);
+        final FloatingActionButton addBookButton = findViewById(R.id.owner_add_book);
         /** If the add book button is clicked */
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
