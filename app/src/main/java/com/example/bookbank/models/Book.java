@@ -65,13 +65,6 @@ public class Book {
         this.description = description;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public String getOwnerId() {
         return ownerId;
@@ -88,4 +81,8 @@ public class Book {
     public void setBorrowerId(String borrowerId) {
         this.borrowerId = borrowerId;
     }
+
+    public String getStatus() { return status; }
+
+    public void setStatus(String status) { this.status = status; }
 }

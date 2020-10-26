@@ -2,6 +2,7 @@ package com.example.bookbank.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -58,7 +59,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Go to Add Book activity
+                startActivity(new Intent(OwnerBooksActivity.this, AddBookActivity.class));
             }
         });
     }
