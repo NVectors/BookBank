@@ -79,6 +79,7 @@ public class AddBookActivity extends AppCompatActivity {
                         author.getText().toString(),
                         Integer.parseInt(isbn.getText().toString()),
                         description.getText().toString(),
+                        "available",
                         ownerId,
                         borrowerId
                 )
