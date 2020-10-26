@@ -47,7 +47,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
         }
 
         bookAdapter = new OwnerBooksAdapter(this, bookDataList);
-        //bookList.setAdapter(bookAdapter);
+        bookList.setAdapter(bookAdapter);
 
         /** Get instance of Firestore */
         db = FirebaseFirestore.getInstance();

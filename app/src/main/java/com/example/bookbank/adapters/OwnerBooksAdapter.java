@@ -55,7 +55,7 @@ public class OwnerBooksAdapter extends ArrayAdapter {
 
         bookTitle.setText(book.getTitle());
         bookAuthor.setText(book.getAuthor());
-        bookISBN.setText(book.getIsbn());
+        bookISBN.setText(book.getIsbn().toString());
         bookStatus.setText(book.getStatus());
 
         // Get Borrower ID and find in database name?
