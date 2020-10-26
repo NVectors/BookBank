@@ -47,6 +47,7 @@ public class AddBookActivity extends AppCompatActivity {
             }
         });
 
+        // canceling adding book
         Button addBookCancel = findViewById(R.id.addBookCancelButton);
         addBookCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,6 +55,8 @@ public class AddBookActivity extends AppCompatActivity {
                 startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
             }
         });
+
+        // need photograph button
 
         firebaseAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();

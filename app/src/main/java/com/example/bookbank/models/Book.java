@@ -8,6 +8,7 @@ public class Book {
     private String description;
     private String ownerId;
     private String borrowerId;
+    private String status;
 
     public Book() {
         // required for Firestore to be able to convert this object
@@ -21,6 +22,7 @@ public class Book {
         this.description = description;
         this.ownerId = ownerId;
         this.borrowerId = borrowerId;
+        this.status = "available";
     }
 
     public String getId() {
@@ -78,4 +80,8 @@ public class Book {
     public void setBorrowerId(String borrowerId) {
         this.borrowerId = borrowerId;
     }
+
+    public String getStatus() { return status; }
+
+    public void setStatus(String status) { this.status = status; }
 }
