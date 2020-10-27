@@ -39,7 +39,7 @@ public class AddBookActivity extends AppCompatActivity {
         isbn = findViewById(R.id.isbnEditText);
         description = findViewById(R.id.descriptionEditText);
 
-        Button addBook = findViewById(R.id.addBookButton);
+        final Button addBook = findViewById(R.id.addBookButton);
         addBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,7 +48,7 @@ public class AddBookActivity extends AppCompatActivity {
         });
 
         // canceling adding book
-        Button addBookCancel = findViewById(R.id.addBookCancelButton);
+        final Button addBookCancel = findViewById(R.id.addBookCancelButton);
         addBookCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,7 +69,7 @@ public class AddBookActivity extends AppCompatActivity {
             ownerId = currentUser.getUid();
         }
         // creating unique id
-        String id = UUID.randomUUID().toString();
+        final String id = UUID.randomUUID().toString();
         // borrowerId will be empty string at creating of book
         String borrowerId = "";
         firestore.collection("Book").document(id).set(
@@ -79,7 +79,7 @@ public class AddBookActivity extends AppCompatActivity {
                         author.getText().toString(),
                         Integer.parseInt(isbn.getText().toString()),
                         description.getText().toString(),
-                        "available",
+                        "Available",
                         ownerId,
                         borrowerId
                 )

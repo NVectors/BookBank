@@ -62,10 +62,10 @@ public class OwnerBooksActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         /** Get top level reference to the collection Book */
-        CollectionReference collectionReference = db.collection("Book");
+       final CollectionReference collectionReference = db.collection("Book");
 
         /** Find reference to the add book button */
-        FloatingActionButton addBookButton = findViewById(R.id.owner_add_book);
+        final FloatingActionButton addBookButton = findViewById(R.id.owner_add_book);
 
         /** If the add book button is clicked */
         addBookButton.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +81,6 @@ public class OwnerBooksActivity extends AppCompatActivity {
             @Override
             /** Method is executed whenever any new event occurs in the remote database */
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
-
                 // Clear the old list
                 bookDataList.clear();
 
@@ -91,19 +90,17 @@ public class OwnerBooksActivity extends AppCompatActivity {
                     Log.d("SAMPLE", String.valueOf(doc.getData().get("id")));
                     Log.d("SAMPLE", String.valueOf(doc.getData().get("isbn")));
 
-                    /**
+
                     String id = (String) doc.getData().get("id");
                     String title = (String) doc.getData().get("title");
                     String author = (String) doc.getData().get("author");
-                    String isbn = (String) doc.getData().get("isbn");
-                    Integer ISBN = 1;
+                    Integer isbn = Integer.parseInt(String.valueOf(doc.getData().get("isbn")));
                     String description = (String) doc.getData().get("description");
-                    String status = "";
+                    String status = (String) doc.getData().get("status");
                     String ownerID = (String) doc.getData().get("ownerId");
                     String borrowerID = (String) doc.getData().get("borrowerId");
 
-
-                    bookDataList.add(new Book(id, title, author, ISBN, description, status, ownerID, borrowerID)); // Add book from FireStore */
+                    bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
                 }
                 bookAdapter.notifyDataSetChanged(); //Notify the adapter of data change
             }
