@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -34,12 +35,15 @@ public class AddBookActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_book);
 
+        /** Move layout up when keyboard is present */
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
         title = findViewById(R.id.titleEditText);
         author = findViewById(R.id.authorEditText);
         isbn = findViewById(R.id.isbnEditText);
         description = findViewById(R.id.descriptionEditText);
 
-        final Button addBook = findViewById(R.id.addBookButton);
+        Button addBook = findViewById(R.id.addBookButton);
         addBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,7 +52,7 @@ public class AddBookActivity extends AppCompatActivity {
         });
 
         // canceling adding book
-        final Button addBookCancel = findViewById(R.id.addBookCancelButton);
+        Button addBookCancel = findViewById(R.id.addBookCancelButton);
         addBookCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

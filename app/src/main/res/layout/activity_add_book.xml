@@ -10,57 +10,57 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textAlignment="center"
+            android:layout_marginBottom="60dp"
             android:text="ADD BOOK"
-            android:layout_marginBottom="60dp"/>
+            android:textAlignment="center"
+            android:textSize="24sp" />
 
         <EditText
             android:id="@+id/titleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Title"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="20dp"
+            android:hint="Enter Title" />
 
         <EditText
             android:id="@+id/authorEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Author"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="20dp"
+            android:hint="Enter Author" />
 
         <EditText
             android:id="@+id/isbnEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter ISBN"
             android:layout_marginBottom="20dp"
-            android:inputType="number"/>
+            android:hint="Enter ISBN"
+            android:inputType="number" />
 
         <EditText
             android:id="@+id/descriptionEditText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter Description"
+            android:layout_height="match_parent"
             android:layout_marginBottom="20dp"
-            android:minLines="6"
-            android:lines="8"
             android:gravity="start"
-            android:scrollbars="vertical"
-            android:inputType="textMultiLine"/>
+            android:hint="Enter Description"
+            android:inputType="textMultiLine"
+            android:lines="8"
+            android:minLines="6"
+            android:scrollbars="vertical" />
 
         <Button
             android:id="@+id/addImageButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
             android:background="#1dd7de"
-            android:text="Add Images"
-            android:layout_marginBottom="30dp"/>
+            android:text="Add Images" />
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -71,19 +71,19 @@
                 android:id="@+id/addBookButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#1dd7de"
+                android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:text="Add Book"
-                android:layout_marginRight="10dp"/>
+                android:background="#1dd7de"
+                android:text="Add Book" />
 
             <Button
                 android:id="@+id/addBookCancelButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#1dd7de"
-                android:text="Cancel"
+                android:layout_marginLeft="10dp"
                 android:layout_weight="1"
-                android:layout_marginLeft="10dp" />
+                android:background="#1dd7de"
+                android:text="Cancel" />
 
         </LinearLayout>
 
