@@ -51,6 +51,8 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         TextView bookISBN = view.findViewById(R.id.owner_book_isbn);
         TextView bookStatus = view.findViewById(R.id.owner_book_status);
         TextView bookBorrower = view.findViewById(R.id.owner_book_borrower);
+
+        // Fix default image of a book
         ImageView bookImage = view.findViewById(R.id.owner_book_image);
 
         bookTitle.setText(book.getTitle());
