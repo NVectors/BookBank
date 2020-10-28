@@ -109,7 +109,10 @@ public class OwnerBooksActivity extends AppCompatActivity {
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                startActivity(new Intent(OwnerBooksActivity.this, ViewOwnedBooksActivity.class));
+                String bookID = bookDataList.get(position).getId();
+                Intent intent = new Intent(getBaseContext(), ViewOwnedBooksActivity.class);
+                intent.putExtra("BOOK_ID", bookID);
+                startActivity(intent);
             }
         });
 
