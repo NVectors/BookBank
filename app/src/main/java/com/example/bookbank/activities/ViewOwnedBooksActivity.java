@@ -4,11 +4,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.bookbank.R;
+import com.example.bookbank.models.Book;
+import com.example.bookbank.models.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -26,7 +35,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_owned_books);
 
         /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
-        String bookID = getIntent().getStringExtra("BOOK_ID");
+        final String bookID = getIntent().getStringExtra("BOOK_ID");
 
         /** Get instance of Firestore */
         db = FirebaseFirestore.getInstance();
@@ -62,9 +71,32 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
+        final Button request = findViewById(R.id.request_button);
+        request.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class));
+            }
+        });
 
-
-
-
+        final Button delete = findViewById(R.id.delete_button);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.collection("Book").document(bookID).delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("TEST", "Document successfully deleted");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("TEST", "Document not successfully deleted" + e.toString());
+                            }
+                        });
+            }
+        });
     }
 }

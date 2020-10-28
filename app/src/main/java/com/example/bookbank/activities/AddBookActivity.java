@@ -43,7 +43,7 @@ public class AddBookActivity extends AppCompatActivity {
         isbn = findViewById(R.id.isbnEditText);
         description = findViewById(R.id.descriptionEditText);
 
-        Button addBook = findViewById(R.id.addBookButton);
+        final Button addBook = findViewById(R.id.addBookButton);
         addBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,7 +52,7 @@ public class AddBookActivity extends AppCompatActivity {
         });
 
         // canceling adding book
-        Button addBookCancel = findViewById(R.id.addBookCancelButton);
+        final Button addBookCancel = findViewById(R.id.addBookCancelButton);
         addBookCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,7 +60,13 @@ public class AddBookActivity extends AppCompatActivity {
             }
         });
 
-        // need photograph button
+        final Button add_image = findViewById(R.id.addImageButton);
+        add_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Implement getting photos from phone storage
+            }
+        });
 
         firebaseAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
@@ -97,5 +103,7 @@ public class AddBookActivity extends AppCompatActivity {
         });
 
     }
+
+
 
 }
