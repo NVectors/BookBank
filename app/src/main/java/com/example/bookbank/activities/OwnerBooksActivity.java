@@ -16,6 +16,8 @@ import com.example.bookbank.R;
 import com.example.bookbank.adapters.OwnerBooksAdapter;
 import com.example.bookbank.models.Book;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,6 +34,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
     ArrayList<Book> bookDataList;
 
     FirebaseFirestore db;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,21 +43,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
 
         /** Find reference to the ListView */
         bookList = findViewById(R.id.owner_book_list);
-
-        String []id = {"01", "02"};
-        String []titles ={"The Grass is Always Greener", "Murder!"};
-        String []author = {"Jeffrey Archer", "Arnold Bennett"};
-        long []isbn = {1860920497, 1860920128};
-        String []description = {"Book is about grass", "Book is about murder"};
-        String []status = {"Available", "Available"};
-        String []ownerId = {"05", "09"};
-        String []borrowerId = {"",""};
-
         bookDataList = new ArrayList<>();
-
-        for(int i=0;i<titles.length;i++){
-            bookDataList.add((new Book(id[i], titles[i], author[i], isbn[i], description[i], status[i], ownerId[i], borrowerId[i])));
-        }
 
         bookAdapter = new OwnerBooksAdapter(this, bookDataList);
         bookList.setAdapter(bookAdapter);
@@ -101,7 +90,10 @@ public class OwnerBooksActivity extends AppCompatActivity {
                     String ownerID = (String) doc.getData().get("ownerId");
                     String borrowerID = (String) doc.getData().get("borrowerId");
 
-                    bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
+                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                    if (ownerID.equals(currentUser.getUid())) {
+                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
+                    }
                 }
                 bookAdapter.notifyDataSetChanged(); //Notify the adapter of data change
             }

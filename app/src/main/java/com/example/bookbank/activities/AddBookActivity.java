@@ -67,9 +67,6 @@ public class AddBookActivity extends AppCompatActivity {
                 // Implement getting photos from phone storage
             }
         });
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
     }
 
     public void addBook(){
