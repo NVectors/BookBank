@@ -5,12 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.bookbank.R;
+import com.example.bookbank.helperClasses.InputValidator;
 import com.example.bookbank.models.Book;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,8 +28,11 @@ public class AddBookActivity extends AppCompatActivity {
 
     private EditText description;
     private EditText title;
+    private TextView titleError;
     private EditText isbn;
+    private TextView isbnError;
     private EditText author;
+    private TextView authorError;
     private FirebaseFirestore firestore;
     private FirebaseAuth firebaseAuth;
 
@@ -39,8 +45,11 @@ public class AddBookActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         title = findViewById(R.id.titleEditText);
+        titleError = findViewById(R.id.titleError);
         author = findViewById(R.id.authorEditText);
+        authorError = findViewById(R.id.authorError);
         isbn = findViewById(R.id.isbnEditText);
+        isbnError = findViewById(R.id.isbnError);
         description = findViewById(R.id.descriptionEditText);
 
         final Button addBook = findViewById(R.id.addBookButton);
@@ -67,40 +76,52 @@ public class AddBookActivity extends AppCompatActivity {
                 // Implement getting photos from phone storage
             }
         });
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
     }
 
-    public void addBook(){
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String ownerId = "";
-        if (currentUser != null) {
-            ownerId = currentUser.getUid();
-        }
-        // creating unique id
-        final String id = UUID.randomUUID().toString();
-        // borrowerId will be empty string at creating of book
-        String borrowerId = "";
-        firestore.collection("Book").document(id).set(
-                new Book(
-                        id,
-                        title.getText().toString(),
-                        author.getText().toString(),
-                        Long.parseLong(isbn.getText().toString()),
-                        description.getText().toString(),
-                        "Available",
-                        ownerId,
-                        borrowerId
-                )
-        ).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
-                }
+    public boolean validate() {
+        boolean[] inputs = {
+                InputValidator.notEmpty(title, titleError),
+                InputValidator.notEmpty(author, authorError),
+                InputValidator.notEmpty(isbn, isbnError),
+                InputValidator.isIsbn(isbn, isbnError)
+        };
+        return InputValidator.validateInputs(inputs);
+    }
+
+    public void addBook() {
+        if (validate()) {
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            String ownerId = "";
+            if (currentUser != null) {
+                ownerId = currentUser.getUid();
             }
-        });
-
+            // creating unique id
+            final String id = UUID.randomUUID().toString();
+            // borrowerId will be empty string at creating of book
+            String borrowerId = "";
+            firestore.collection("Book").document(id).set(
+                    new Book(
+                            id,
+                            title.getText().toString(),
+                            author.getText().toString(),
+                            Long.parseLong(isbn.getText().toString()),
+                            description.getText().toString(),
+                            "Available",
+                            ownerId,
+                            borrowerId
+                    )
+            ).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
+                    }
+                }
+            });
+        }
     }
-
-
-
 }
+
