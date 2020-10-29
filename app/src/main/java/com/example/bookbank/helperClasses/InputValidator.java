@@ -112,4 +112,16 @@ public class InputValidator {
         }
         return test;
     }
+
+    public static boolean isIsbn(EditText box, TextView errorBox) {
+        String regex = "^[0-9]{10,13}$";
+        boolean test = box.getText().toString().matches(regex);
+        if (!test) {
+            // if empty, set error message to warn the user
+            errorBox.setText("Invalid ISBN number");
+        } else {
+            errorBox.setText("");
+        }
+        return test;
+    }
 }

@@ -44,7 +44,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
         String []id = {"01", "02"};
         String []titles ={"The Grass is Always Greener", "Murder!"};
         String []author = {"Jeffrey Archer", "Arnold Bennett"};
-        Integer []isbn = {1860920497, 1860920128};
+        long []isbn = {1860920497, 1860920128};
         String []description = {"Book is about grass", "Book is about murder"};
         String []status = {"Available", "Available"};
         String []ownerId = {"05", "09"};
@@ -95,7 +95,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
                     String id = (String) doc.getData().get("id");
                     String title = (String) doc.getData().get("title");
                     String author = (String) doc.getData().get("author");
-                    Integer isbn = Integer.parseInt(String.valueOf(doc.getData().get("isbn")));
+                    long isbn = Long.parseLong(String.valueOf(doc.getData().get("isbn")));
                     String description = (String) doc.getData().get("description");
                     String status = (String) doc.getData().get("status");
                     String ownerID = (String) doc.getData().get("ownerId");
