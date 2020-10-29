@@ -71,6 +71,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
+        /** Request button is clicked */
         final Button request = findViewById(R.id.request_button);
         request.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,23 +80,12 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
+        /** Delete button is clicked */
         final Button delete = findViewById(R.id.delete_button);
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.collection("Book").document(bookID).delete()
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("TEST", "Document successfully deleted");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("TEST", "Document not successfully deleted" + e.toString());
-                            }
-                        });
+                db.collection("Book").document(bookID).delete();
             }
         });
     }

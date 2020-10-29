@@ -90,7 +90,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
                     String ownerID = (String) doc.getData().get("ownerId");
                     String borrowerID = (String) doc.getData().get("borrowerId");
 
-                    // Code not working 
+                    // Code not working
                     //FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     //if (ownerID.equals(currentUser.getUid())) {
                     bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
