@@ -1,26 +1,37 @@
 package com.example.bookbank.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.renderscript.ScriptGroup;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bookbank.R;
 import com.example.bookbank.helperClasses.InputValidator;
 import com.example.bookbank.models.Book;
+import com.example.bookbank.models.BookPhotograph;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.UUID;
 
@@ -35,6 +46,10 @@ public class AddBookActivity extends AppCompatActivity {
     private TextView authorError;
     private FirebaseFirestore firestore;
     private FirebaseAuth firebaseAuth;
+
+    private StorageReference storageReference;
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +66,8 @@ public class AddBookActivity extends AppCompatActivity {
         isbn = findViewById(R.id.isbnEditText);
         isbnError = findViewById(R.id.isbnError);
         description = findViewById(R.id.descriptionEditText);
+
+        storageReference = FirebaseStorage.getInstance().getReference("images");
 
         final Button addBook = findViewById(R.id.addBookButton);
         addBook.setOnClickListener(new View.OnClickListener() {
@@ -73,12 +90,62 @@ public class AddBookActivity extends AppCompatActivity {
         add_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Implement getting photos from phone storage
+                openImageSelect();
             }
         });
 
         firebaseAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
+    }
+
+    private void openImageSelect() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null){
+            uri = data.getData();
+        }
+    }
+
+    private void uploadImage(final String id){
+        if (uri != null){
+            final StorageReference fileRef = storageReference.child(id);
+            final CollectionReference colRef = firestore.collection("BookPhoto");
+            fileRef.putFile(uri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Toast.makeText(AddBookActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+                            BookPhotograph photo = new BookPhotograph("", fileRef.getDownloadUrl().toString(), id);
+                            colRef.document(id)
+                                    .set(new BookPhotograph("", fileRef.getDownloadUrl().toString(), id))
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()){
+                                                Toast.makeText(AddBookActivity.this, "new book photo was added", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(AddBookActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            Toast.makeText(this, "No image added", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public boolean validate() {
@@ -117,6 +184,7 @@ public class AddBookActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
+                        uploadImage(id);
                         startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
                     }
                 }
