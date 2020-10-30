@@ -20,4 +20,11 @@
     <string name="my_books">My Books</string>
     <string name="my_profile">My Profile</string>
     <string name="title_activity_set_location">Map</string>
+
+    <string-array name="bookStatus">
+        <item>Available/Borrowed</item>
+        <item>Available</item>
+        <item>Borrowed</item>
+    </string-array>
+
 </resources>
