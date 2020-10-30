@@ -37,7 +37,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/owner_add_book"
@@ -96,6 +97,7 @@
         android:id="@+id/owner_book_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

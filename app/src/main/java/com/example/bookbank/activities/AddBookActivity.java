@@ -34,7 +34,6 @@ public class AddBookActivity extends AppCompatActivity {
     private EditText author;
     private TextView authorError;
     private FirebaseFirestore firestore;
-    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +43,10 @@ public class AddBookActivity extends AppCompatActivity {
         /** Move layout up when keyboard is present */
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
+        /** Get instance of Firestore */
+        firestore = FirebaseFirestore.getInstance();
+
+        /** Get references to the layout objects */
         title = findViewById(R.id.titleEditText);
         titleError = findViewById(R.id.titleError);
         author = findViewById(R.id.authorEditText);
@@ -52,17 +55,25 @@ public class AddBookActivity extends AppCompatActivity {
         isbnError = findViewById(R.id.isbnError);
         description = findViewById(R.id.descriptionEditText);
 
+
         final Button addBook = findViewById(R.id.addBookButton);
         addBook.setOnClickListener(new View.OnClickListener() {
+            /**
+             * The add button is clicked
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 addBook();
             }
         });
 
-        // canceling adding book
         final Button addBookCancel = findViewById(R.id.addBookCancelButton);
         addBookCancel.setOnClickListener(new View.OnClickListener() {
+            /**
+             * The cancel button is clicked, go back to main activity screen
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
@@ -76,11 +87,12 @@ public class AddBookActivity extends AppCompatActivity {
                 // Implement getting photos from phone storage
             }
         });
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Check if there is any empty fields for input
+     * @return
+     */
     public boolean validate() {
         boolean[] inputs = {
                 InputValidator.notEmpty(title, titleError),
@@ -91,16 +103,19 @@ public class AddBookActivity extends AppCompatActivity {
         return InputValidator.validateInputs(inputs);
     }
 
+    /**
+     *  Make a new book object and add as a document to the collection "Book"
+     */
     public void addBook() {
         if (validate()) {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             String ownerId = "";
-            if (currentUser != null) {
+            if (currentUser != null) {  // Set ownerId to unique User ID
                 ownerId = currentUser.getUid();
             }
-            // creating unique id
+            // Creating unique User ID
             final String id = UUID.randomUUID().toString();
-            // borrowerId will be empty string at creating of book
+            // borrowerId will be empty string at creation of a book
             String borrowerId = "";
             firestore.collection("Book").document(id).set(
                     new Book(
@@ -114,6 +129,11 @@ public class AddBookActivity extends AppCompatActivity {
                             borrowerId
                     )
             ).addOnCompleteListener(new OnCompleteListener<Void>() {
+                /**
+                 * Successfully added book as a document to collection "Book",
+                 * go back to the main activity screen
+                 * @param task
+                 */
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {

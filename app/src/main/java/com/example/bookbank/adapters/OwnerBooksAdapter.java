@@ -2,6 +2,7 @@ package com.example.bookbank.adapters;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,13 @@ import androidx.annotation.Nullable;
 
 import com.example.bookbank.R;
 import com.example.bookbank.models.Book;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -21,6 +29,7 @@ public class OwnerBooksAdapter extends ArrayAdapter {
 
     private ArrayList<Book> books;
     private  Context context;
+    private FirebaseFirestore firestore;
 
     public OwnerBooksAdapter(Context context, ArrayList<Book> books) {
         super(context, 0, books);
@@ -31,11 +40,6 @@ public class OwnerBooksAdapter extends ArrayAdapter {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        // custom array adapter for formatting each item in our list
-        // inflate our custom layout (R.layout.gear_list_view) instead of the default view
-        // LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        // View view = inflater.inflate(R.layout.list_item, null);
-
         View view = convertView;
 
         if (view == null){
@@ -53,14 +57,24 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         TextView bookBorrower = view.findViewById(R.id.owner_book_borrower);
         ImageView bookImage = view.findViewById(R.id.owner_book_image);
 
+        /** Set references to the book object data */
         bookTitle.setText(book.getTitle());
-        bookAuthor.setText(book.getAuthor());
-        bookISBN.setText(book.getIsbn().toString());
-        bookStatus.setText(book.getStatus());
-        bookImage.setImageResource(R.drawable.default_book_image);
+        bookAuthor.setText("By " + book.getAuthor());
+        bookISBN.setText("ISBN: " + book.getIsbn().toString());
+        bookStatus.setText("Status: " + book.getStatus());
+        bookBorrower.setVisibility(View.INVISIBLE); // Default of Borrower text view
+        bookImage.setImageResource(R.drawable.default_book_image); // Default image
 
-        // Get Borrower ID and find in database name?
-        bookBorrower.setText(book.getBorrowerId());
+        // User borrowerID to get User's full name in database (Need to test later on)
+        if (book.getBorrowerId() != ""){
+            bookBorrower.setVisibility(View.VISIBLE);
+            String name = firestore.collection("User").document(book.getBorrowerId()).get().getResult().get("fullname").toString();
+
+            // Tests
+            Log.d("SAMPLE", name);
+
+            bookBorrower.setText("Borrower: " + name);
+        }
 
         return view;
     }

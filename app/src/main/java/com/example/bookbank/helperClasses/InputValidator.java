@@ -21,7 +21,7 @@ public class InputValidator {
         boolean test = box.getText().toString().matches(regex);
         if (!test) {
             // if empty, set error message to warn the user
-            errorBox.setText("field must be a valid phone number format");
+            errorBox.setText("Field must be a valid phone number format");
         } else {
             errorBox.setText("");
         }
@@ -32,7 +32,7 @@ public class InputValidator {
         boolean test = box1.getText().toString().equals(box2.getText().toString());
         if (!test) {
             // if empty, set error message to warn the user
-            errorBox.setText("passwords dont match");
+            errorBox.setText("Password don't match");
         } else {
             errorBox.setText("");
         }
@@ -46,7 +46,7 @@ public class InputValidator {
         boolean test = box.getText().toString().matches(regex);
         if (!test) {
             // if empty, set error message to warn the user
-            errorBox.setText("field must be a valid email format");
+            errorBox.setText("Field must be a valid email format");
         } else {
             errorBox.setText("");
         }
@@ -58,7 +58,7 @@ public class InputValidator {
         boolean test = box.getText().toString().matches(regex);
         if (!test) {
             // if empty, set error message to warn the user
-            errorBox.setText("field must be a number");
+            errorBox.setText("Field must be a number");
         } else {
             errorBox.setText("");
         }
@@ -70,7 +70,7 @@ public class InputValidator {
         boolean test = box.getText().toString().matches(regex);
         if (!test) {
             // if empty, set error message to warn the user
-            errorBox.setText("field must be a negative number");
+            errorBox.setText("Field must be a negative number");
         } else {
             errorBox.setText("");
         }
@@ -82,7 +82,7 @@ public class InputValidator {
         boolean test = box.getText().toString().matches(regex);
         if (!test) {
             // if empty, set error message to warn the user
-            errorBox.setText("field must be a positive number");
+            errorBox.setText("Field must be a positive number");
         } else {
             errorBox.setText("");
         }
@@ -94,7 +94,7 @@ public class InputValidator {
         boolean test = box.getText().toString().matches(regex);
         if (!test) {
             // if empty, set error message to warn the user
-            errorBox.setText("field must be a number, max 2 decimal places");
+            errorBox.setText("Field must be a number, max 2 decimal places");
         } else {
             errorBox.setText("");
         }
@@ -106,7 +106,7 @@ public class InputValidator {
         boolean test = box.getText().toString().trim().length() != 0;
         if (!test) {
             // if empty, set error message to warn the user
-            errorBox.setText("field is required");
+            errorBox.setText("Field is required");
         } else {
             errorBox.setText("");
         }

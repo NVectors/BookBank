@@ -32,9 +32,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
     ListView bookList;
     ArrayAdapter<Book> bookAdapter;
     ArrayList<Book> bookDataList;
-
-    FirebaseFirestore db;
-    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +78,6 @@ public class OwnerBooksActivity extends AppCompatActivity {
                     Log.d("SAMPLE", String.valueOf(doc.getData().get("id")));
                     Log.d("SAMPLE", String.valueOf(doc.getData().get("isbn")));
 
-
                     String id = (String) doc.getData().get("id");
                     String title = (String) doc.getData().get("title");
                     String author = (String) doc.getData().get("author");
@@ -90,11 +87,10 @@ public class OwnerBooksActivity extends AppCompatActivity {
                     String ownerID = (String) doc.getData().get("ownerId");
                     String borrowerID = (String) doc.getData().get("borrowerId");
 
-                    // Code not working
-                    //FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                    //if (ownerID.equals(currentUser.getUid())) {
-                    bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
-                    //}
+                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                    if (ownerID.equals(currentUser.getUid())) { //Display books that only belong to that user
+                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
+                    }
                 }
                 bookAdapter.notifyDataSetChanged(); //Notify the adapter of data change
             }
