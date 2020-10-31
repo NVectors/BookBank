@@ -75,8 +75,10 @@ public class OwnerBooksActivity extends AppCompatActivity {
                 for (QueryDocumentSnapshot doc: queryDocumentSnapshots)
                 {
                     // Tests
-                    Log.d("SAMPLE", String.valueOf(doc.getData().get("id")));
-                    Log.d("SAMPLE", String.valueOf(doc.getData().get("isbn")));
+                    Log.d("ID", String.valueOf(doc.getData().get("id")));
+                    Log.d("TITLE", String.valueOf(doc.getData().get("title")));
+                    Log.d("AUTHOR", String.valueOf(doc.getData().get("author")));
+                    Log.d("ISBN", String.valueOf(doc.getData().get("isbn")));
 
                     String id = (String) doc.getData().get("id");
                     String title = (String) doc.getData().get("title");
