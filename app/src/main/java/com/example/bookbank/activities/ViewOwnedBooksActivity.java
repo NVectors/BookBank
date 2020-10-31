@@ -1,6 +1,5 @@
 package com.example.bookbank.activities;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,18 +11,10 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.bookbank.R;
-import com.example.bookbank.models.Book;
-import com.example.bookbank.models.Request;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -118,11 +109,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         title.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                edit_title.setText(title.getText().toString());
-                title.setVisibility(View.INVISIBLE);
-                edit_title.setVisibility(View.VISIBLE);
-                done_edit.setVisibility(View.VISIBLE);
-                cancel_edit.setVisibility(View.VISIBLE);
+                revertAppearanceChange(title, edit_title, done_edit, cancel_edit, null);
 
                 cancel_edit.setOnClickListener(new View.OnClickListener() {
                     /**
@@ -131,10 +118,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                      */
                     @Override
                     public void onClick(View v) {
-                        title.setVisibility(View.VISIBLE);
-                        edit_title.setVisibility(View.INVISIBLE);
-                        done_edit.setVisibility(View.INVISIBLE);
-                        cancel_edit.setVisibility(View.INVISIBLE);
+                        revertAppearanceChange(title, edit_title, done_edit, cancel_edit, null);
                     }
                 });
                 done_edit.setOnClickListener(new View.OnClickListener() {
@@ -146,11 +130,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         String new_text = edit_title.getText().toString();
                         db.collection("Book").document(bookID).update("title", new_text);
-                        title.setText(new_text);
-                        title.setVisibility(View.VISIBLE);
-                        edit_title.setVisibility(View.INVISIBLE);
-                        done_edit.setVisibility(View.INVISIBLE);
-                        cancel_edit.setVisibility(View.INVISIBLE);
+                        revertAppearanceChange(title, edit_title, done_edit, cancel_edit, new_text);
                     }
                 });
                 return false;
@@ -163,11 +143,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 String old_text = author.getText().toString();
                 String old_author =  old_text.replace("By: ", "");
-                edit_author.setText(old_author);
-                author.setVisibility(View.INVISIBLE);
-                edit_author.setVisibility(View.VISIBLE);
-                done_edit.setVisibility(View.VISIBLE);
-                cancel_edit.setVisibility(View.VISIBLE);
+                appearanceChange(author, edit_author, done_edit, cancel_edit, old_author);
 
                 cancel_edit.setOnClickListener(new View.OnClickListener() {
                     /**
@@ -176,10 +152,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                      */
                     @Override
                     public void onClick(View v) {
-                        author.setVisibility(View.VISIBLE);
-                        edit_author.setVisibility(View.INVISIBLE);
-                        done_edit.setVisibility(View.INVISIBLE);
-                        cancel_edit.setVisibility(View.INVISIBLE);
+                        revertAppearanceChange(author, edit_author, done_edit, cancel_edit, null);
                     }
                 });
                 done_edit.setOnClickListener(new View.OnClickListener() {
@@ -191,11 +164,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         String new_text = edit_author.getText().toString();
                         db.collection("Book").document(bookID).update("author", new_text);
-                        author.setText(new_text);
-                        author.setVisibility(View.VISIBLE);
-                        edit_author.setVisibility(View.INVISIBLE);
-                        done_edit.setVisibility(View.INVISIBLE);
-                        cancel_edit.setVisibility(View.INVISIBLE);
+                        appearanceChange(author, edit_author, done_edit, cancel_edit, new_text);
                     }
                 });
                 return false;
@@ -208,11 +177,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 String old_text = isbn.getText().toString();
                 String old_isbn =  old_text.replace("ISBN: ", "");
-                edit_isbn.setText(old_isbn);
-                isbn.setVisibility(View.INVISIBLE);
-                edit_isbn.setVisibility(View.VISIBLE);
-                done_edit.setVisibility(View.VISIBLE);
-                cancel_edit.setVisibility(View.VISIBLE);
+                appearanceChange(isbn, edit_isbn, done_edit, cancel_edit, old_isbn);
 
                 cancel_edit.setOnClickListener(new View.OnClickListener() {
                     /**
@@ -221,10 +186,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                      */
                     @Override
                     public void onClick(View v) {
-                        isbn.setVisibility(View.VISIBLE);
-                        edit_isbn.setVisibility(View.INVISIBLE);
-                        done_edit.setVisibility(View.INVISIBLE);
-                        cancel_edit.setVisibility(View.INVISIBLE);
+                        revertAppearanceChange(isbn, edit_isbn, done_edit, cancel_edit, null);
                     }
                 });
                 edit_isbn.setOnKeyListener(new View.OnKeyListener() {
@@ -234,11 +196,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                             String new_text = edit_isbn.getText().toString();
                             long new_isbn = Long.parseLong(new_text);
                             db.collection("Book").document(bookID).update("isbn", new_isbn);
-                            isbn.setText(new_text);
-                            isbn.setVisibility(View.VISIBLE);
-                            edit_isbn.setVisibility(View.INVISIBLE);
-                            done_edit.setVisibility(View.INVISIBLE);
-                            cancel_edit.setVisibility(View.INVISIBLE);
+                            revertAppearanceChange(isbn, edit_isbn, done_edit, cancel_edit, new_text);
                             InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                             return true;
@@ -257,11 +215,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                         String new_text = edit_isbn.getText().toString();
                         long new_isbn = Long.parseLong(new_text);
                         db.collection("Book").document(bookID).update("isbn", new_isbn);
-                        isbn.setText(new_text);
-                        isbn.setVisibility(View.VISIBLE);
-                        edit_isbn.setVisibility(View.INVISIBLE);
-                        done_edit.setVisibility(View.INVISIBLE);
-                        cancel_edit.setVisibility(View.INVISIBLE);
+                        revertAppearanceChange(isbn, edit_isbn, done_edit, cancel_edit, new_text);
                     }
                 });
                 return false;
@@ -274,11 +228,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 String old_text = description.getText().toString();
                 String old_description =  old_text.replace("Description: ", "");
-                edit_description.setText(old_description);
-                description.setVisibility(View.INVISIBLE);
-                edit_description.setVisibility(View.VISIBLE);
-                done_edit.setVisibility(View.VISIBLE);
-                cancel_edit.setVisibility(View.VISIBLE);
+                appearanceChange(description, edit_description, done_edit, cancel_edit, old_description);
 
                 cancel_edit.setOnClickListener(new View.OnClickListener() {
                     /**
@@ -287,10 +237,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                      */
                     @Override
                     public void onClick(View v) {
-                        description.setVisibility(View.VISIBLE);
-                        edit_description.setVisibility(View.INVISIBLE);
-                        done_edit.setVisibility(View.INVISIBLE);
-                        cancel_edit.setVisibility(View.INVISIBLE);
+                        revertAppearanceChange(description, edit_description, done_edit, cancel_edit, null);
                     }
                 });
                 done_edit.setOnClickListener(new View.OnClickListener() {
@@ -302,15 +249,47 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         String new_text = edit_description.getText().toString();
                         db.collection("Book").document(bookID).update("description", new_text);
-                        description.setText(new_text);
-                        description.setVisibility(View.VISIBLE);
-                        edit_description.setVisibility(View.INVISIBLE);
-                        done_edit.setVisibility(View.INVISIBLE);
-                        cancel_edit.setVisibility(View.INVISIBLE);
+                        revertAppearanceChange(description, edit_description, done_edit, cancel_edit, new_text);
                     }
                 });
                 return false;
             }
         });
+    }
+
+    /**
+     * Hide EditText/Buttons and make TextView visible.
+     * @param current
+     * @param editCurrent
+     * @param done
+     * @param cancel
+     * @param text
+     */
+    private void revertAppearanceChange(TextView current, TextView editCurrent, Button done, Button cancel, String text) {
+        if (text != null) { // Input text not empty
+            current.setText(text); // Set the text of  the Text View to input text
+        }
+        current.setVisibility(View.VISIBLE);
+        editCurrent.setVisibility(View.INVISIBLE);
+        done.setVisibility(View.INVISIBLE);
+        cancel.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * Hide the TextView and make EditText/Buttons visible.
+     * @param current
+     * @param editCurrent
+     * @param done
+     * @param cancel
+     * @param text
+     */
+    private void appearanceChange(TextView current, TextView editCurrent, Button done, Button cancel, String text) {
+        if (text != null) { // Input text not empty
+            editCurrent.setText(text); // Set the text of  the Edit Text to input text
+        }
+        current.setVisibility(View.INVISIBLE);
+        editCurrent.setVisibility(View.VISIBLE);
+        done.setVisibility(View.VISIBLE);
+        cancel.setVisibility(View.VISIBLE);
     }
 }
