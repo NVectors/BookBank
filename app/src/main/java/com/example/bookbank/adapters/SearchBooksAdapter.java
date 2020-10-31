@@ -15,22 +15,45 @@ import com.example.bookbank.models.Book;
 
 import java.util.ArrayList;
 
-public class SearchBooksAdapter extends ArrayAdapter {
+public class SearchBooksAdapter extends ArrayAdapter<Book> {
 
+    private int resource;
+    private Context context;
     private ArrayList<Book> bookList;
 
     public SearchBooksAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Book> bookList) {
         super(context, resource, bookList);
         this.bookList = bookList;
+        this.context = context;
+        this.resource = resource;
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        // custom array adapter for formatting each item in our list
-        // inflate our custom layout (R.layout.gear_list_view) instead of the default view
-        // LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        // View view = inflater.inflate(R.layout.list_item, null);
+        // checking if convertView == null
+        View view = convertView;
+        if(view == null){
+            view = LayoutInflater.from(context).inflate(resource, parent,false);
+        }
+
+        // getting the book at the position
+        Book book = bookList.get(position);
+
+        // initializing all the text views
+        TextView title = view.findViewById(R.id.title_text);
+        TextView author = view.findViewById(R.id.author_text);
+        TextView isbn = view.findViewById(R.id.isbn_text);
+        TextView status = view.findViewById(R.id.status_text);
+        TextView ownerName = view.findViewById(R.id.ownerName_text);
+
+        // setting text in all the 5 textviews
+        title.setText(book.getTitle());
+        author.setText(book.getAuthor());
+        isbn.setText(book.getIsbn());
+        status.setText(book.getStatus());
+        ownerName.setText(book.getOwnerName());
+
 
         return convertView;
     }
