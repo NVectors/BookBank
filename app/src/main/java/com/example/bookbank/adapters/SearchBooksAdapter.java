@@ -12,16 +12,17 @@ import androidx.annotation.Nullable;
 
 import com.example.bookbank.R;
 import com.example.bookbank.models.Book;
+import com.example.bookbank.models.BookSearch;
 
 import java.util.ArrayList;
 
-public class SearchBooksAdapter extends ArrayAdapter<Book> {
+public class SearchBooksAdapter extends ArrayAdapter<BookSearch> {
 
     private int resource;
     private Context context;
-    private ArrayList<Book> bookList;
+    private ArrayList<BookSearch> bookList;
 
-    public SearchBooksAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Book> bookList) {
+    public SearchBooksAdapter(@NonNull Context context, int resource, @NonNull ArrayList<BookSearch> bookList) {
         super(context, resource, bookList);
         this.bookList = bookList;
         this.context = context;
@@ -38,7 +39,7 @@ public class SearchBooksAdapter extends ArrayAdapter<Book> {
         }
 
         // getting the book at the position
-        Book book = bookList.get(position);
+        BookSearch book = bookList.get(position);
 
         // initializing all the text views
         TextView title = view.findViewById(R.id.title_text);
