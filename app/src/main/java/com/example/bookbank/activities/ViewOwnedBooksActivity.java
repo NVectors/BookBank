@@ -11,10 +11,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bookbank.R;
 import com.example.bookbank.models.Book;
-import com.example.bookbank.models.Request;
+//import com.example.bookbank.models.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,6 +26,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class ViewOwnedBooksActivity extends AppCompatActivity {
     FirebaseFirestore db;
@@ -86,6 +89,8 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 db.collection("Book").document(bookID).delete();
+                StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
+                photoRef.delete();
             }
         });
     }

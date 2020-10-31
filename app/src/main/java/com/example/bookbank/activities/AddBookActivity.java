@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.example.bookbank.R;
 import com.example.bookbank.helperClasses.InputValidator;
 import com.example.bookbank.models.Book;
-import com.example.bookbank.models.BookPhotograph;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -124,17 +123,6 @@ public class AddBookActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             Toast.makeText(AddBookActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
-                            BookPhotograph photo = new BookPhotograph("", fileRef.getDownloadUrl().toString(), id);
-                            colRef.document(id)
-                                    .set(new BookPhotograph("", fileRef.getDownloadUrl().toString(), id))
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()){
-                                                Toast.makeText(AddBookActivity.this, "new book photo was added", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

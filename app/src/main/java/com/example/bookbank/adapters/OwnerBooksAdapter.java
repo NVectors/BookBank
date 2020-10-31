@@ -15,8 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.bookbank.R;
+import com.example.bookbank.activities.ViewBookPhotoActivity;
 import com.example.bookbank.models.Book;
-import com.example.bookbank.models.BookPhotograph;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -72,7 +72,7 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         bookAuthor.setText(book.getAuthor());
         bookISBN.setText(book.getIsbn().toString());
         bookStatus.setText(book.getStatus());
-        setImage(book, bookImage);
+        ViewBookPhotoActivity.setImage(book, bookImage);
 
         // Get Borrower ID and find in database name?
         bookBorrower.setText(book.getBorrowerId());
@@ -80,17 +80,4 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         return view;
     }
 
-    private void setImage(Book book, final ImageView bookImage) {
-        final StorageReference imageRef = FirebaseStorage.getInstance().getReference("images/" + book.getId());
-        bookImage.setImageResource(R.drawable.default_book_image);
-
-        imageRef.getBytes(1024 * 1024)
-                .addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        bookImage.setImageBitmap(bitmap);
-                    }
-                });
-    }
 }
