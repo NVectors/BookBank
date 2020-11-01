@@ -56,6 +56,6 @@ public class SearchBooksAdapter extends ArrayAdapter<BookSearch> {
         ownerName.setText(book.getOwnerName());
 
 
-        return convertView;
+        return view;
     }
 }
