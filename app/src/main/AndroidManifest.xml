@@ -50,9 +50,9 @@
         <activity android:name=".activities.SearchUsernameActivity" />
         <activity android:name=".activities.NotificationsActivity" />
         <activity android:name=".activities.MyCurrentRequestsActivity" />
-        <activity android:name=".activities.SearchBooksActivity" />
+        <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.SignUpActivity" />
-        <activity android:name=".activities.LoginActivity">
+        <activity android:name=".activities.SearchBooksActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
