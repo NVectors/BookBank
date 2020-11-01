@@ -34,6 +34,8 @@ import java.util.ArrayList;
 
 public class SearchBooksActivity extends AppCompatActivity {
 
+    // Declaring the keyword to search
+    final String keyWord = "Hobbit";
     // Declaring the variables needed
     ListView searchList;
     ArrayAdapter<Book> bookAdapter;
@@ -85,7 +87,13 @@ public class SearchBooksActivity extends AppCompatActivity {
 
                         Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId);
 
-                        bookArrayList.add(book);
+                        if(title.matches(".*\\b"+keyWord+"\\b.*") ||
+                                author.matches(".*\\b"+keyWord+"\\b.*") ||
+                                String.valueOf(isbn).equals(keyWord))
+                        {
+                            bookArrayList.add(book);
+                        }
+
 
                     }
 
