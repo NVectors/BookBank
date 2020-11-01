@@ -1,5 +1,6 @@
 package com.example.bookbank.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ public class SearchBooksAdapter extends ArrayAdapter<Book> {
         this.resource = resource;
     }
 
+    @SuppressLint("SetTextI18n")
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -52,34 +54,27 @@ public class SearchBooksAdapter extends ArrayAdapter<Book> {
         TextView author = view.findViewById(R.id.author_text);
         TextView isbn = view.findViewById(R.id.isbn_text);
         TextView status = view.findViewById(R.id.status_text);
-        TextView ownerName = view.findViewById(R.id.ownerName_text);
+        final TextView ownerName = view.findViewById(R.id.ownerName_text);
 
         // Creating document reference to the ownerId user
-//        DocumentReference docRef = FirebaseFirestore.getInstance().collection("user").document(book.getOwnerId());
-//        Log.d(" IDMOHIT" , docRef.getId());
-
+        DocumentReference docRef = FirebaseFirestore.getInstance().collection("User").document(String.valueOf(book.getOwnerId()));
 
         // getting ownerName
-//        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                Log.d("OWNERNAME","ownerNameText");
-//                if(documentSnapshot.exists()){
-//                    String ownerNameText = documentSnapshot.getString("fullname");
-//                    Log.d("OWNERNAME",ownerNameText);
-//                    ownerName.setText(ownerNameText);
-//                }
-//            }
-//        });
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()){
+                    String ownerNameText = documentSnapshot.getString("fullname");
+                    ownerName.setText(ownerNameText);
+                }
+            }
+        });
 
         // setting text in all the 5 textviews
         title.setText(book.getTitle());
         author.setText("By " + book.getAuthor());
         isbn.setText("ISBN: " + String.valueOf(book.getIsbn()));
         status.setText("Status: " + book.getStatus());
-        ownerName.setText(book.getOwnerId());
-
-
 
         return view;
     }
