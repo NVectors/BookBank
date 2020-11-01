@@ -16,13 +16,13 @@ import com.example.bookbank.models.BookSearch;
 
 import java.util.ArrayList;
 
-public class SearchBooksAdapter extends ArrayAdapter<BookSearch> {
+public class SearchBooksAdapter extends ArrayAdapter<Book> {
 
     private int resource;
     private Context context;
-    private ArrayList<BookSearch> bookList;
+    private ArrayList<Book> bookList;
 
-    public SearchBooksAdapter(@NonNull Context context, int resource, @NonNull ArrayList<BookSearch> bookList) {
+    public SearchBooksAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Book> bookList) {
         super(context, resource, bookList);
         this.bookList = bookList;
         this.context = context;
@@ -39,7 +39,7 @@ public class SearchBooksAdapter extends ArrayAdapter<BookSearch> {
         }
 
         // getting the book at the position
-        BookSearch book = bookList.get(position);
+        Book book = bookList.get(position);
 
         // initializing all the text views
         TextView title = view.findViewById(R.id.title_text);
@@ -51,9 +51,9 @@ public class SearchBooksAdapter extends ArrayAdapter<BookSearch> {
         // setting text in all the 5 textviews
         title.setText(book.getTitle());
         author.setText(book.getAuthor());
-        isbn.setText(book.getIsbn());
+        isbn.setText(String.valueOf(book.getIsbn()));
         status.setText(book.getStatus());
-        ownerName.setText(book.getOwnerName());
+        ownerName.setText(book.getOwnerId());
 
 
         return view;
