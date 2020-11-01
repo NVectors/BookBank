@@ -102,7 +102,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String bookID = bookDataList.get(position).getId();
-                Intent intent = new Intent(getBaseContext(), ViewOwnedBooksActivity.class);
+                Intent intent = new Intent(OwnerBooksActivity.this, ViewOwnedBooksActivity.class);
                 intent.putExtra("BOOK_ID", bookID);
                 startActivity(intent);
             }

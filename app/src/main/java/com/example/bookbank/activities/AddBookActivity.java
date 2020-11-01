@@ -76,7 +76,8 @@ public class AddBookActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
+                finish();
+                //startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
             }
         });
 
@@ -137,7 +138,8 @@ public class AddBookActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
+                        finish();
+                        //startActivity(new Intent(AddBookActivity.this, OwnerBooksActivity.class));
                     }
                 }
             });

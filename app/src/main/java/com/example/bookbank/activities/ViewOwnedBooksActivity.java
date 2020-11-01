@@ -49,20 +49,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         final TextView status = findViewById(R.id.status);
         final TextView borrower = findViewById(R.id.borrower);
         final TextView description = findViewById(R.id.description);
-        final TextView edit_title = findViewById(R.id.edit_book_title);
-        final TextView edit_author = findViewById(R.id.edit_author);
-        final TextView edit_isbn = findViewById(R.id.edit_isbn);
-        final TextView edit_description = findViewById(R.id.edit_description);
-        final Button done_edit = findViewById(R.id.done_button);
-        final Button cancel_edit = findViewById(R.id.cancel_button);
-
-        /** By default these objects in layout are hidden until an long click action is triggered */
-        edit_title.setVisibility(View.INVISIBLE);
-        edit_author.setVisibility(View.INVISIBLE);
-        edit_isbn.setVisibility(View.INVISIBLE);
-        edit_description.setVisibility(View.INVISIBLE);
-        done_edit.setVisibility(View.INVISIBLE);
-        cancel_edit.setVisibility(View.INVISIBLE);
 
         /**  Realtime updates, snapshot is the state of the database at any given point of time */
         bookReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -109,30 +95,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         title.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                revertAppearanceChange(title, edit_title, done_edit, cancel_edit, null);
-
-                cancel_edit.setOnClickListener(new View.OnClickListener() {
-                    /**
-                     * Cancel button is clicked, don't update the document and go back to TextView
-                     * @param v
-                     */
-                    @Override
-                    public void onClick(View v) {
-                        revertAppearanceChange(title, edit_title, done_edit, cancel_edit, null);
-                    }
-                });
-                done_edit.setOnClickListener(new View.OnClickListener() {
-                    /**
-                     * Done button is clicked, update the field of the document with the data of the Edit Text
-                     * @param v
-                     */
-                    @Override
-                    public void onClick(View v) {
-                        String new_text = edit_title.getText().toString();
-                        db.collection("Book").document(bookID).update("title", new_text);
-                        revertAppearanceChange(title, edit_title, done_edit, cancel_edit, new_text);
-                    }
-                });
+                editDescription(title, author, isbn, description, bookID);
                 return false;
             }
         });
@@ -141,32 +104,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         author.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                String old_text = author.getText().toString();
-                String old_author =  old_text.replace("By: ", "");
-                appearanceChange(author, edit_author, done_edit, cancel_edit, old_author);
 
-                cancel_edit.setOnClickListener(new View.OnClickListener() {
-                    /**
-                     * Cancel button is clicked, don't update the document and go back to TextView
-                     * @param v
-                     */
-                    @Override
-                    public void onClick(View v) {
-                        revertAppearanceChange(author, edit_author, done_edit, cancel_edit, null);
-                    }
-                });
-                done_edit.setOnClickListener(new View.OnClickListener() {
-                    /**
-                     * Done button is clicked, update the field of the document with the data of the Edit Text
-                     * @param v
-                     */
-                    @Override
-                    public void onClick(View v) {
-                        String new_text = edit_author.getText().toString();
-                        db.collection("Book").document(bookID).update("author", new_text);
-                        appearanceChange(author, edit_author, done_edit, cancel_edit, new_text);
-                    }
-                });
                 return false;
             }
         });
@@ -175,49 +113,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         isbn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                String old_text = isbn.getText().toString();
-                String old_isbn =  old_text.replace("ISBN: ", "");
-                appearanceChange(isbn, edit_isbn, done_edit, cancel_edit, old_isbn);
 
-                cancel_edit.setOnClickListener(new View.OnClickListener() {
-                    /**
-                     * Cancel button is clicked, don't update the document and go back to TextView
-                     * @param v
-                     */
-                    @Override
-                    public void onClick(View v) {
-                        revertAppearanceChange(isbn, edit_isbn, done_edit, cancel_edit, null);
-                    }
-                });
-                edit_isbn.setOnKeyListener(new View.OnKeyListener() {
-                    @Override
-                    public boolean onKey(View v, int keyCode, KeyEvent event) {
-                        if(keyCode == KeyEvent.KEYCODE_ENTER ) {
-                            String new_text = edit_isbn.getText().toString();
-                            long new_isbn = Long.parseLong(new_text);
-                            db.collection("Book").document(bookID).update("isbn", new_isbn);
-                            revertAppearanceChange(isbn, edit_isbn, done_edit, cancel_edit, new_text);
-                            InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-
-                done_edit.setOnClickListener(new View.OnClickListener() {
-                    /**
-                     * Done button is clicked, update the field of the document with the data of the Edit Text
-                     * @param v
-                     */
-                    @Override
-                    public void onClick(View v) {
-                        String new_text = edit_isbn.getText().toString();
-                        long new_isbn = Long.parseLong(new_text);
-                        db.collection("Book").document(bookID).update("isbn", new_isbn);
-                        revertAppearanceChange(isbn, edit_isbn, done_edit, cancel_edit, new_text);
-                    }
-                });
                 return false;
             }
         });
@@ -226,70 +122,20 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         description.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                String old_text = description.getText().toString();
-                String old_description =  old_text.replace("Description: ", "");
-                appearanceChange(description, edit_description, done_edit, cancel_edit, old_description);
 
-                cancel_edit.setOnClickListener(new View.OnClickListener() {
-                    /**
-                     * Cancel button is clicked, don't update the document and go back to TextView
-                     * @param v
-                     */
-                    @Override
-                    public void onClick(View v) {
-                        revertAppearanceChange(description, edit_description, done_edit, cancel_edit, null);
-                    }
-                });
-                done_edit.setOnClickListener(new View.OnClickListener() {
-                    /**
-                     * Done button is clicked, update the field of the document with the data of the Edit Text
-                     * @param v
-                     */
-                    @Override
-                    public void onClick(View v) {
-                        String new_text = edit_description.getText().toString();
-                        db.collection("Book").document(bookID).update("description", new_text);
-                        revertAppearanceChange(description, edit_description, done_edit, cancel_edit, new_text);
-                    }
-                });
                 return false;
             }
         });
     }
 
-    /**
-     * Hide EditText/Buttons and make TextView visible.
-     * @param current
-     * @param editCurrent
-     * @param done
-     * @param cancel
-     * @param text
-     */
-    private void revertAppearanceChange(TextView current, TextView editCurrent, Button done, Button cancel, String text) {
-        if (text != null) { // Input text not empty
-            current.setText(text); // Set the text of  the Text View to input text
-        }
-        current.setVisibility(View.VISIBLE);
-        editCurrent.setVisibility(View.INVISIBLE);
-        done.setVisibility(View.INVISIBLE);
-        cancel.setVisibility(View.INVISIBLE);
+    private void editDescription(TextView title, TextView author, TextView isbn, TextView description, String bookID) {
+        Intent intent = new Intent(ViewOwnedBooksActivity.this, EditDescriptionActivity.class);
+        intent.putExtra("BOOK_ID", bookID);
+        intent.putExtra("TITLE", title.getText().toString());
+        intent.putExtra("AUTHOR", author.getText().toString());
+        intent.putExtra("ISBN", isbn.getText().toString());
+        intent.putExtra("DESCRIPTION", description.getText().toString());
+        startActivity(intent);
     }
 
-    /**
-     * Hide the TextView and make EditText/Buttons visible.
-     * @param current
-     * @param editCurrent
-     * @param done
-     * @param cancel
-     * @param text
-     */
-    private void appearanceChange(TextView current, TextView editCurrent, Button done, Button cancel, String text) {
-        if (text != null) { // Input text not empty
-            editCurrent.setText(text); // Set the text of  the Edit Text to input text
-        }
-        current.setVisibility(View.INVISIBLE);
-        editCurrent.setVisibility(View.VISIBLE);
-        done.setVisibility(View.VISIBLE);
-        cancel.setVisibility(View.VISIBLE);
-    }
 }

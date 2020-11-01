@@ -66,15 +66,15 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         bookImage.setImageResource(R.drawable.default_book_image); // Default image
 
         // User borrowerID to get User's full name in database (Need to test later on)
-        if (book.getBorrowerId() != ""){
-            bookBorrower.setVisibility(View.VISIBLE);
-            String name = firestore.collection("User").document(book.getBorrowerId()).get().getResult().get("fullname").toString();
+        //if (book.getBorrowerId() != ""){
+        //    bookBorrower.setVisibility(View.VISIBLE);
+        //    String name = (String) firestore.collection("User").document(book.getBorrowerId()).get().getResult().get("fullname");
 
             // Tests
-            Log.d("SAMPLE", name);
+        //    Log.d("SAMPLE", name);
 
-            bookBorrower.setText("Borrower: " + name);
-        }
+        bookBorrower.setText("Borrower: " + book.getBorrowerId());
+        //}
 
         return view;
     }
