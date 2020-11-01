@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 
 import com.example.bookbank.R;
 import com.example.bookbank.models.Book;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,15 +47,17 @@ public class OwnerBooksAdapter extends ArrayAdapter {
             view = LayoutInflater.from(context).inflate(R.layout.owner_book_content,parent,false);
         }
 
+        firestore  = FirebaseFirestore.getInstance();
+
         /** Get the position of book in the ArrayList<Book> */
-        Book book = books.get(position);
+        final Book book = books.get(position);
 
         /** Get references to the objects in the layout */
         TextView bookTitle = view.findViewById(R.id.owner_book_title);
         TextView bookAuthor = view.findViewById(R.id.owner_book_author);
         TextView bookISBN = view.findViewById(R.id.owner_book_isbn);
         TextView bookStatus = view.findViewById(R.id.owner_book_status);
-        TextView bookBorrower = view.findViewById(R.id.owner_book_borrower);
+        final TextView bookBorrower = view.findViewById(R.id.owner_book_borrower);
         ImageView bookImage = view.findViewById(R.id.owner_book_image);
 
         /** Set references to the book object data */
@@ -66,16 +69,31 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         bookImage.setImageResource(R.drawable.default_book_image); // Default image
 
         // User borrowerID to get User's full name in database (Need to test later on)
-        //if (book.getBorrowerId() != ""){
-        //    bookBorrower.setVisibility(View.VISIBLE);
-        //    String name = (String) firestore.collection("User").document(book.getBorrowerId()).get().getResult().get("fullname");
+        if (book.getBorrowerId() != "") {
+            DocumentReference documentRef = firestore.collection("User").document(book.getBorrowerId());
+            documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String name = document.getString("fullname");
+                            // Test
+                            Log.d("NAME", name);
 
-            // Tests
-        //    Log.d("SAMPLE", name);
+                            bookBorrower.setVisibility(View.VISIBLE); // Default of Borrower text view
+                            bookBorrower.setText("Borrower: " + name);
 
-        bookBorrower.setText("Borrower: " + book.getBorrowerId());
-        //}
-
+                        } else {
+                            Log.d("TAG", "No such document");
+                            bookBorrower.setText("Borrower: FAILED");
+                        }
+                    } else {
+                        Log.d("TAG", "get failed with ", task.getException());
+                    }
+                }
+            });
+        }
         return view;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.bookbank.activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,6 +16,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.bookbank.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -59,15 +62,38 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 author.setText("By: " + value.getString("author"));
                 isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                 status.setText("Status: " + value.getString("status"));
-                if (value.getString("borrower") == null){
+
+                if (value.getString("borrowerId") == ""){
                     borrower.setText("Borrower: None");
                 }
                 else { // Will have to test this later
-                    String name = db.collection("User").document(value.getString("borrowerId")).get().getResult().get("fullname").toString();
-                    // Tests
-                    Log.d("SAMPLE", name);
+                    DocumentReference documentRef = db.collection("User").document(value.getString("borrowerId"));
+                    documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        /**
+                         * Use DocumentSnapshot to find field value in the document
+                         * @param task
+                         */
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    String name = document.getString("fullname");
+                                    // Test
+                                    Log.d("NAME", name);
 
-                    borrower.setText("Borrower: " + name);
+                                    borrower.setVisibility(View.VISIBLE); // Default of Borrower text view
+                                    borrower.setText("Borrower: " + name);
+
+                                } else {
+                                    Log.d("TAG", "No such document");
+                                    borrower.setText("Borrower: FAILED");
+                                }
+                            } else {
+                                Log.d("TAG", "get failed with ", task.getException());
+                            }
+                        }
+                    });
                 }
                 description.setText("Description: " + value.getString("description"));
             }
@@ -104,7 +130,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         author.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-
+                editDescription(title, author, isbn, description, bookID);
                 return false;
             }
         });
@@ -113,7 +139,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         isbn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-
+                editDescription(title, author, isbn, description, bookID);
                 return false;
             }
         });
@@ -122,12 +148,15 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         description.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-
+                editDescription(title, author, isbn, description, bookID);
                 return false;
             }
         });
     }
 
+    /**
+     * Start new activity screen and pass along the TextView data to allow editing of the field strings
+     */
     private void editDescription(TextView title, TextView author, TextView isbn, TextView description, String bookID) {
         Intent intent = new Intent(ViewOwnedBooksActivity.this, EditDescriptionActivity.class);
         intent.putExtra("BOOK_ID", bookID);
@@ -137,5 +166,4 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         intent.putExtra("DESCRIPTION", description.getText().toString());
         startActivity(intent);
     }
-
 }

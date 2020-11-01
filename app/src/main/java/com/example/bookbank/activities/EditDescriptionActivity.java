@@ -106,7 +106,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
     }
 
     /**
-     * Check if there is any empty fields for input
+     * Check if there is any empty fields for required input
      * @return
      */
     public boolean validate() {
