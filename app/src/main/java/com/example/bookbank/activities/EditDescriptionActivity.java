@@ -23,7 +23,6 @@ public class EditDescriptionActivity extends AppCompatActivity {
     private TextView titleError;
     private TextView authorError;
     private TextView isbnError;
-    private String bookID;
     private FirebaseFirestore db;
 
     @Override
@@ -35,7 +34,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         /** Get data passed on from ViewOwnedBooksActivity.class  */
-        bookID = getIntent().getStringExtra("BOOK_ID");
+        final String bookID = getIntent().getStringExtra("BOOK_ID");
         final String oldTitle = getIntent().getStringExtra("TITLE");
         final String oldAuthor = getIntent().getStringExtra("AUTHOR");
         final String oldISBN = getIntent().getStringExtra("ISBN");
@@ -74,18 +73,22 @@ public class EditDescriptionActivity extends AppCompatActivity {
         final Button done = findViewById(R.id.done_button);
         done.setOnClickListener(new View.OnClickListener() {
             /**
-             * The done button is clicked, update document in Firestore and go back to main activity screen
+             * The done button is clicked, call updateBook(bookID)
              * @param view
              */
             @Override
             public void onClick(View view) {
-               updateBook();
+               updateBook(bookID);
             }
         });
 
     }
 
-    private void updateBook() {
+    /**
+     * Update document (if inputs are valid) in Firestore and go back to main activity screen
+     * @param bookID
+     */
+    private void updateBook(String bookID) {
         if (validate()) {
             /** Set variables with the Edit Text data */
             Long newISBN = Long.parseLong(editISBN.getText().toString());
