@@ -56,8 +56,6 @@ public class SearchBooksActivity extends AppCompatActivity {
 
         bookArrayList = new ArrayList<>();
 
-     //   bookArrayList.add(new Book("1","2","3","4","5","6","7","8"));
-
         bookAdapter = new SearchBooksAdapter(this,R.layout.search_book_content , bookArrayList);
 
         searchList.setAdapter(bookAdapter);
