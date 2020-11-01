@@ -97,12 +97,8 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
                     String ownerID = (String) doc.getData().get("ownerId");
                     String borrowerID = (String) doc.getData().get("borrowerId");
 
-                    // Code not working
-                    //FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                    //if (ownerID.equals(currentUser.getUid())) {
                     originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID));
                     bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
-                    //}
                 }
                 bookAdapter.notifyDataSetChanged(); //Notify the adapter of data change
             }
@@ -118,14 +114,21 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
             }
         });
 
+        /** Find reference to the spinner */
         Spinner spinner = findViewById(R.id.owner_book_filter);
+
+        /** Create an array adapter for the spinner. Create from bookStatus in strings.xml */
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.bookStatus, android.R.layout.simple_spinner_item);
+
+        /** simple_spinner_dropdown_item from android.R.layout */
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
+        /** Find reference to the filter button */
         Button filterButton = findViewById(R.id.owner_filter_button);
 
+        /** When filter button is clicked */
         filterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,6 +148,10 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
             }
         });
     }
+    /**
+     *  Retrieve the value of the spinner when filter button is clicked.
+     *  If user didn't specify spinner value; spinner value default to "Available/Borrowed".
+     */
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         String text = adapterView.getItemAtPosition(i).toString();
