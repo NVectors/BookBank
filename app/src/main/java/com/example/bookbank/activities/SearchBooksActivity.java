@@ -121,9 +121,12 @@ public class SearchBooksActivity extends AppCompatActivity {
                             bookArrayList.add(book);
                         }
                         else{
-                            keyWord = keyWord.trim();
-                            if(title.matches(".*\\b"+keyWord+"\\b.*") ||
-                                    author.matches(".*\\b"+keyWord+"\\b.*") ||
+                            String lowerTitle = title.toLowerCase();
+                            String lowerAuthor = author.toLowerCase();
+                            keyWord = keyWord.trim().toLowerCase();
+
+                            if(lowerTitle.matches(".*\\b"+keyWord+"\\b.*") ||
+                                    lowerAuthor.matches(".*\\b"+keyWord+"\\b.*") ||
                                     String.valueOf(isbn).equals(keyWord))
                             {
                                 bookArrayList.add(book);
