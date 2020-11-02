@@ -77,6 +77,7 @@ public class SearchBooksAdapter extends ArrayAdapter<Book> {
         author.setText("By " + book.getAuthor());
         isbn.setText("ISBN: " + String.valueOf(book.getIsbn()));
         status.setText("Status: " + book.getStatus());
+        
         bookPhoto.setImageResource(R.drawable.ic_launcher_background);
 
         return view;
