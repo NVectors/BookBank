@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.bookbank.R;
+import com.example.bookbank.activities.ViewBookPhotoActivity;
 import com.example.bookbank.models.Book;
 import com.example.bookbank.models.BookSearch;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -77,8 +78,8 @@ public class SearchBooksAdapter extends ArrayAdapter<Book> {
         author.setText("By " + book.getAuthor());
         isbn.setText("ISBN: " + String.valueOf(book.getIsbn()));
         status.setText("Status: " + book.getStatus());
-        
-        bookPhoto.setImageResource(R.drawable.ic_launcher_background);
+        ViewBookPhotoActivity.setImage(book.getId(), bookPhoto);
+
 
         return view;
     }
