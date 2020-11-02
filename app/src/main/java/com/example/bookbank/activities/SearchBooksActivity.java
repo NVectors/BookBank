@@ -54,46 +54,21 @@ public class SearchBooksActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Log.d("HEREIAM","INTENT");
 
-        if (intent.getStringExtra("KEYWORD") == null){
-            Log.d("HEREIAM","BEFORE");
-            if(intent.getStringExtra("KEYWORD") == null){
-                Log.d("HEREIAM","HERE");
-                keyWord = "";
-            }
-            else{
-                Log.d("HEREIAM","ELSE");
-                keyWord = intent.getStringExtra("KEYWORD");
-            }
-
-        }
-
-        else{
-            Log.d("HEREIAM","NEXT");
+        if(intent.hasExtra("KEYWORD")){
             keyWord = intent.getStringExtra("KEYWORD");
         }
 
-       // keyWord = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE);
+        else{
+            keyWord = "";
+        }
 
         // initializing the search_button and the search_field
         Button search_button = findViewById(R.id.search_button) ;
         final EditText search_field = findViewById(R.id.search_field);
 
-        // checking if an intent with extra word was passed, if yes setting that as the keyword
-//        if(intent!=null){
-//            keyWord = intent.getStringExtra("KEYWORD");
-//
-//        }
-//        else{
-//            Log.d("Running","HI");
-//            keyWord = "Hobbit";
-//        }
-
-
-
         // initializing the firebase db
         final String TAG = "Search";
         FirebaseFirestore db;
-
 
         // setting the view,arraylist and adapter for the list
         searchList = findViewById(R.id.search_list);
@@ -115,7 +90,6 @@ public class SearchBooksActivity extends AppCompatActivity {
                 String newKeyWord = search_field.getText().toString();
                 intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP );
                 intent.putExtra("KEYWORD",newKeyWord);
- //               Log.d("NEWKEYIAM",newKeyWord);
                 startActivity(intent);
                 finish();
             }
@@ -170,17 +144,6 @@ public class SearchBooksActivity extends AppCompatActivity {
 
 
     }
-
-//    public void keyWordSearch(View view) {
-//        Intent intent = new Intent(this, SearchBooksActivity.class);
-//        EditText search_field = findViewById(R.id.search_field);
-//        String newKeyWord = search_field.getText().toString();
-//        Log.d("NEWKEY",newKeyWord);
-//        intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP );
-//        intent.putExtra("KEYWORD",newKeyWord);
-//        startActivity(intent);
-//        finish();
-//    }
 
 
 }
