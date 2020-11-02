@@ -5,22 +5,30 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.bookbank.R;
 import com.example.bookbank.models.Book;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
 public class BorrowedBooksAdapter extends ArrayAdapter {
 
     private ArrayList<Book> bookList;
+    private Context context;
+    private FirebaseFirestore firestore;
 
-    public BorrowedBooksAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Book> bookList) {
-        super(context, resource, bookList);
+    public BorrowedBooksAdapter(@NonNull Context context, @NonNull ArrayList<Book> bookList) {
+        super(context, 0, bookList);
         this.bookList = bookList;
+        this.context = context;
     }
 
     @NonNull
@@ -31,6 +39,34 @@ public class BorrowedBooksAdapter extends ArrayAdapter {
         // LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         // View view = inflater.inflate(R.layout.list_item, null);
 
-        return convertView;
+        View view = convertView;
+
+        if (view == null){
+            view = LayoutInflater.from(context).inflate(R.layout.borrower_book_content,parent,false);
+        }
+
+        /** Get the position of book in the ArrayList<Book> */
+        Book book = bookList.get(position);
+
+        firestore = FirebaseFirestore.getInstance();
+
+        /** Get references to the objects in the layout */
+        TextView bookTitle = view.findViewById(R.id.borrower_book_title);
+        TextView bookAuthor = view.findViewById(R.id.borrower_book_author);
+        TextView bookISBN = view.findViewById(R.id.borrower_book_isbn);
+        TextView bookStatus = view.findViewById(R.id.borrower_book_status);
+        TextView bookOwner = view.findViewById(R.id.book_owner);
+        ImageView bookImage = view.findViewById(R.id.borrower_book_image);
+
+        /** Set references to the book object data */
+        bookTitle.setText(book.getTitle());
+        bookAuthor.setText("By " + book.getAuthor());
+        bookISBN.setText("ISBN: " + book.getIsbn().toString());
+        bookStatus.setText("Status: " + book.getStatus());
+        //String name = firestore.collection("User").document(book.getOwnerId()).get().getResult().get("fullname").toString();
+        bookOwner.setText("Owner: " + book.getOwnerId()); // need to set to owner name not id.
+        bookImage.setImageResource(R.drawable.default_book_image); // Default image
+
+        return view;
     }
 }
