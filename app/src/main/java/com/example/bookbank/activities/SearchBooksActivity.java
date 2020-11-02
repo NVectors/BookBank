@@ -121,6 +121,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                             bookArrayList.add(book);
                         }
                         else{
+                            keyWord = keyWord.trim();
                             if(title.matches(".*\\b"+keyWord+"\\b.*") ||
                                     author.matches(".*\\b"+keyWord+"\\b.*") ||
                                     String.valueOf(isbn).equals(keyWord))
