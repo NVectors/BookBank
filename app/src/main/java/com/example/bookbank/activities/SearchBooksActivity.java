@@ -56,22 +56,23 @@ public class SearchBooksActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Log.d("HEREIAM","INTENT");
-        if (intent.getStringExtra(LoginActivity.EXTRA_MESSAGE) == null){
+
+        if (intent.getStringExtra("KEYWORD") == null){
             Log.d("HEREIAM","BEFORE");
-            if(intent.getStringExtra(SearchBooksActivity.AKEYWORD) == null){
+            if(intent.getStringExtra("KEYWORD") == null){
                 Log.d("HEREIAM","HERE");
                 keyWord = "";
             }
             else{
                 Log.d("HEREIAM","ELSE");
-                keyWord = intent.getStringExtra(SearchBooksActivity.AKEYWORD);
+                keyWord = intent.getStringExtra("KEYWORD");
             }
 
         }
 
         else{
             Log.d("HEREIAM","NEXT");
-            keyWord = intent.getStringExtra(SearchBooksActivity.AKEYWORD);
+            keyWord = intent.getStringExtra("KEYWORD");
         }
 
        // keyWord = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE);
@@ -116,7 +117,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                 Intent intent = new Intent(SearchBooksActivity.this, SearchBooksActivity.class);
                 String newKeyWord = search_field.getText().toString();
                 intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP );
-                intent.putExtra(AKEYWORD,newKeyWord);
+                intent.putExtra("KEYWORD",newKeyWord);
  //               Log.d("NEWKEYIAM",newKeyWord);
                 startActivity(intent);
                 finish();
