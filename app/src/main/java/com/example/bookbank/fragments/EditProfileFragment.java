@@ -1,18 +1,21 @@
-package com.example.bookbank.activities;
+package com.example.bookbank.fragments;
+
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
-import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bookbank.R;
+import com.example.bookbank.activities.EditProfileActivity;
 import com.example.bookbank.enums.FirestoreCollectionName;
 import com.example.bookbank.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -21,8 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class EditProfileActivity extends AppCompatActivity {
-    public static String EDIT_PROFILE_TAG = "EditProfileTag";
+public class EditProfileFragment extends Fragment {
 
     private TextView emailTextView;
     private TextView fullnameTextView;
@@ -40,27 +42,34 @@ public class EditProfileActivity extends AppCompatActivity {
     private User user;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View root = inflater.inflate(R.layout.fragment_edit_profile, container, false);
+
+        // Inflate the layout for this fragment
         // set firebase references
         firestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
-        emailTextView = findViewById(R.id.emailTextView);
-        fullnameTextView = findViewById(R.id.fullnameTextView);
-        addressTextView = findViewById(R.id.addressTextView);
-        phoneNumberTextView = findViewById(R.id.phoneNumberTextView);
+        emailTextView = root.findViewById(R.id.emailTextView);
+        fullnameTextView = root.findViewById(R.id.fullnameTextView);
+        addressTextView = root.findViewById(R.id.addressTextView);
+        phoneNumberTextView = root.findViewById(R.id.phoneNumberTextView);
 
-        emailEditText = findViewById(R.id.emailEditText);
-        fullnameEditText = findViewById(R.id.fullnameEditText);
-        addressEditText = findViewById(R.id.addressEditText);
-        phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
+        emailEditText = root.findViewById(R.id.emailEditText);
+        fullnameEditText = root.findViewById(R.id.fullnameEditText);
+        addressEditText = root.findViewById(R.id.addressEditText);
+        phoneNumberEditText = root.findViewById(R.id.phoneNumberEditText);
 
-        editProfileButton = findViewById(R.id.editProfileButton);
-        updateProfileButton = findViewById(R.id.updateProfileButton);
-        cancelButton = findViewById(R.id.cancelUpdateProfileButton);
+        editProfileButton = root.findViewById(R.id.editProfileButton);
+        updateProfileButton = root.findViewById(R.id.updateProfileButton);
+        cancelButton = root.findViewById(R.id.cancelUpdateProfileButton);
 
         editProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,16 +101,16 @@ public class EditProfileActivity extends AppCompatActivity {
                         public void onSuccess(Void aVoid) {
                             toggleViewMode();
                             refreshTextViews();
-                            Toast.makeText(EditProfileActivity.this, "successfully update profile", Toast.LENGTH_SHORT);
+                            Toast.makeText(getActivity(), "successfully update profile", Toast.LENGTH_SHORT).show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(EditProfileActivity.this, "update profile failed", Toast.LENGTH_SHORT);
+                            Toast.makeText(getActivity(), "update profile failed", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {
-                    Toast.makeText(EditProfileActivity.this, "FirebaseAuth UID is null", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "FirebaseAuth UID is null", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -123,12 +132,14 @@ public class EditProfileActivity extends AppCompatActivity {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(EditProfileActivity.this, "failed to get user from firebase", Toast.LENGTH_SHORT);
+                    Toast.makeText(getActivity(), "failed to get user from firebase", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
-            Toast.makeText(this, "FirebaseAuth UID is null", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "FirebaseAuth UID is null", Toast.LENGTH_SHORT).show();
         }
+
+        return root;
     }
 
     public void toggleViewMode() {
