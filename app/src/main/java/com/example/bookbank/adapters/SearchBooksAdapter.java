@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,6 +56,7 @@ public class SearchBooksAdapter extends ArrayAdapter<Book> {
         TextView isbn = view.findViewById(R.id.isbn_text);
         TextView status = view.findViewById(R.id.status_text);
         final TextView ownerName = view.findViewById(R.id.ownerName_text);
+        ImageView bookPhoto = view.findViewById(R.id.search_photo);
 
         // Creating document reference to the ownerId user
         DocumentReference docRef = FirebaseFirestore.getInstance().collection("User").document(String.valueOf(book.getOwnerId()));
@@ -75,6 +77,7 @@ public class SearchBooksAdapter extends ArrayAdapter<Book> {
         author.setText("By " + book.getAuthor());
         isbn.setText("ISBN: " + String.valueOf(book.getIsbn()));
         status.setText("Status: " + book.getStatus());
+        bookPhoto.setImageResource(R.drawable.ic_launcher_background);
 
         return view;
     }
