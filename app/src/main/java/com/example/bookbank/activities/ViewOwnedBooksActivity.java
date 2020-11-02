@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -13,9 +14,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bookbank.R;
+import com.example.bookbank.models.Book;
+//import com.example.bookbank.models.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -23,9 +28,16 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 public class ViewOwnedBooksActivity extends AppCompatActivity {
     private FirebaseFirestore db;
+
+    private StorageReference storageReference;
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +57,8 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         /** Get top level reference to the book in collection  by ID */
         final DocumentReference bookReference = db.collection("Book").document(bookID);
 
+        final StorageReference imageRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
+
         /** Get references in the layout*/
         final TextView title = findViewById(R.id.book_title);
         final TextView author = findViewById(R.id.author);
@@ -52,6 +66,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         final TextView status = findViewById(R.id.status);
         final TextView borrower = findViewById(R.id.borrower);
         final TextView description = findViewById(R.id.description);
+
+        final ImageView bookImage = findViewById(R.id.owner_book_image);
+        ViewBookPhotoActivity.setImage(bookID, bookImage);
 
         /**  Realtime updates, snapshot is the state of the database at any given point of time */
         bookReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -114,6 +131,8 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 db.collection("Book").document(bookID).delete();
+                StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
+                photoRef.delete();
             }
         });
 
@@ -150,6 +169,17 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 editDescription(title, author, isbn, description, bookID);
                 return false;
+            }
+        });
+
+        /** Image delete button is clicked */
+        final Button deleteImage = findViewById(R.id.delete_image);
+        deleteImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
+                photoRef.delete();
+                ViewBookPhotoActivity.setImage(bookID, bookImage);
             }
         });
     }

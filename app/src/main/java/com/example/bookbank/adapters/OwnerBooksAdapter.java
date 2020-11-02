@@ -1,6 +1,8 @@
 package com.example.bookbank.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.bookbank.R;
+import com.example.bookbank.activities.ViewBookPhotoActivity;
 import com.example.bookbank.models.Book;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,6 +26,14 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -66,7 +77,6 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         bookISBN.setText("ISBN: " + book.getIsbn().toString());
         bookStatus.setText("Status: " + book.getStatus());
         bookBorrower.setVisibility(View.INVISIBLE); // Default of Borrower text view
-        bookImage.setImageResource(R.drawable.default_book_image); // Default image
 
         // User borrowerID to get User's full name in database (Need to test later on)
         if (book.getBorrowerId() != "") {
@@ -96,4 +106,5 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         }
         return view;
     }
+
 }
