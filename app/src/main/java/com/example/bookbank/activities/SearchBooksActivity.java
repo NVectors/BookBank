@@ -36,9 +36,6 @@ import androidx.appcompat.widget.Toolbar;
 import java.util.ArrayList;
 
 public class SearchBooksActivity extends AppCompatActivity {
-    public static final String AKEYWORD = "com.example.bookbank.MESSAGE";
-
-    // getting the intent
 
     String keyWord;
     // Declaring the variables needed

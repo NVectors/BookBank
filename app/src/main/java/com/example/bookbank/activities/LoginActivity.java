@@ -21,7 +21,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
-    public static final String EXTRA_MESSAGE = "com.example.bookbank.MESSAGE";
 
     private EditText email;
     private EditText password;
@@ -84,9 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onSuccess(AuthResult authResult) {
                     if (authResult.getUser() != null) {
                         // successfully authenticted user, go to search books activity
-                        Intent intent1 = new Intent(LoginActivity.this, SearchBooksActivity.class);
-    //                    intent1.putExtra(EXTRA_MESSAGE,"Hobbit");
-                        startActivity(intent1);
+                        startActivity(new Intent(LoginActivity.this, SearchBooksActivity.class));
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
