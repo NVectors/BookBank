@@ -85,12 +85,18 @@ public class SearchBooksActivity extends AppCompatActivity {
 
                         Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId);
 
-                        if(title.matches(".*\\b"+keyWord+"\\b.*") ||
-                                author.matches(".*\\b"+keyWord+"\\b.*") ||
-                                String.valueOf(isbn).equals(keyWord))
-                        {
+                        if(keyWord.equals("")){
                             bookArrayList.add(book);
                         }
+                        else{
+                            if(title.matches(".*\\b"+keyWord+"\\b.*") ||
+                                    author.matches(".*\\b"+keyWord+"\\b.*") ||
+                                    String.valueOf(isbn).equals(keyWord))
+                            {
+                                bookArrayList.add(book);
+                            }
+                        }
+
 
 
                     }
