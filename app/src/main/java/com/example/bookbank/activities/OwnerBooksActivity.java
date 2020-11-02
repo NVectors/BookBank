@@ -10,7 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.bookbank.R;
 import com.example.bookbank.adapters.OwnerBooksAdapter;
@@ -27,12 +30,16 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class OwnerBooksActivity extends AppCompatActivity {
+public class OwnerBooksActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     ListView bookList;
     ArrayAdapter<Book> bookAdapter;
     ArrayList<Book> bookDataList;
-    private FirebaseFirestore db;
+    ArrayList<Book> originalBookDataList;
+    private String tempStatus = "Available/Borrowed";
+
+    FirebaseFirestore db;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +49,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
         /** Find reference to the ListView */
         bookList = findViewById(R.id.owner_book_list);
         bookDataList = new ArrayList<>();
+        originalBookDataList = new ArrayList<>();
 
         bookAdapter = new OwnerBooksAdapter(this, bookDataList);
         bookList.setAdapter(bookAdapter);
@@ -71,6 +79,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
                 // Clear the old list
                 bookDataList.clear();
+                originalBookDataList.clear();
 
                 for (QueryDocumentSnapshot doc: queryDocumentSnapshots)
                 {
@@ -92,6 +101,7 @@ public class OwnerBooksActivity extends AppCompatActivity {
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     if (ownerID.equals(currentUser.getUid())) { //Display books that only belong to that user
                         bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
+                        originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID));
                     }
                 }
                 bookAdapter.notifyDataSetChanged(); //Notify the adapter of data change
@@ -108,5 +118,52 @@ public class OwnerBooksActivity extends AppCompatActivity {
             }
         });
 
+        /** Find reference to the spinner */
+        Spinner spinner = findViewById(R.id.owner_book_filter);
+
+        /** Create an array adapter for the spinner. Create from bookStatus in strings.xml */
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.bookStatus, android.R.layout.simple_spinner_item);
+
+        /** simple_spinner_dropdown_item from android.R.layout */
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+
+        /** Find reference to the filter button */
+        Button filterButton = findViewById(R.id.owner_filter_button);
+
+        /** When filter button is clicked */
+        filterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ArrayList<Book> toDisplayBook = new ArrayList<>();
+                for (Book book: originalBookDataList){
+                    if (tempStatus.equals("Available/Borrowed")){
+                        toDisplayBook.addAll(originalBookDataList);
+                        break;
+                    }
+                    else if (book.getStatus().equals(tempStatus)){
+                        toDisplayBook.add(book);
+                    }
+                }
+                bookDataList.clear();
+                bookDataList.addAll(toDisplayBook);
+                bookAdapter.notifyDataSetChanged();
+            }
+        });
     }
+    /**
+     *  Retrieve the value of the spinner when filter button is clicked.
+     *  If user didn't specify spinner value; spinner value default to "Available/Borrowed".
+     */
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        String text = adapterView.getItemAtPosition(i).toString();
+        tempStatus = text;
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+    }
+
 }
