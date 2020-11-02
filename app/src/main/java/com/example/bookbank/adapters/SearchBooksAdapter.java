@@ -2,7 +2,6 @@ package com.example.bookbank.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +15,6 @@ import androidx.annotation.Nullable;
 import com.example.bookbank.R;
 import com.example.bookbank.activities.ViewBookPhotoActivity;
 import com.example.bookbank.models.Book;
-import com.example.bookbank.models.BookSearch;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -78,6 +75,8 @@ public class SearchBooksAdapter extends ArrayAdapter<Book> {
         author.setText("By " + book.getAuthor());
         isbn.setText("ISBN: " + String.valueOf(book.getIsbn()));
         status.setText("Status: " + book.getStatus());
+
+        // viewBookPhotoActivity to set the book Image
         ViewBookPhotoActivity.setImage(book.getId(), bookPhoto);
 
 

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,10 +12,6 @@ import android.widget.ListView;
 import com.example.bookbank.R;
 import com.example.bookbank.adapters.SearchBooksAdapter;
 import com.example.bookbank.models.Book;
-import com.example.bookbank.models.BookSearch;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,19 +20,16 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import androidx.annotation.Nullable;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 
 public class SearchBooksActivity extends AppCompatActivity {
+
+    //declaring the keyWord to search
     String keyWord;
-    // Declaring the variables needed
+
+    // Declaring the variables needed for the list
     ListView searchList;
     ArrayAdapter<Book> bookAdapter;
     ArrayList<Book> bookArrayList;
@@ -48,8 +40,8 @@ public class SearchBooksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_books);
 
+        // getting the intent and checking if it has the keyword. If not set it to empty string
         Intent intent = getIntent();
-
         if(intent.hasExtra("KEYWORD")){
             keyWord = intent.getStringExtra("KEYWORD");
         }
@@ -83,6 +75,8 @@ public class SearchBooksActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String newKeyWord = search_field.getText().toString();
+
+                // checking to make sure button only works when field is empty
                 if(newKeyWord.trim().length()!= 0){
                     Intent intent = new Intent(SearchBooksActivity.this, SearchBooksActivity.class);
                     intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP );
@@ -93,18 +87,22 @@ public class SearchBooksActivity extends AppCompatActivity {
             }
         });
 
+        // getting a snapshot of the DB
         collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
                 bookArrayList.clear();
 
+                // iterating each document in the Book collection to get all the book's attributes
                 for(QueryDocumentSnapshot doc : queryDocumentSnapshots){
                     Log.d(TAG,String.valueOf(doc.getData().get("id")));
                     Log.d(TAG,String.valueOf(doc.getData().get("title")));
                     Log.d(TAG,String.valueOf(doc.getData().get("status")));
 
+                    // making sure we only query the book which are available
                     String status = (String) doc.getData().get("status");
                     if(status.equals("Available")){
+                        // fetching all the atributes of the book
                         String author = (String) doc.getData().get("author");
                         String borrowerId = (String) doc.getData().get("borrowerId");
                         String description = (String) doc.getData().get("description");
@@ -115,14 +113,19 @@ public class SearchBooksActivity extends AppCompatActivity {
 
                         Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId);
 
+                        // if keyword is empty string all available books are added as default
                         if(keyWord.equals("")){
                             bookArrayList.add(book);
                         }
+
+                        // if there's a search keyword we search for the keyword in title, author and ISBN fields
                         else{
+                            // making author, title and the keyword lowerase for both case searching
                             String lowerTitle = title.toLowerCase();
                             String lowerAuthor = author.toLowerCase();
                             keyWord = keyWord.trim().toLowerCase();
 
+                            // searching with regex
                             if(lowerTitle.matches(".*\\b"+keyWord+"\\b.*") ||
                                     lowerAuthor.matches(".*\\b"+keyWord+"\\b.*") ||
                                     String.valueOf(isbn).equals(keyWord))
@@ -137,7 +140,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
 
                 }
-
+                // notifying the adapter for the change
                 bookAdapter.notifyDataSetChanged();
 
             }
