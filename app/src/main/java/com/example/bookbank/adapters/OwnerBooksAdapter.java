@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -44,7 +45,7 @@ public class OwnerBooksAdapter extends ArrayAdapter {
 
     public OwnerBooksAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Book> bookList) {
         super(context, resource, bookList);
-        this.bookList = bookList;
+        this.books = bookList;
     }
 
     @NonNull
@@ -74,6 +75,7 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         bookAuthor.setText("By " + book.getAuthor());
         bookISBN.setText("ISBN: " + book.getIsbn().toString());
         bookStatus.setText("Status: " + book.getStatus());
+        ViewBookPhotoActivity.setImage(book.getId(), bookImage);
         bookBorrower.setVisibility(View.INVISIBLE); // Default of Borrower text view
 
         // User borrowerID to get User's full name in database (Need to test later on)

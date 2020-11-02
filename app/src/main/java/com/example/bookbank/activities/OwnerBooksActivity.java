@@ -1,7 +1,9 @@
 package com.example.bookbank.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -14,6 +16,19 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.bookbank.R;
+import com.example.bookbank.adapters.OwnerBooksAdapter;
+import com.example.bookbank.models.Book;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 public class OwnerBooksActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
@@ -36,7 +51,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
         bookDataList = new ArrayList<>();
         originalBookDataList = new ArrayList<>();
 
-        bookAdapter = new OwnerBooksAdapter(this, bookDataList);
+        bookAdapter = new OwnerBooksAdapter(this, 0, bookDataList);
         bookList.setAdapter(bookAdapter);
 
         /** Get instance of Firestore */

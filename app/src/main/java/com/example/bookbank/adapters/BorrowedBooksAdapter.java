@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.bookbank.R;
+import com.example.bookbank.activities.ViewBookPhotoActivity;
 import com.example.bookbank.models.Book;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -65,7 +66,7 @@ public class BorrowedBooksAdapter extends ArrayAdapter {
         bookStatus.setText("Status: " + book.getStatus());
         //String name = firestore.collection("User").document(book.getOwnerId()).get().getResult().get("fullname").toString();
         bookOwner.setText("Owner: " + book.getOwnerId()); // need to set to owner name not id.
-        bookImage.setImageResource(R.drawable.default_book_image); // Default image
+        ViewBookPhotoActivity.setImage(book.getId(), bookImage);
 
         return view;
     }
