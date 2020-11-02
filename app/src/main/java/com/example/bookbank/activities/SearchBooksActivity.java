@@ -36,15 +36,12 @@ import androidx.appcompat.widget.Toolbar;
 import java.util.ArrayList;
 
 public class SearchBooksActivity extends AppCompatActivity {
-
     String keyWord;
     // Declaring the variables needed
     ListView searchList;
     ArrayAdapter<Book> bookAdapter;
     ArrayList<Book> bookArrayList;
-
     SearchBooksAdapter searchBooksAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +49,6 @@ public class SearchBooksActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search_books);
 
         Intent intent = getIntent();
-        Log.d("HEREIAM","INTENT");
 
         if(intent.hasExtra("KEYWORD")){
             keyWord = intent.getStringExtra("KEYWORD");
@@ -86,12 +82,14 @@ public class SearchBooksActivity extends AppCompatActivity {
         search_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SearchBooksActivity.this, SearchBooksActivity.class);
                 String newKeyWord = search_field.getText().toString();
-                intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP );
-                intent.putExtra("KEYWORD",newKeyWord);
-                startActivity(intent);
-                finish();
+                if(newKeyWord.trim().length()!= 0){
+                    Intent intent = new Intent(SearchBooksActivity.this, SearchBooksActivity.class);
+                    intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP );
+                    intent.putExtra("KEYWORD",newKeyWord);
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
 
@@ -145,9 +143,6 @@ public class SearchBooksActivity extends AppCompatActivity {
             }
         });
 
-
-
     }
-
 
 }
