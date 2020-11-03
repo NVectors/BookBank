@@ -3,15 +3,19 @@ package com.example.bookbank.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.bookbank.R;
 import com.example.bookbank.adapters.SearchBooksAdapter;
 import com.example.bookbank.models.Book;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,6 +25,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 
@@ -34,6 +39,7 @@ public class SearchBooksActivity extends AppCompatActivity {
     ArrayAdapter<Book> bookAdapter;
     ArrayList<Book> bookArrayList;
     SearchBooksAdapter searchBooksAdapter;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +74,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
         // getting a DB instance and getting a reference to the 'Book' collection.
         db = FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
         final CollectionReference collectionReference = db.collection("Book");
 
         // Adding onClickListener to the button to search a new Keyword with Intent data
@@ -146,6 +153,62 @@ public class SearchBooksActivity extends AppCompatActivity {
             }
         });
 
+        // --------------------------Required for Toolbar---------------------------------//
+        // set tool bar
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
+    }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        tb.inflateMenu(R.menu.activity_main_drawer);
+        tb.setOnMenuItemClickListener(
+                new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        return onOptionsItemSelected(item);
+                    }
+                });
+        return true;
+    }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // action with ID action_refresh was selected
+            case R.id.nav_my_profile:
+                startActivity(new Intent(SearchBooksActivity.this, EditProfileActivity.class));
+                break;
+            case R.id.nav_my_books:
+                startActivity(new Intent(SearchBooksActivity.this, OwnerBooksActivity.class));
+                break;
+            case R.id.nav_borrowed_books:
+                startActivity(new Intent(SearchBooksActivity.this, BorrowedBooksActivity.class));
+                break;
+            case R.id.nav_search_books:
+                startActivity(new Intent(SearchBooksActivity.this, SearchBooksActivity.class));
+                break;
+            case R.id.nav_notifications:
+                startActivity(new Intent(SearchBooksActivity.this, NotificationsActivity.class));
+                break;
+            case R.id.nav_search_users:
+                startActivity(new Intent(SearchBooksActivity.this, SearchUsernameActivity.class));
+                break;
+            case R.id.nav_my_requests:
+                startActivity(new Intent(SearchBooksActivity.this, RequestsActivity.class));
+                break;
+            case R.id.nav_sign_out:
+                firebaseAuth.signOut();
+                Toast.makeText(SearchBooksActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(SearchBooksActivity.this, LoginActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
 }

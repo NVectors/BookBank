@@ -3,9 +3,13 @@ package com.example.bookbank.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,6 +24,7 @@ import com.example.bookbank.helperClasses.InputValidator;
 import com.example.bookbank.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -35,6 +40,7 @@ public class SearchUsernameActivity extends AppCompatActivity {
     ListView userList;
     ArrayAdapter<User> userAdapter;
     ArrayList<User> userDataList;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +52,7 @@ public class SearchUsernameActivity extends AppCompatActivity {
         final TextView userNameError;
         Button searchUserButton;
         FirebaseFirestore db;
+        firebaseAuth =  FirebaseAuth.getInstance();
 
         userList = findViewById(R.id.search_user_list);
         userName = findViewById(R.id.search_user_field);
@@ -66,7 +73,65 @@ public class SearchUsernameActivity extends AppCompatActivity {
             }
         });
 
+        // --------------------------Required for Toolbar---------------------------------//
+        // set tool bar
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
     }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        tb.inflateMenu(R.menu.activity_main_drawer);
+        tb.setOnMenuItemClickListener(
+                new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        return onOptionsItemSelected(item);
+                    }
+                });
+        return true;
+    }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // action with ID action_refresh was selected
+            case R.id.nav_my_profile:
+                startActivity(new Intent(SearchUsernameActivity.this, EditProfileActivity.class));
+                break;
+            case R.id.nav_my_books:
+                startActivity(new Intent(SearchUsernameActivity.this, OwnerBooksActivity.class));
+                break;
+            case R.id.nav_borrowed_books:
+                startActivity(new Intent(SearchUsernameActivity.this, BorrowedBooksActivity.class));
+                break;
+            case R.id.nav_search_books:
+                startActivity(new Intent(SearchUsernameActivity.this, SearchBooksActivity.class));
+                break;
+            case R.id.nav_notifications:
+                startActivity(new Intent(SearchUsernameActivity.this, NotificationsActivity.class));
+                break;
+            case R.id.nav_search_users:
+                startActivity(new Intent(SearchUsernameActivity.this, SearchUsernameActivity.class));
+                break;
+            case R.id.nav_my_requests:
+                startActivity(new Intent(SearchUsernameActivity.this, RequestsActivity.class));
+                break;
+            case R.id.nav_sign_out:
+                firebaseAuth.signOut();
+                Toast.makeText(SearchUsernameActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(SearchUsernameActivity.this, LoginActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+
     public boolean validate(EditText userName, TextView userNameError) {
         boolean[] inputs = {
                 InputValidator.notEmpty(userName, userNameError),

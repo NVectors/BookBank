@@ -9,33 +9,21 @@
     tools:context=".activities.SearchUsernameActivity">
 
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#1dd7de"
-        android:gravity="center_vertical"
-        android:padding="12dp">
+        android:theme="@style/AppTheme.NoActionBar.AppBarOverlay">
 
-        <ImageView
-            android:id="@+id/nav_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_menu_24" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Book Bank"
-            android:textAlignment="center"
-            android:textColor="#000"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-    </LinearLayout>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -45,7 +33,7 @@
             android:id="@+id/search_user_field"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Username"></EditText>
+            android:hint="Enter Username"/>
 
         <TextView
             android:id="@+id/search_user_error"
@@ -59,12 +47,12 @@
             android:id="@+id/search_user_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Search Username"></Button>
+            android:text="Search Username"/>
 
         <ListView
             android:id="@+id/search_user_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></ListView>
+            android:layout_height="match_parent"/>
     </LinearLayout>
 
 </LinearLayout>
