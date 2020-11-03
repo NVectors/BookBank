@@ -2,10 +2,13 @@ package com.example.bookbank.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -129,6 +132,63 @@ public class EditProfileActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "FirebaseAuth UID is null", Toast.LENGTH_SHORT).show();
         }
+
+        // --------------------------Required for Toolbar---------------------------------//
+        // set tool bar
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
+    }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        tb.inflateMenu(R.menu.activity_main_drawer);
+        tb.setOnMenuItemClickListener(
+                new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        return onOptionsItemSelected(item);
+                    }
+                });
+        return true;
+    }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // action with ID action_refresh was selected
+            case R.id.nav_my_profile:
+                startActivity(new Intent(EditProfileActivity.this, EditProfileActivity.class));
+                break;
+            case R.id.nav_my_books:
+                startActivity(new Intent(EditProfileActivity.this, OwnerBooksActivity.class));
+                break;
+            case R.id.nav_borrowed_books:
+                startActivity(new Intent(EditProfileActivity.this, BorrowedBooksActivity.class));
+                break;
+            case R.id.nav_search_books:
+                startActivity(new Intent(EditProfileActivity.this, SearchBooksActivity.class));
+                break;
+            case R.id.nav_notifications:
+                startActivity(new Intent(EditProfileActivity.this, NotificationsActivity.class));
+                break;
+            case R.id.nav_search_users:
+                startActivity(new Intent(EditProfileActivity.this, SearchUsernameActivity.class));
+                break;
+            case R.id.nav_my_requests:
+                startActivity(new Intent(EditProfileActivity.this, RequestsActivity.class));
+                break;
+            case R.id.nav_sign_out:
+                firebaseAuth.signOut();
+                Toast.makeText(EditProfileActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(EditProfileActivity.this, LoginActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
     public void toggleViewMode() {
