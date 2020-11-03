@@ -43,9 +43,12 @@ public class OwnerBooksAdapter extends ArrayAdapter {
     private  Context context;
     private FirebaseFirestore firestore;
 
+
+
     public OwnerBooksAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Book> bookList) {
-        super(context, resource, bookList);
+        super(context, 0, bookList);
         this.books = bookList;
+        this.context = context;
     }
 
     @NonNull
@@ -70,7 +73,7 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         final TextView bookBorrower = view.findViewById(R.id.owner_book_borrower);
         ImageView bookImage = view.findViewById(R.id.owner_book_image);
 
-        /** Set references to the book object data */
+//        /** Set references to the book object data */
         bookTitle.setText(book.getTitle());
         bookAuthor.setText("By " + book.getAuthor());
         bookISBN.setText("ISBN: " + book.getIsbn().toString());

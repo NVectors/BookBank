@@ -51,7 +51,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
         bookDataList = new ArrayList<>();
         originalBookDataList = new ArrayList<>();
 
-        bookAdapter = new OwnerBooksAdapter(this, 0, bookDataList);
+        bookAdapter = new OwnerBooksAdapter(this, R.layout.owner_book_content, bookDataList);
         bookList.setAdapter(bookAdapter);
 
         /** Get instance of Firestore */
@@ -88,7 +88,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
                     Log.d("TITLE", String.valueOf(doc.getData().get("title")));
                     Log.d("AUTHOR", String.valueOf(doc.getData().get("author")));
                     Log.d("ISBN", String.valueOf(doc.getData().get("isbn")));
-
+//
                     String id = (String) doc.getData().get("id");
                     String title = (String) doc.getData().get("title");
                     String author = (String) doc.getData().get("author");
@@ -97,7 +97,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
                     String status = (String) doc.getData().get("status");
                     String ownerID = (String) doc.getData().get("ownerId");
                     String borrowerID = (String) doc.getData().get("borrowerId");
-
+//
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     if (ownerID.equals(currentUser.getUid())) { //Display books that only belong to that user
                         bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore

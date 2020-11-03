@@ -131,9 +131,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.collection("Book").document(bookID).delete();
                 StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
                 photoRef.delete();
+                db.collection("Book").document(bookID).delete();
             }
         });
 
