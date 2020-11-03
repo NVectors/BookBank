@@ -78,7 +78,6 @@ public class OwnerBooksAdapter extends ArrayAdapter {
         bookAuthor.setText("By " + book.getAuthor());
         bookISBN.setText("ISBN: " + book.getIsbn().toString());
         bookStatus.setText("Status: " + book.getStatus());
-        ViewBookPhotoActivity.setImage(book.getId(), bookImage);
         bookBorrower.setVisibility(View.INVISIBLE); // Default of Borrower text view
 
         // User borrowerID to get User's full name in database (Need to test later on)
@@ -107,6 +106,7 @@ public class OwnerBooksAdapter extends ArrayAdapter {
                 }
             });
         }
+        ViewBookPhotoActivity.setImage(book.getId(), bookImage);
         return view;
     }
 
