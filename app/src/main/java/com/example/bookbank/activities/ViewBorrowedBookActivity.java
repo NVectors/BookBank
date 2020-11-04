@@ -1,5 +1,6 @@
 package com.example.bookbank.activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,6 +13,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.bookbank.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -56,12 +59,37 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                 status.setText("Status: " + value.getString("status"));
 
-                // retrieving name
-                // String name = firestore.collection("User").document(value.getString("ownerId")).get();
-                // Tests
-                // Log.d("SAMPLE", name);
+                if (value.getString("ownerId") == "") {
+                    owner.setText("Borrower: None");
+                } else { // Will have to test this later
+                    DocumentReference documentRef = firestore.collection("User").document(value.getString("ownerId"));
+                    documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        /**
+                         * Use DocumentSnapshot to find field value in the document
+                         * @param task
+                         */
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    String name = document.getString("fullname");
+                                    // Test
+                                    Log.d("NAME", name);
 
-                owner.setText("Owner: " + "name goes here");
+                                    owner.setText("Owner: " + "name goes here");
+                                    owner.setText("Owner: " + name);
+
+                                } else {
+                                    Log.d("TAG", "No such document");
+                                    owner.setText("Owner: FAILED");
+                                }
+                            } else {
+                                Log.d("TAG", "get failed with ", task.getException());
+                            }
+                        }
+                    });
+                }
                 description.setText("Description: " + value.getString("description"));
             }
         });
