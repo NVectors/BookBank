@@ -35,13 +35,13 @@ import java.util.ArrayList;
 
 public class OwnerBooksActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
-    ListView bookList;
-    ArrayAdapter<Book> bookAdapter;
-    ArrayList<Book> bookDataList;
-    ArrayList<Book> originalBookDataList;
+    private ListView bookList;
+    private ArrayAdapter<Book> bookAdapter;
+    private ArrayList<Book> bookDataList;
+    private ArrayList<Book> originalBookDataList;
     private String tempStatus = "Available/Borrowed";
 
-    FirebaseFirestore db;
+    private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
 
     @Override
