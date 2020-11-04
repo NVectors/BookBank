@@ -1,6 +1,7 @@
 package com.example.bookbank.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,11 @@ import androidx.annotation.Nullable;
 import com.example.bookbank.R;
 import com.example.bookbank.activities.ViewBookPhotoActivity;
 import com.example.bookbank.models.Book;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -56,7 +60,7 @@ public class BorrowedBooksAdapter extends ArrayAdapter {
         TextView bookAuthor = view.findViewById(R.id.borrower_book_author);
         TextView bookISBN = view.findViewById(R.id.borrower_book_isbn);
         TextView bookStatus = view.findViewById(R.id.borrower_book_status);
-        TextView bookOwner = view.findViewById(R.id.book_owner);
+        final TextView bookOwner = view.findViewById(R.id.book_owner);
         ImageView bookImage = view.findViewById(R.id.borrower_book_image);
 
         /** Set references to the book object data */
@@ -64,10 +68,35 @@ public class BorrowedBooksAdapter extends ArrayAdapter {
         bookAuthor.setText("By " + book.getAuthor());
         bookISBN.setText("ISBN: " + book.getIsbn().toString());
         bookStatus.setText("Status: " + book.getStatus());
-        //String name = firestore.collection("User").document(book.getOwnerId()).get().getResult().get("fullname").toString();
-        bookOwner.setText("Owner: " + book.getOwnerId()); // need to set to owner name not id.
+        if (book.getOwnerId() == "") {
+            bookOwner.setText("Owner: None");
+        } else { // Will have to test this later
+            DocumentReference documentRef = firestore.collection("User").document(book.getOwnerId());
+            documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                /**
+                 * Use DocumentSnapshot to find field value in the document
+                 * @param task
+                 */
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String name = document.getString("fullname");
+                            // Test
+                            Log.d("NAME", name);
+                            bookOwner.setText("Owner: " + name);
+                        } else {
+                            Log.d("TAG", "No such document");
+                            bookOwner.setText("Owner: FAILED");
+                        }
+                    } else {
+                        Log.d("TAG", "get failed with ", task.getException());
+                    }
+                }
+            });
+        }
         ViewBookPhotoActivity.setImage(book.getId(), bookImage);
-
         return view;
     }
 }

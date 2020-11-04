@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +55,8 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
         final TextView status = findViewById(R.id.status);
         final TextView owner = findViewById(R.id.owner);
         final TextView description = findViewById(R.id.description);
+        final ImageView bookImage = findViewById(R.id.owner_book_image);
+        ViewBookPhotoActivity.setImage(bookID, bookImage);
 
         /**  Realtime updates, snapshot is the state of the database at any given point of time */
         bookReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -66,7 +69,7 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 status.setText("Status: " + value.getString("status"));
 
                 if (value.getString("ownerId") == "") {
-                    owner.setText("Borrower: None");
+                    owner.setText("Owner: None");
                 } else { // Will have to test this later
                     DocumentReference documentRef = firestore.collection("User").document(value.getString("ownerId"));
                     documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
