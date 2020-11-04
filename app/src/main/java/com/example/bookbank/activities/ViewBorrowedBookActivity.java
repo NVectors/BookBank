@@ -1,17 +1,26 @@
 package com.example.bookbank.activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bookbank.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -20,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class ViewBorrowedBookActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +55,8 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
         final TextView status = findViewById(R.id.status);
         final TextView owner = findViewById(R.id.owner);
         final TextView description = findViewById(R.id.description);
+        final ImageView bookImage = findViewById(R.id.owner_book_image);
+        ViewBookPhotoActivity.setImage(bookID, bookImage);
 
         /**  Realtime updates, snapshot is the state of the database at any given point of time */
         bookReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -56,12 +68,36 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                 status.setText("Status: " + value.getString("status"));
 
-                // retrieving name
-                // String name = firestore.collection("User").document(value.getString("ownerId")).get();
-                // Tests
-                // Log.d("SAMPLE", name);
+                if (value.getString("ownerId") == "") {
+                    owner.setText("Owner: None");
+                } else { // Will have to test this later
+                    DocumentReference documentRef = firestore.collection("User").document(value.getString("ownerId"));
+                    documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        /**
+                         * Use DocumentSnapshot to find field value in the document
+                         * @param task
+                         */
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    String name = document.getString("fullname");
+                                    // Test
+                                    Log.d("NAME", name);
 
-                owner.setText("Owner: " + "name goes here");
+                                    owner.setText("Owner: " + name);
+
+                                } else {
+                                    Log.d("TAG", "No such document");
+                                    owner.setText("Owner: FAILED");
+                                }
+                            } else {
+                                Log.d("TAG", "get failed with ", task.getException());
+                            }
+                        }
+                    });
+                }
                 description.setText("Description: " + value.getString("description"));
             }
         });
@@ -74,5 +110,62 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 //startActivity(new Intent(ViewBorrowedBookActivity.this, /**acitivty to return**/));
             }
         });
+
+        // --------------------------Required for Toolbar---------------------------------//
+        // set tool bar
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
+    }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        tb.inflateMenu(R.menu.activity_main_drawer);
+        tb.setOnMenuItemClickListener(
+                new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        return onOptionsItemSelected(item);
+                    }
+                });
+        return true;
+    }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // action with ID action_refresh was selected
+            case R.id.nav_my_profile:
+                startActivity(new Intent(ViewBorrowedBookActivity.this, EditProfileActivity.class));
+                break;
+            case R.id.nav_my_books:
+                startActivity(new Intent(ViewBorrowedBookActivity.this, OwnerBooksActivity.class));
+                break;
+            case R.id.nav_borrowed_books:
+                startActivity(new Intent(ViewBorrowedBookActivity.this, BorrowedBooksActivity.class));
+                break;
+            case R.id.nav_search_books:
+                startActivity(new Intent(ViewBorrowedBookActivity.this, SearchBooksActivity.class));
+                break;
+            case R.id.nav_notifications:
+                startActivity(new Intent(ViewBorrowedBookActivity.this, NotificationsActivity.class));
+                break;
+            case R.id.nav_search_users:
+                startActivity(new Intent(ViewBorrowedBookActivity.this, SearchUsernameActivity.class));
+                break;
+            case R.id.nav_my_requests:
+                startActivity(new Intent(ViewBorrowedBookActivity.this, RequestsActivity.class));
+                break;
+            case R.id.nav_sign_out:
+                firebaseAuth.signOut();
+                Toast.makeText(ViewBorrowedBookActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ViewBorrowedBookActivity.this, LoginActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 }

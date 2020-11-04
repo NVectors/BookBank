@@ -2,6 +2,7 @@ package com.example.bookbank.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -22,6 +25,7 @@ import com.example.bookbank.models.Book;
 //import com.example.bookbank.models.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -35,7 +39,7 @@ import javax.annotation.Nullable;
 
 public class ViewOwnedBooksActivity extends AppCompatActivity {
     private FirebaseFirestore db;
-
+    private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri uri;
@@ -73,7 +77,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
 
         /**  Realtime updates, snapshot is the state of the database at any given point of time */
         bookReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            /** Method is executed whenever any new event occurs in the remote database */
+            /**
+             * Method is executed whenever any new event occurs in the remote database
+             */
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 title.setText(value.getString("title"));
@@ -81,10 +87,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                 status.setText("Status: " + value.getString("status"));
 
-                if (value.getString("borrowerId") == ""){
+                if (value.getString("borrowerId") == "") {
                     borrower.setText("Borrower: None");
-                }
-                else { // Will have to test this later
+                } else { // Will have to test this later
                     DocumentReference documentRef = db.collection("User").document(value.getString("borrowerId"));
                     documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         /**
@@ -183,12 +188,18 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 ViewBookPhotoActivity.setImage(bookID, bookImage);
             }
         });
+
+        // --------------------------Required for Toolbar---------------------------------//
+        // set tool bar
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
     }
 
     /**
      * Start new activity screen and pass along the TextView data to allow editing of the field strings
      */
-    private void editDescription(TextView title, TextView author, TextView isbn, TextView description, String bookID) {
+    private void editDescription (TextView title, TextView author, TextView isbn, TextView
+            description, String bookID){
         Intent intent = new Intent(ViewOwnedBooksActivity.this, EditDescriptionActivity.class);
         intent.putExtra("BOOK_ID", bookID);
         intent.putExtra("TITLE", title.getText().toString());
@@ -196,5 +207,57 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         intent.putExtra("ISBN", isbn.getText().toString());
         intent.putExtra("DESCRIPTION", description.getText().toString());
         startActivity(intent);
+    }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        tb.inflateMenu(R.menu.activity_main_drawer);
+        tb.setOnMenuItemClickListener(
+                new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        return onOptionsItemSelected(item);
+                    }
+                });
+        return true;
+    }
+
+    // --------------------------Create Toolbar Menu---------------------------------//
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // action with ID action_refresh was selected
+            case R.id.nav_my_profile:
+                startActivity(new Intent(ViewOwnedBooksActivity.this, EditProfileActivity.class));
+                break;
+            case R.id.nav_my_books:
+                startActivity(new Intent( ViewOwnedBooksActivity.this, OwnerBooksActivity.class));
+                break;
+            case R.id.nav_borrowed_books:
+                startActivity(new Intent(ViewOwnedBooksActivity.this, BorrowedBooksActivity.class));
+                break;
+            case R.id.nav_search_books:
+                startActivity(new Intent(ViewOwnedBooksActivity.this, SearchBooksActivity.class));
+                break;
+            case R.id.nav_notifications:
+                startActivity(new Intent(ViewOwnedBooksActivity.this, NotificationsActivity.class));
+                break;
+            case R.id.nav_search_users:
+                startActivity(new Intent(ViewOwnedBooksActivity.this, SearchUsernameActivity.class));
+                break;
+            case R.id.nav_my_requests:
+                startActivity(new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class));
+                break;
+            case R.id.nav_sign_out:
+                firebaseAuth.signOut();
+                Toast.makeText(ViewOwnedBooksActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ViewOwnedBooksActivity.this, LoginActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 }

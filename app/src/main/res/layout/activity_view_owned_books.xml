@@ -7,31 +7,19 @@
     android:orientation="vertical"
     tools:context=".activities.ViewOwnedBooksActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#1dd7de"
-        android:gravity="center_vertical"
-        android:padding="12dp">
+        android:theme="@style/AppTheme.NoActionBar.AppBarOverlay">
 
-        <ImageView
-            android:id="@+id/nav_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_menu_24" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Book Bank"
-            android:textAlignment="center"
-            android:textColor="#000"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-            
-    </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,20 +32,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="#FF5722"
+            android:backgroundTint="#1dd7de"
             android:fontFamily="sans-serif-black"
             android:text="REQUESTS"
-            android:textColor="#FFFFFF" />
+            android:textColor="#000000" />
 
         <Button
             android:id="@+id/delete_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="#FF5722"
+            android:backgroundTint="#1dd7de"
             android:fontFamily="sans-serif-black"
             android:text="DELETE"
-            android:textColor="#FFFFFF" />
+            android:textColor="#000000" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -105,7 +93,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="2dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="2dp"
             android:fontFamily="sans-serif-medium"
@@ -168,48 +156,58 @@
         <Button
             android:id="@+id/add_image_button"
             android:layout_width="0dp"
-            android:layout_height="37dp"
+            android:layout_height="40dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginBottom="4dp"
-            android:backgroundTint="#FF5722"
-            android:fontFamily="sans-serif-medium"
+            android:backgroundTint="#1dd7de"
+            android:fontFamily="sans-serif-black"
             android:text="ADD IMAGE"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/delete_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/description" />
 
+        <Button
+            android:id="@+id/delete_image"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="#1dd7de"
+            android:fontFamily="sans-serif-black"
+            android:text="Delete Image"
+            android:textColor="#000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/add_image_button"
+            app:layout_constraintTop_toBottomOf="@+id/description"></Button>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
+
 
         <ImageView
             android:id="@+id/owner_book_image"
-            android:layout_width="200dp"
-            android:layout_height="250dp"
+            android:layout_width="395dp"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:baselineAligned="false"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@drawable/default_book_image" />
-
-        <Button
-            android:id="@+id/delete_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#FF5722"
-            android:fontFamily="sans-serif-black"
-            android:text="Delete Image"
-            android:textColor="#FFFFFF">
-        </Button>
-
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

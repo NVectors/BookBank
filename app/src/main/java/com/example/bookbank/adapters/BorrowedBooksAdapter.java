@@ -68,9 +68,15 @@ public class BorrowedBooksAdapter extends ArrayAdapter {
         bookAuthor.setText("By " + book.getAuthor());
         bookISBN.setText("ISBN: " + book.getIsbn().toString());
         bookStatus.setText("Status: " + book.getStatus());
-        if (book.getOwnerId() != "") {
+        if (book.getOwnerId() == "") {
+            bookOwner.setText("Owner: None");
+        } else { // Will have to test this later
             DocumentReference documentRef = firestore.collection("User").document(book.getOwnerId());
             documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                /**
+                 * Use DocumentSnapshot to find field value in the document
+                 * @param task
+                 */
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
@@ -80,7 +86,6 @@ public class BorrowedBooksAdapter extends ArrayAdapter {
                             // Test
                             Log.d("NAME", name);
                             bookOwner.setText("Owner: " + name);
-
                         } else {
                             Log.d("TAG", "No such document");
                             bookOwner.setText("Owner: FAILED");
@@ -92,7 +97,6 @@ public class BorrowedBooksAdapter extends ArrayAdapter {
             });
         }
         ViewBookPhotoActivity.setImage(book.getId(), bookImage);
-
         return view;
     }
 }
