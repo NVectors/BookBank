@@ -32,6 +32,8 @@
         <item>Available/Borrowed</item>
         <item>Available</item>
         <item>Borrowed</item>
+        <item>Requested</item>
+        <item>Accepted</item>
     </string-array>
 
 </resources>
