@@ -29,7 +29,7 @@
     <string name="title_activity_set_location">Map</string>
 
     <string-array name="bookStatus">
-        <item>Available/Borrowed</item>
+        <item>Show All</item>
         <item>Available</item>
         <item>Borrowed</item>
         <item>Requested</item>

@@ -141,7 +141,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
             public void onClick(View view) {
                 ArrayList<Book> toDisplayBook = new ArrayList<>();
                 for (Book book: originalBookDataList){
-                    if (tempStatus.equals("Available/Borrowed")){
+                    if (tempStatus.equals("Show All")){
                         toDisplayBook.addAll(originalBookDataList);
                         break;
                     }
