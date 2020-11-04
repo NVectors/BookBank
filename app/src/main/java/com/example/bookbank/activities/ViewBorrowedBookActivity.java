@@ -107,7 +107,7 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
         returnBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(ViewBorrowedBookActivity.this, /**acitivty to return**/));
+               finish();
             }
         });
 
