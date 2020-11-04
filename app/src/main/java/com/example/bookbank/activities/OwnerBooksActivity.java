@@ -39,7 +39,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
     private ArrayAdapter<Book> bookAdapter;
     private ArrayList<Book> bookDataList;
     private ArrayList<Book> originalBookDataList;
-    private String tempStatus = "Available/Borrowed";
+    private String tempStatus = "Show All";
 
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;

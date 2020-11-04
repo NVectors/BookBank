@@ -36,4 +36,11 @@
         <item>Accepted</item>
     </string-array>
 
+    <string-array name="bookStatusBorrower">
+        <item>Show All</item>
+        <item>Borrowed</item>
+        <item>Requested</item>
+        <item>Accepted</item>
+    </string-array>
+
 </resources>
