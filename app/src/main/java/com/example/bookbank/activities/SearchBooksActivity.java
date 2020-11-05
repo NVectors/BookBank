@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -149,6 +150,28 @@ public class SearchBooksActivity extends AppCompatActivity {
                 }
                 // notifying the adapter for the change
                 bookAdapter.notifyDataSetChanged();
+
+            }
+        });
+
+        // opening ViewSearchBookDetails Activity on Click
+        searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // get the book at this position
+                Book book = bookArrayList.get(position);
+
+                Intent intent = new Intent(SearchBooksActivity.this, ViewSearchBookDetails.class);
+
+                // Pass all the values required as extras
+                intent.putExtra("OWNER_NAME",book.getOwnerId());
+                intent.putExtra("TITLE", book.getTitle());
+                intent.putExtra("ISBN", String.valueOf(book.getIsbn()));
+                intent.putExtra("DESCRIPTION", book.getDescription());
+                intent.putExtra("AUTHOR",book.getAuthor());
+
+                startActivity(intent);
 
             }
         });
