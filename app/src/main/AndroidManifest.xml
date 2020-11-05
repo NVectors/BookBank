@@ -21,9 +21,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".activities.ViewSearchBookDetails"></activity>
         <activity
             android:name=".activities.MainNavigationActivity"
-            android:theme="@style/AppTheme.NoActionBar.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar.NoActionBar" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -51,9 +52,9 @@
         <activity android:name=".activities.SearchUsernameActivity" />
         <activity android:name=".activities.NotificationsActivity" />
         <activity android:name=".activities.MyCurrentRequestsActivity" />
-        <activity android:name=".activities.SearchBooksActivity"/>
+        <activity android:name=".activities.SearchBooksActivity" />
         <activity android:name=".activities.SignUpActivity" />
-        <activity android:name=".activities.EditDescriptionActivity"/>
+        <activity android:name=".activities.EditDescriptionActivity" />
         <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
