@@ -170,6 +170,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                 intent.putExtra("ISBN", String.valueOf(book.getIsbn()));
                 intent.putExtra("DESCRIPTION", book.getDescription());
                 intent.putExtra("AUTHOR",book.getAuthor());
+                intent.putExtra("BOOK_ID", book.getId());
 
                 startActivity(intent);
 
