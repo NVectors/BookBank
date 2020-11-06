@@ -16,8 +16,11 @@ import android.widget.Toast;
 import com.example.bookbank.R;
 import com.example.bookbank.adapters.SearchBooksAdapter;
 import com.example.bookbank.models.Book;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -34,6 +37,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
     //declaring the keyWord to search
     String keyWord;
+    String ownerNameText;
 
     // Declaring the variables needed for the list
     ListView searchList;
@@ -164,14 +168,16 @@ public class SearchBooksActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(SearchBooksActivity.this, ViewSearchBookDetails.class);
 
-                // Pass all the values required as extras
-                intent.putExtra("OWNER_NAME",book.getOwnerId());
+                 // putting other extras
+                intent.putExtra("OWNER_ID",book.getOwnerId());
                 intent.putExtra("TITLE", book.getTitle());
                 intent.putExtra("ISBN", String.valueOf(book.getIsbn()));
                 intent.putExtra("DESCRIPTION", book.getDescription());
                 intent.putExtra("AUTHOR",book.getAuthor());
                 intent.putExtra("BOOK_ID", book.getId());
 
+
+                // string the new activity
                 startActivity(intent);
 
             }
