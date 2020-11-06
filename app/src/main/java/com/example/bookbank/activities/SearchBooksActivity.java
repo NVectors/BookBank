@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,8 +16,11 @@ import android.widget.Toast;
 import com.example.bookbank.R;
 import com.example.bookbank.adapters.SearchBooksAdapter;
 import com.example.bookbank.models.Book;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -33,6 +37,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
     //declaring the keyWord to search
     String keyWord;
+    String ownerNameText;
 
     // Declaring the variables needed for the list
     ListView searchList;
@@ -149,6 +154,31 @@ public class SearchBooksActivity extends AppCompatActivity {
                 }
                 // notifying the adapter for the change
                 bookAdapter.notifyDataSetChanged();
+
+            }
+        });
+
+        // opening ViewSearchBookDetails Activity on Click
+        searchList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // get the book at this position
+                Book book = bookArrayList.get(position);
+
+                Intent intent = new Intent(SearchBooksActivity.this, ViewSearchBookDetails.class);
+
+                 // putting other extras
+                intent.putExtra("OWNER_ID",book.getOwnerId());
+                intent.putExtra("TITLE", book.getTitle());
+                intent.putExtra("ISBN", String.valueOf(book.getIsbn()));
+                intent.putExtra("DESCRIPTION", book.getDescription());
+                intent.putExtra("AUTHOR",book.getAuthor());
+                intent.putExtra("BOOK_ID", book.getId());
+
+
+                // string the new activity
+                startActivity(intent);
 
             }
         });
