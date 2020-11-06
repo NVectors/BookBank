@@ -41,12 +41,15 @@ public class SearchUsernameAdapter extends ArrayAdapter {
             view = LayoutInflater.from(context).inflate(R.layout.searched_user_block, parent,false);
         }
 
+        /** Get the position of book in the ArrayList<User> */
         User user = userList.get(position);
 
+        /** Get references to the objects in the layout */
         TextView userName = view.findViewById(R.id.searched_user_name);
         TextView userPhone = view.findViewById(R.id.searched_user_phone);
         TextView userAddr = view.findViewById(R.id.searched_user_addr);
 
+        /** Set references to the user object data */
         userName.setText(user.getFullname());
         userPhone.setText(user.getPhoneNumber());
         userAddr.setText(user.getAddress());
