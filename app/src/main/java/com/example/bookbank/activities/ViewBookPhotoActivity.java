@@ -21,6 +21,11 @@ public class ViewBookPhotoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_book_photo);
     }
 
+    /**
+     * This is the class that gets an image and sets it to the image view provided.
+     * @param bookId This is the book id used to reference an image.
+     * @param bookImage This is the image view that the image should be set to.
+     */
     static public void setImage(String bookId, final ImageView bookImage) {
         final StorageReference imageRef = FirebaseStorage.getInstance().getReference("images/" + bookId);
         bookImage.setImageResource(R.drawable.default_book_image);
