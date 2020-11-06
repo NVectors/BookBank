@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +22,8 @@ public class ViewSearchBookDetails extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_search_book_details);
+
+        Button viewOwnerButton = findViewById(R.id.button_view_owner);
 
         // getting all the views from the layout
         TextView textTitle = findViewById(R.id.text_title);
@@ -37,7 +41,7 @@ public class ViewSearchBookDetails extends AppCompatActivity {
         String description = intent.getStringExtra("DESCRIPTION");
         String bookId = intent.getStringExtra("BOOK_ID");
         String author = intent.getStringExtra("AUTHOR");
-        String ownerID = intent.getStringExtra("OWNER_ID");
+        final String ownerID = intent.getStringExtra("OWNER_ID");
 
         // setting all the views
         textTitle.setText(title);
@@ -62,6 +66,14 @@ public class ViewSearchBookDetails extends AppCompatActivity {
             }
         });
 
-
+        // on view owner profile button. open ViewSearchUser Activity
+        viewOwnerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ViewSearchBookDetails.this, ViewSearchUserActivity.class);
+                intent.putExtra("USER_ID", ownerID);
+                startActivity(intent);
+            }
+        });
     }
 }
