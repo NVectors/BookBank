@@ -12,6 +12,8 @@
 
         <TextView
             android:id="@+id/status_text"
+            android:textSize="16sp"
+            android:typeface="serif"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
@@ -22,6 +24,8 @@
 
         <TextView
             android:id="@+id/ownerName_text"
+            android:textSize="16sp"
+            android:typeface="serif"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -32,6 +36,9 @@
 
         <TextView
             android:id="@+id/title_text"
+            android:textSize="16sp"
+            android:typeface="serif"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
@@ -42,6 +49,8 @@
 
         <TextView
             android:id="@+id/author_text"
+            android:textSize="16sp"
+            android:typeface="serif"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
@@ -52,6 +61,8 @@
 
         <TextView
             android:id="@+id/isbn_text"
+            android:textSize="16sp"
+            android:typeface="serif"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
