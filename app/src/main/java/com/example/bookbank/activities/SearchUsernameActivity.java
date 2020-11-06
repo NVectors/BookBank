@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -56,8 +57,8 @@ public class SearchUsernameActivity extends AppCompatActivity {
 
         userList = findViewById(R.id.search_user_list);
         userName = findViewById(R.id.search_user_field);
-        userNameError = findViewById(R.id.search_user_error);
         searchUserButton = findViewById(R.id.search_user_button);
+        userList = findViewById(R.id.search_user_list);
 
         userDataList = new ArrayList<>();
         userAdapter = new SearchUsernameAdapter(this, userDataList);
@@ -69,7 +70,18 @@ public class SearchUsernameActivity extends AppCompatActivity {
         searchUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findUser(collectionReference, userName, userNameError);
+                String key = userName.getText().toString();
+                findUser(collectionReference, key, userAdapter);
+            }
+        });
+
+        userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String userID = userDataList.get(position).getId();
+                Intent intent = new Intent(SearchUsernameActivity.this, ViewSearchUserActivity.class);
+                intent.putExtra("USER_ID", userID);
+                startActivity(intent);
             }
         });
 
@@ -131,39 +143,43 @@ public class SearchUsernameActivity extends AppCompatActivity {
         return true;
     }
 
+    public void findUser(CollectionReference collectionReference, final String keyWord, final ArrayAdapter<User> userAdapter) {
 
-    public boolean validate(EditText userName, TextView userNameError) {
-        boolean[] inputs = {
-                InputValidator.notEmpty(userName, userNameError),
-                InputValidator.isEmail(userName, userNameError)
-        };
-        return InputValidator.validateInputs(inputs);
-    }
+        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                userDataList.clear();
 
-    public void findUser(CollectionReference collectionReference, EditText userName, TextView userNameError) {
-        if(validate(userName, userNameError)){
-            final Query query = collectionReference
-                    .whereEqualTo("email", userName.getText().toString());
-            query.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                @Override
-                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
-                    userDataList.clear();
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        String id = (String) doc.getData().get("id");
-                        String email = (String) doc.getData().get("email");
-                        String password = (String) doc.getData().get("password");
-                        String fullname = (String) doc.getData().get("fullname");
-                        String address = (String) doc.getData().get("address");
-                        String phoneNumber = (String) doc.getData().get("phoneNumber");
-                        userDataList.add(new User(id, email, password, fullname, address, phoneNumber)); // Adding the cities and provinces from FireStore
+                // iterating each document in the Book collection to get all the book's attributes
+                for(QueryDocumentSnapshot doc : queryDocumentSnapshots){
+
+                    String id = (String) doc.getData().get("id");
+                    String email = (String) doc.getData().get("email");
+                    String password = (String) doc.getData().get("password");
+                    String fullname = (String) doc.getData().get("fullname");
+                    String address = (String) doc.getData().get("address");
+                    String phoneNumber = (String) doc.getData().get("phoneNumber");
+                    User user = new User(id, email, password, fullname, address, phoneNumber);
+
+                    // making author, title and the keyword lowerase for both case searching
+                    String loEmail = email.toLowerCase();
+                    String loFullName = fullname.toLowerCase();
+                    String loPhoneNumber = phoneNumber.toLowerCase();
+                    String key = keyWord.trim().toLowerCase();
+
+                    // searching with regex
+                    if(loEmail.matches(".*\\b"+key+"\\b.*") ||
+                            loFullName.matches(".*\\b"+key+"\\b.*") ||
+                            loPhoneNumber.matches(".*\\b"+key+"\\b.*"))
+                    {
+                        userDataList.add(user);
                     }
-                    if (userDataList.isEmpty()){
-                        Toast.makeText(SearchUsernameActivity.this, "No such username exists", Toast.LENGTH_SHORT).show();
-                    }
-                    userAdapter.notifyDataSetChanged(); // Notifying the adapter to render any new data fetched from the cloud
+
                 }
-            });
-        }
+                // notifying the adapter for the change
+                userAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
 }

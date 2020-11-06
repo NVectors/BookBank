@@ -35,14 +35,6 @@
             android:layout_height="wrap_content"
             android:hint="Enter Username"/>
 
-        <TextView
-            android:id="@+id/search_user_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:textColor="#f00"
-            android:textSize="10sp" />
-
         <Button
             android:id="@+id/search_user_button"
             android:layout_width="match_parent"
