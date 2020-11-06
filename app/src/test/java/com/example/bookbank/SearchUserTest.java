@@ -53,7 +53,7 @@ public class SearchUserTest {
         solo.clickOnButton("search_user_button"); //Select Search Username Button
         solo.clearEditText((EditText) solo.getView(R.id.search_user_field)); //Clear the EditText
         //True if there is no text: testemail@email.com on the screen
-        assertFalse(solo.searchText("testemail@email.com"));
+        assertFalse(solo.searchText("Test"));
     }
 
     @Test
