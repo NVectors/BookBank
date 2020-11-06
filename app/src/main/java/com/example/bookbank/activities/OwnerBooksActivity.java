@@ -35,7 +35,7 @@ import java.util.ArrayList;
 
 public class OwnerBooksActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
-    private ListView bookList;
+    public ListView bookList; //changed to public -> solo need to access this.
     private ArrayAdapter<Book> bookAdapter;
     private ArrayList<Book> bookDataList;
     private ArrayList<Book> originalBookDataList;

@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 public class BorrowedBooksActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
-    ListView bookList;
+    public ListView bookList; //changed to public -> solo need to access this.
     ArrayAdapter<Book> bookAdapter;
     ArrayList<Book> bookDataList;
     private FirebaseAuth firebaseAuth;
