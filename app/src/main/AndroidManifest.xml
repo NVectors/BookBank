@@ -49,6 +49,7 @@
         <activity android:name=".activities.AddBookActivity" />
         <activity android:name=".activities.OwnerBooksActivity" />
         <activity android:name=".activities.SearchUsernameActivity" />
+        <activity android:name=".activities.ViewSearchUserActivity" />
         <activity android:name=".activities.NotificationsActivity" />
         <activity android:name=".activities.MyCurrentRequestsActivity" />
         <activity android:name=".activities.SearchBooksActivity"/>

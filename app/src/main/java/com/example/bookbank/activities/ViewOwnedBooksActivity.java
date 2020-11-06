@@ -185,7 +185,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             public void onClick(View v) {
                 StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
                 photoRef.delete();
-                ViewBookPhotoActivity.setImage(bookID, bookImage);
+                bookImage.setImageResource(R.drawable.default_book_image);
             }
         });
 
