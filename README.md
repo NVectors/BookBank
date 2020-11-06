@@ -15,5 +15,5 @@ The owner can denote when a borrowed book is returned and available again.
 
 Project deilverables in our [Wiki](https://github.com/CMPUT301F20T17/BookBank/wiki)
 
-Jaca doc for our project : [Java Doc](https://cmput301f20t17.github.io/BookBank/doc/)
+Java doc for our project : [Java Doc](https://cmput301f20t17.github.io/BookBank/doc/)
 
