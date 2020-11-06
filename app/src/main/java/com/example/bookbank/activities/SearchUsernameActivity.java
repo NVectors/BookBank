@@ -54,7 +54,10 @@ public class SearchUsernameActivity extends AppCompatActivity {
         Button searchUserButton;
         FirebaseFirestore db;
         firebaseAuth =  FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        final CollectionReference collectionReference = db.collection("User");
 
+        /** Get references to the objects in the layout */
         userList = findViewById(R.id.search_user_list);
         userName = findViewById(R.id.search_user_field);
         searchUserButton = findViewById(R.id.search_user_button);
@@ -64,9 +67,7 @@ public class SearchUsernameActivity extends AppCompatActivity {
         userAdapter = new SearchUsernameAdapter(this, userDataList);
         userList.setAdapter(userAdapter);
 
-        db = FirebaseFirestore.getInstance();
-        final CollectionReference collectionReference = db.collection("User");
-
+        /** The search user button is clicked*/
         searchUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +76,7 @@ public class SearchUsernameActivity extends AppCompatActivity {
             }
         });
 
+        /** A username search result is clicked*/
         userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -143,6 +145,12 @@ public class SearchUsernameActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * This function finds a user based on the keyword provided.
+     * @param collectionReference A reference to the "User" collection in firebase.
+     * @param keyWord The keyword used to search for a user.
+     * @param userAdapter The custom adapter used to display the user information in the list view.
+     */
     public void findUser(CollectionReference collectionReference, final String keyWord, final ArrayAdapter<User> userAdapter) {
 
         collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {

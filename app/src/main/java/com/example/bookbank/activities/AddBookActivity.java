@@ -100,6 +100,9 @@ public class AddBookActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates a new intent to choose a image from the device
+     */
     private void openImageSelect() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -107,6 +110,9 @@ public class AddBookActivity extends AppCompatActivity {
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Gets the uri of the selected image
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -117,6 +123,11 @@ public class AddBookActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This function is responsible for uploading the selected image
+     * @param id This is the id of the book that the image is being attached too,
+     *           the image is also stored with the id as it's name.
+     */
     private void uploadImage(final String id){
         if (uri != null){
             final StorageReference fileRef = storageReference.child(id);
