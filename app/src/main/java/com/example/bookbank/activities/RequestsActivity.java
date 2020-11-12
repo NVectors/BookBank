@@ -1,20 +1,28 @@
 package com.example.bookbank.activities;
 
+import android.app.Dialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
-
 import com.example.bookbank.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class RequestsActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
+    private static final int ERROR_DIALOG_REQUEST = 9001;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,11 +31,49 @@ public class RequestsActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        if (checkServices()){
+            Button location = (Button) findViewById(R.id.map_button);
+            location.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(RequestsActivity.this, SetLocationActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
+
+
         // --------------------------Required for Toolbar---------------------------------//
         // set tool bar
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(tb);
     }
+
+
+    /**
+     * Check Google Services to make sure map requests is possible for user
+     * @return
+     */
+    public boolean checkServices(){
+        Log.d("LOCATION", "Check Google Services Version!");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(RequestsActivity.this);
+
+        if (available == ConnectionResult.SUCCESS){
+            Log.d("LOCATION", "Google Play Services is working!");
+            return  true;
+        }
+        else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            Log.d("Location", "Fixable error!");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(RequestsActivity.this, available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+        }
+        else{
+            Toast.makeText(this, "We can't make map requests!", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
 
     // --------------------------Create Toolbar Menu---------------------------------//
     @Override
