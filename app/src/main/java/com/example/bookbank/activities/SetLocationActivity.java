@@ -12,17 +12,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.bookbank.R;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 public class SetLocationActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-
+    private FusedLocationProviderClient mFusedLocationProviderCLient;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 01;
@@ -34,12 +31,11 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_location);
-
         getLocationPermission();
     }
 
     /**
-     *
+     *  Initialize the Map fragment
      */
     private  void initMap(){
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -49,8 +45,14 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         mapFragment.getMapAsync(this);
     }
 
+    private void getDeviceLocation(){
+        Log.d(TAG, "Getting the device location");
+
+
+    }
+
     /**
-     * Check if Location access is allowed by user
+     * Check if Location permission access is allowed by user
      */
     private void getLocationPermission(){
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
@@ -61,6 +63,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) ==
                     PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionsGranted = true;
+                initMap();
             }
         }
         else{
@@ -99,10 +102,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
 
     }
 
-
-
-
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -118,9 +117,5 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         Log.d(TAG, "Map is ready!");
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 }
