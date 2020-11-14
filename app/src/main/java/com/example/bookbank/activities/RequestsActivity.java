@@ -1,27 +1,88 @@
 package com.example.bookbank.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bookbank.R;
+import com.example.bookbank.adapters.MyCurrentRequestsAdapter;
+import com.example.bookbank.adapters.OwnerBooksAdapter;
+import com.example.bookbank.adapters.RequestsAdapter;
+import com.example.bookbank.models.Book;
+import com.example.bookbank.models.Request;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 public class RequestsActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firestore;
+    private ListView requestsList;
+    private ArrayList<Request> requestsDataList;
+    private RequestsAdapter requestsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_requests);
 
+        final TextView bookTitle = findViewById(R.id.book_title);
+        final TextView bookAuthor = findViewById(R.id.book_author);
+        final TextView bookISBN = findViewById(R.id.book_isbn);
+
+        /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
+        final String bookID = getIntent().getStringExtra("BOOK_ID");
+
+        firestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        requestsList = findViewById(R.id.requests_list);
+        requestsDataList = new ArrayList<>();
+
+        requestsAdapter = new RequestsAdapter(this, R.layout.activity_requests, requestsDataList);
+        requestsList.setAdapter(requestsAdapter);
+
+        firestore.collection("Book").document(bookID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.exists()) {
+                    Book book = documentSnapshot.toObject(Book.class);
+                    bookTitle.setText(book.getTitle());
+                    bookAuthor.setText(book.getAuthor());
+                    bookISBN.setText(book.getIsbn().toString());
+                }
+            }
+        });
+
+        firestore.collection("Request").whereEqualTo("bookId", bookID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        requestsDataList.add(document.toObject(Request.class));
+                    }
+                    requestsAdapter.notifyDataSetChanged();
+                } else {
+                    Log.d("debug", "Error getting documents: ", task.getException());
+                }
+            }
+        });
 
         // --------------------------Required for Toolbar---------------------------------//
         // set tool bar
@@ -68,7 +129,7 @@ public class RequestsActivity extends AppCompatActivity {
                 startActivity(new Intent(RequestsActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(RequestsActivity.this, RequestsActivity.class));
+                startActivity(new Intent(RequestsActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

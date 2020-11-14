@@ -187,7 +187,7 @@ public class BorrowedBooksActivity extends AppCompatActivity implements AdapterV
                 startActivity(new Intent(BorrowedBooksActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(BorrowedBooksActivity.this, RequestsActivity.class));
+                startActivity(new Intent(BorrowedBooksActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

@@ -200,7 +200,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
                 startActivity(new Intent(OwnerBooksActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(OwnerBooksActivity.this, RequestsActivity.class));
+                startActivity(new Intent(OwnerBooksActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

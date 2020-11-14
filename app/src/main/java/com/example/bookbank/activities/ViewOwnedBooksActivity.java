@@ -43,6 +43,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri uri;
+    private String bookID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
-        final String bookID = getIntent().getStringExtra("BOOK_ID");
+        bookID = getIntent().getStringExtra("BOOK_ID");
 
         /** Get instance of Firestore */
         db = FirebaseFirestore.getInstance();
@@ -127,7 +128,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         request.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class));
+                Intent intent = new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class);
+                intent.putExtra("BOOK_ID", bookID);
+                startActivity(intent);
             }
         });
 
@@ -248,7 +251,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 startActivity(new Intent(ViewOwnedBooksActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class));
+                startActivity(new Intent(ViewOwnedBooksActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

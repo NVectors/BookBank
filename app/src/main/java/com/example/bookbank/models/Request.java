@@ -3,6 +3,7 @@ package com.example.bookbank.models;
 public class Request {
     private String id;
     private String bookId;
+    private String bookTitle;
     private String requesterId;
     private String ownerId;
     private String status;
@@ -13,9 +14,10 @@ public class Request {
         // required for Firestore to be able to convert this object
     }
 
-    public Request(String id, String bookId, String requesterId, String ownerId, String status, Double latitude, Double longitude) {
+    public Request(String id, String bookId, String bookTitle, String requesterId, String ownerId, String status, Double latitude, Double longitude) {
         this.id = id;
         this.bookId = bookId;
+        this.bookTitle = bookTitle;
         this.requesterId = requesterId;
         this.ownerId = ownerId;
         this.status = status;
@@ -38,6 +40,10 @@ public class Request {
     public void setBookId(String bookId) {
         this.bookId = bookId;
     }
+
+    public String getBookTitle() { return bookTitle; }
+
+    public void setBookTitle(String bookTitle) { this.bookTitle = bookTitle; }
 
     public String getRequesterId() {
         return requesterId;

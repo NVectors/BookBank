@@ -117,7 +117,7 @@ public class ViewSearchUserActivity extends AppCompatActivity {
                 startActivity(new Intent(ViewSearchUserActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(ViewSearchUserActivity.this, RequestsActivity.class));
+                startActivity(new Intent(ViewSearchUserActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();
