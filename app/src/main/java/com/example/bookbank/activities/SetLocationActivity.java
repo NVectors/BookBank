@@ -1,6 +1,7 @@
 package com.example.bookbank.activities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -8,8 +9,11 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +50,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     private static final float DEFAULT_ZOOM = 15f;
 
     private EditText mSearchText;
+    private ImageView mGPS;
     private static final String TAG = "MAP";
 
     @Override
@@ -53,6 +58,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_location);
         mSearchText =(EditText) findViewById(R.id.map_search);
+        mGPS = (ImageView) findViewById(R.id.icon_gps);
 
         getLocationPermission();
     }
@@ -69,18 +75,28 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                         || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
                     //Execute method for searching
                     geoLocate();
-
+                    mSearchText.getText().clear();
                 }
                 return false;
             }
         });
+
+        mGPS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "CLicked GPS icon!");
+                getDeviceLocation(); //Go to device current location
+            }
+        });
+
+        hideSoftKeyboard();
     }
 
     /**
-     *
+     * Given a keyword input in the search bar, use geographical location to search
      */
     private void geoLocate() {
-        Log.d(TAG, "GeoLocating!");
+        Log.d(TAG, "Search bar was used! GeoLocating!");
 
         String searchString = mSearchText.getText().toString();
         Geocoder geocoder = new Geocoder(SetLocationActivity.this);
@@ -93,12 +109,13 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             Log.e(TAG,"GeoLocating: IOException: " + e.getMessage());
         }
 
-        if (list.size() > 0){
+        if (list.size() > 0){ // List is not empty
             Address address = list.get(0);
 
             Log.d(TAG, "Found a location: " + address.toString());
             //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT.show());
 
+            // Move the camera to the location found and pin mark it with a title
             moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM, address.getAddressLine(0));
         }
 
@@ -115,6 +132,10 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         mapFragment.getMapAsync(this);
     }
 
+    /**
+     *  Ask for permission from user before getting the current location of the device
+     *  If we can get the current location, move the map to where it is pinned.
+     */
     private void getDeviceLocation() {
         Log.d(TAG, "Getting the device location");
 
@@ -145,15 +166,20 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
 
     /**
      * Moves the camera in the map fragment to the given latitude and longitude as parameters
+     * Sets a pin marker at the given location with a title as well (if not "My Location")
      * @param latLng
      * @param zoom
      */
     private void moveCamera(LatLng latLng, float zoom, String title) {
         Log.d(TAG, "Moving camera to: Lat: " + latLng.latitude + ", Lng: " + latLng.longitude);
+
+        hideSoftKeyboard();
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        MarkerOptions options = new MarkerOptions().position(latLng).title(title);
-        mMap.addMarker(options);
+        if (!title.equals("My Location")){ // Title != "My Location"
+            MarkerOptions options = new MarkerOptions().position(latLng).title(title);
+            mMap.addMarker(options);
+        }
     }
 
     /**
@@ -243,5 +269,10 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             init();
         }
 
+    }
+
+    private void hideSoftKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mSearchText.getWindowToken(), 0);
     }
 }
