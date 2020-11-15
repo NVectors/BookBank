@@ -2,9 +2,15 @@ package com.example.bookbank.activities;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,26 +26,82 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class SetLocationActivity extends FragmentActivity implements OnMapReadyCallback {
-
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private Boolean mLocationPermissionsGranted = false; //By default
+
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 01;
-    private Boolean mLocationPermissionsGranted = false; //By default
     private static final float DEFAULT_ZOOM = 15f;
+
+    private EditText mSearchText;
     private static final String TAG = "MAP";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_location);
+        mSearchText =(EditText) findViewById(R.id.map_search);
+
         getLocationPermission();
+    }
+
+
+    private void init(){
+        Log.d(TAG, "Initializing the search bar!");
+
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
+                    //Execute method for searching
+                    geoLocate();
+
+                }
+                return false;
+            }
+        });
+    }
+
+    /**
+     *
+     */
+    private void geoLocate() {
+        Log.d(TAG, "GeoLocating!");
+
+        String searchString = mSearchText.getText().toString();
+        Geocoder geocoder = new Geocoder(SetLocationActivity.this);
+        List<Address> list = new ArrayList<>();
+        try{
+            // Get only 1 result
+            list = geocoder.getFromLocationName(searchString,1);
+        }
+        catch (IOException e){
+            Log.e(TAG,"GeoLocating: IOException: " + e.getMessage());
+        }
+
+        if (list.size() > 0){
+            Address address = list.get(0);
+
+            Log.d(TAG, "Found a location: " + address.toString());
+            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT.show());
+
+            moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM, address.getAddressLine(0));
+        }
+
     }
 
     /**
@@ -68,7 +130,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                             Log.d(TAG, "Found Location!");
                             Location currentLocation = (Location) task.getResult();
                             moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM);
+                                    DEFAULT_ZOOM, "My Location");
                         } else {
                             Log.d(TAG, "Current location is null!");
                             Toast.makeText(SetLocationActivity.this, "Unable to get Current Location", Toast.LENGTH_SHORT).show();
@@ -82,13 +144,16 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     }
 
     /**
-     *
+     * Moves the camera in the map fragment to the given latitude and longitude as parameters
      * @param latLng
      * @param zoom
      */
-    private void moveCamera(LatLng latLng, float zoom) {
+    private void moveCamera(LatLng latLng, float zoom, String title) {
         Log.d(TAG, "Moving camera to: Lat: " + latLng.latitude + ", Lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+
+        MarkerOptions options = new MarkerOptions().position(latLng).title(title);
+        mMap.addMarker(options);
     }
 
     /**
@@ -170,9 +235,12 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             }
             mMap.setMyLocationEnabled(true); // Set blue marker of where current location is
             mMap.getUiSettings().setMyLocationButtonEnabled(false); // Remove button to go back to current location
-            //mMap.getUiSettings().setCompassEnabled(true);
+
+            //Makes testing with Emulator phone easier
             mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.getUiSettings().setRotateGesturesEnabled(true);
+
+            init();
         }
 
     }

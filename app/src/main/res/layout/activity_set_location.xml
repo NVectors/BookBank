@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,31 +7,62 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="-2dp" />
+
+    <Button
+        android:id="@+id/confirm_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="-1dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="-2dp"
+        android:layout_marginBottom="0dp"
+        android:background="#1dd7de"
+        android:fontFamily="sans-serif-black"
+        android:text="CONFIRM LOCATION" />
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:elevation="10dp"
+        android:background="@drawable/white_border"
+        android:id="@+id/search_bar">
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+        <ImageView
+            android:id="@+id/icon_magnify"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/icon_magnify" />
+
+        <EditText
+            android:id="@+id/map_search"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="-2dp" />
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/icon_magnify"
+            android:hint="Enter Address, City or ZIP/Postal Code"
+            android:imeOptions="actionSearch"
+            android:textColor="#000"
+            android:textSize="15dp"
+            android:inputType="text"
+            android:background="@null" />
 
-        <Button
-            android:id="@+id/confirm_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
-            android:background="#1dd7de"
-            android:fontFamily="sans-serif-black"
-            android:text="CONFIRM LOCATION" />
 
     </RelativeLayout>
 
-</LinearLayout>
+
+</RelativeLayout>
