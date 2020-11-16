@@ -12,6 +12,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +54,12 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     private EditText mSearchText;
     private ImageView mGPS;
     private static final String TAG = "MAP";
+    private FirebaseFirestore db;
 
+    /**
+     * Get Location permission from user after starting the activity
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,9 +68,20 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         mGPS = (ImageView) findViewById(R.id.icon_gps);
 
         getLocationPermission();
+
+        Button confirmed = (Button) findViewById(R.id.confirm_location);
+        confirmed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
 
+    /**
+     * Initializing of the search bar to keyword search for address
+     */
     private void init(){
         Log.d(TAG, "Initializing the search bar!");
 
@@ -80,7 +98,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                 return false;
             }
         });
-
         mGPS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,7 +105,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                 getDeviceLocation(); //Go to device current location
             }
         });
-
         hideSoftKeyboard();
     }
 
@@ -202,35 +218,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         }
     }
 
-    /**
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        // super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(TAG, "onRequestPermissionsResult() is called!");
-        mLocationPermissionsGranted = false;
-        switch (requestCode) {
-            case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (grantResults.length > 0) {
-                    for (int i = 0; i < grantResults.length; i++) {
-                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                            mLocationPermissionsGranted = false;
-                            Log.d(TAG, "onRequestPermissionsResult() failed!");
-                            return;
-                        }
-                    }
-                    Log.d(TAG, "onRequestPermissionsResult() granted!");
-                    mLocationPermissionsGranted = true;
-                    initMap(); //Start initialing the map
-                }
-            }
-        }
-
-    }
 
     /**
      * Manipulates the map once available.
@@ -247,7 +234,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         mMap = googleMap;
 
         if (mLocationPermissionsGranted) {
-            getDeviceLocation();
+            getDeviceLocation(); // Get current location
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -266,7 +253,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.getUiSettings().setRotateGesturesEnabled(true);
 
-            init();
+            init(); //Initialize the search bar
         }
 
     }
