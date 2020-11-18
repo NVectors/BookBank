@@ -54,7 +54,7 @@ public class RequestsAdapter extends ArrayAdapter {
         View view = convertView;
 
         if (view == null){
-            view = LayoutInflater.from(context).inflate(R.layout.owner_book_content,parent,false);
+            view = LayoutInflater.from(context).inflate(R.layout.book_requests_item,parent,false);
         }
 
         firestore  = FirebaseFirestore.getInstance();
