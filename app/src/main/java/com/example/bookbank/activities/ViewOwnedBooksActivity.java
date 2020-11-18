@@ -1,28 +1,23 @@
 package com.example.bookbank.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.example.bookbank.R;
-import com.example.bookbank.models.Book;
-//import com.example.bookbank.models.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,9 +28,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import javax.annotation.Nullable;
+
+//import com.example.bookbank.models.Request;
 
 public class ViewOwnedBooksActivity extends AppCompatActivity {
     private FirebaseFirestore db;
@@ -43,6 +39,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri uri;
+    private static final String tag = "VIEW OWNED BOOK";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +100,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                 if (document.exists()) {
                                     String name = document.getString("fullname");
                                     // Test
-                                    Log.d("NAME", name);
+                                    Log.d(tag,"Book name: " + name);
 
                                     borrower.setVisibility(View.VISIBLE); // Default of Borrower text view
                                     borrower.setText("Borrower: " + name);
@@ -113,7 +110,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                     borrower.setText("Borrower: FAILED");
                                 }
                             } else {
-                                Log.d("TAG", "get failed with ", task.getException());
+                                Log.d("TAG", "Failed with ", task.getException());
                             }
                         }
                     });
@@ -177,6 +174,17 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        final Button addImage = findViewById(R.id.add_image_button);
+        addImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "Adding an image");
+
+                //Implement
+            }
+        });
+
 
         /** Image delete button is clicked */
         final Button deleteImage = findViewById(R.id.delete_image);

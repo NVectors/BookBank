@@ -16,7 +16,7 @@
         android:layout_marginBottom="-2dp" />
 
     <Button
-        android:id="@+id/confirm_button"
+        android:id="@+id/confirm_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -61,8 +61,19 @@
             android:inputType="text"
             android:background="@null" />
 
-
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/icon_gps"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/search_bar"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/icon_gps"
+        android:background="@null"/>
 
 
 </RelativeLayout>

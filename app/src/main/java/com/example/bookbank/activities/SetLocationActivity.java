@@ -34,7 +34,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,7 +53,8 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     private EditText mSearchText;
     private ImageView mGPS;
     private static final String TAG = "MAP";
-    private FirebaseFirestore db;
+    private double currentLat;
+    private double currentLong;
 
     /**
      * Get Location permission from user after starting the activity
@@ -73,6 +73,8 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         confirmed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                    Log.d(TAG, "Confirming Location at: Latitude: " + currentLat + " Longitude: " + currentLong);
+
 
             }
         });
@@ -132,7 +134,9 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT.show());
 
             // Move the camera to the location found and pin mark it with a title
-            moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM, address.getAddressLine(0));
+            currentLat = address.getLatitude();
+            currentLong = address.getLongitude();
+            moveCamera(new LatLng(currentLat, currentLong), DEFAULT_ZOOM, address.getAddressLine(0));
         }
 
     }
@@ -166,8 +170,9 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Found Location!");
                             Location currentLocation = (Location) task.getResult();
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM, "My Location");
+                            currentLat = currentLocation.getLatitude();
+                            currentLong = currentLocation.getLongitude();
+                            moveCamera(new LatLng(currentLat, currentLong), DEFAULT_ZOOM, "My Location");
                         } else {
                             Log.d(TAG, "Current location is null!");
                             Toast.makeText(SetLocationActivity.this, "Unable to get Current Location", Toast.LENGTH_SHORT).show();
