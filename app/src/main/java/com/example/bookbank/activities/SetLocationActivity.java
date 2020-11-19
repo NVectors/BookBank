@@ -31,6 +31,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class SetLocationActivity extends FragmentActivity implements OnMapReadyCallback {
+public class SetLocationActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener {
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionsGranted = false; //By default
@@ -147,6 +148,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                 }
             }
         });
+
         hideSoftKeyboard();
     }
 
@@ -165,6 +167,8 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         }
         catch (IOException e){
             Log.e(TAG,"GeoLocating: IOException: " + e.getMessage());
+            hideSoftKeyboard();
+            Toast.makeText(SetLocationActivity.this, "Unable to get Current Location", Toast.LENGTH_SHORT).show();
         }
 
         if (list.size() > 0){ // List is not empty
@@ -238,7 +242,9 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
 
         if (!title.equals("My Location")){ // Title != "My Location"
             MarkerOptions options = new MarkerOptions().position(latLng).title(title);
-            mMap.addMarker(options);
+            /** Allow user to long press the marker to enable dragging */
+            options.draggable(true);    // Allow adjustments to where the marker is on the map
+            mMap.addMarker(options);    // Add marker to the map
         }
     }
 
@@ -275,6 +281,11 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         Log.d(TAG, "Map is ready!");
         mMap = googleMap;
 
+        /** Listen for marker drags by the user */
+        mMap.setOnMarkerDragListener(this);
+
+        mMap.getUiSettings().setMyLocationButtonEnabled(false); // Remove button to go back to current location
+
         if (mLocationPermissionsGranted) {
             getDeviceLocation(); // Get current location
 
@@ -289,13 +300,48 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                 return;
             }
             mMap.setMyLocationEnabled(true); // Set blue marker of where current location is
-            mMap.getUiSettings().setMyLocationButtonEnabled(false); // Remove button to go back to current location
         }
 
     }
 
+    /**
+     * Close and hide the keyboard
+     */
     private void hideSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(mSearchText.getWindowToken(), 0);
+    }
+
+    /**
+     * Called initially when a marker is dragged
+     * @param marker
+     */
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    /**
+     * Called constantly when a marker is dragged
+     * @param marker
+     */
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    /**
+     * Called at the end of drag of a marker
+     * Get the position of the marker and convert to latitude and longitude.
+     * Store latitude and longitude into variables, for later access to store into firestore
+     * @param marker
+     */
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        LatLng location = marker.getPosition();
+        currentLat = location.latitude;
+        currentLong = location.longitude;
+
+        Log.d(TAG, "DRAGGED MARKER -> LATITUDE: " + currentLat + " LONGITUDE: " + currentLong);
     }
 }
