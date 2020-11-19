@@ -27,4 +27,10 @@
         android:layout_height="wrap_content"
         android:text="Request" />
 
+    <Button
+        android:id="@+id/view_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="VIEW BOOK LOCATION" />
+
 </LinearLayout>

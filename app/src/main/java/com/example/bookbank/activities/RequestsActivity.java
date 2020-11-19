@@ -40,6 +40,17 @@ public class RequestsActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+
+            Button viewLocation = (Button) findViewById(R.id.view_location);
+            viewLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
+                    Intent intent = new Intent(RequestsActivity.this, ViewLocationActivity.class);
+                    intent.putExtra("REQUEST_DOC", requestDoc);
+                    startActivity(intent);
+                }
+            });
         }
 
 

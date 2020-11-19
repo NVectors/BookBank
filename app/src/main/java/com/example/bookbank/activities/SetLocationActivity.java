@@ -60,7 +60,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
 
     private FirebaseFirestore db;
 
-
     /**
      * Get Location permission from user after starting the activity
      * @param savedInstanceState
@@ -83,7 +82,18 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         final DocumentReference requestReference = db.collection("Request").document(requestDoc);
 
         getLocationPermission();
+        initMap();  //Initialize the map
+        init();     //Initialize the search bar & current location button
+        /** Permissions is granted, get the device current location */
+        if (mLocationPermissionsGranted){
+            getDeviceLocation();    // Will also mark and move camera to the current location found
+        }
+        else{
+            /** Hide the GPS widget that gets device current location */
+            mGPS.setVisibility(View.INVISIBLE); // Device location permission is not granted
+        }
 
+        /** If the confirm button is clicked, store required data into the database and exit */
         Button confirmed = (Button) findViewById(R.id.confirm_location);
         confirmed.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +105,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                         /** Update the fields for the document in firestore */
                         db.collection("Request").document(requestDoc).update("latitude", currentLat);
                         db.collection("Request").document(requestDoc).update("longitude", currentLong);
-
                         finish();
                     }
                     else{
@@ -104,7 +113,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             }
         });
     }
-
 
     /**
      * Initializing of the search bar to keyword search for address
@@ -125,11 +133,18 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                 return false;
             }
         });
+
+        Log.d(TAG, "Initializing the gps widget!");
         mGPS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "CLicked GPS icon!");
-                getDeviceLocation(); //Go to device current location
+                if (mLocationPermissionsGranted) {
+                    getDeviceLocation(); //Go to device current location
+                }
+                else{
+                    Toast.makeText(SetLocationActivity.this, "Device's location permissions is denied", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         hideSoftKeyboard();
@@ -156,7 +171,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             Address address = list.get(0);
 
             Log.d(TAG, "Found a location: " + address.toString());
-            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT.show());
 
             // Move the camera to the location found and pin mark it with a title
             currentLat = address.getLatitude();
@@ -173,7 +187,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         Log.d(TAG, "Initializing Map!");
         // Map ID
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.set_map);
         mapFragment.getMapAsync(this);
     }
 
@@ -240,14 +254,12 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) ==
                     PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionsGranted = true;
-                initMap();
             }
         } else {
             // Ask user for permission
             ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
-
 
     /**
      * Manipulates the map once available.
@@ -278,12 +290,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             }
             mMap.setMyLocationEnabled(true); // Set blue marker of where current location is
             mMap.getUiSettings().setMyLocationButtonEnabled(false); // Remove button to go back to current location
-
-            //Makes testing with Emulator phone easier
-            mMap.getUiSettings().setZoomControlsEnabled(true);
-            mMap.getUiSettings().setRotateGesturesEnabled(true);
-
-            init(); //Initialize the search bar
         }
 
     }
