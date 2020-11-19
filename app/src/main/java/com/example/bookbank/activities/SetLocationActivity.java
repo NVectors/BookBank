@@ -34,6 +34,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,6 +58,9 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     private double currentLat;
     private double currentLong;
 
+    private FirebaseFirestore db;
+
+
     /**
      * Get Location permission from user after starting the activity
      * @param savedInstanceState
@@ -67,6 +72,16 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         mSearchText =(EditText) findViewById(R.id.map_search);
         mGPS = (ImageView) findViewById(R.id.icon_gps);
 
+        /** Get request document name from RequestsActivity */
+        // -> ADD THIS -> final String requestDoc = getIntent().getStringExtra("REQUEST_DOC");
+        final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
+
+        /** Get instance of Firestore */
+        db = FirebaseFirestore.getInstance();
+
+        /** Get top level reference to the book in collection  by ID */
+        final DocumentReference requestReference = db.collection("Request").document(requestDoc);
+
         getLocationPermission();
 
         Button confirmed = (Button) findViewById(R.id.confirm_location);
@@ -74,8 +89,18 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             @Override
             public void onClick(View v) {
                     Log.d(TAG, "Confirming Location at: Latitude: " + currentLat + " Longitude: " + currentLong);
+                    Log.d(TAG, "CURRENT LOCATION-> Latitude: " + currentLat + " Longtitude: " + currentLong);
 
+                    if (currentLat != 0 && currentLong != 0){
+                        /** Update the fields for the document in firestore */
+                        db.collection("Request").document(requestDoc).update("latitude", currentLat);
+                        db.collection("Request").document(requestDoc).update("longitude", currentLong);
 
+                        finish();
+                    }
+                    else{
+                        Toast.makeText(SetLocationActivity.this, "Search for an Address", Toast.LENGTH_SHORT).show();
+                    }
             }
         });
     }
