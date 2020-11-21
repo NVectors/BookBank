@@ -56,8 +56,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore'
     // Firebase Storage
     implementation 'com.google.firebase:firebase-storage'
-    // Barcode API
-    implementation 'com.google.android.gms:play-services-vision:20.1.2'
+    // Ml kit for barcode scanning
+    implementation 'com.google.mlkit:barcode-scanning:16.0.3'
+
     // Google Maps API
 
 
