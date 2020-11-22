@@ -6,4 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".activities.ScanBarcodeActivity">
 
+    <TextureView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="149dp"
+        tools:layout_editor_absoluteY="562dp"
+        android:text="Scan Barcode"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
