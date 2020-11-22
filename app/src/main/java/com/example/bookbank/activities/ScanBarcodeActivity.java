@@ -89,8 +89,11 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
+                    Toast.makeText(getApplicationContext(),"Taking Image",Toast.LENGTH_LONG).show();
+
                     takePicture();
                 } catch (CameraAccessException e) {
+
                     e.printStackTrace();
                 }
             }
@@ -216,6 +219,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
     }
 
     private void takePicture() throws CameraAccessException {
+        Toast.makeText(getApplicationContext(),"Picture Function",Toast.LENGTH_LONG).show();
         if(cameraDevice == null){
             return;
         }
@@ -229,15 +233,15 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         yuvSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.YUV_420_888);
 
         // recommended image size for google ml kit
-        int width = 1920;
-        int height = 1080;
+        int width = 640;
+        int height = 480;
 
         if(yuvSizes != null && yuvSizes.length >0){
             width = yuvSizes[0].getWidth();
             height = yuvSizes[0].getHeight();
         }
 
-        ImageReader reader = ImageReader.newInstance(width,height,ImageFormat.JPEG,1);
+        ImageReader reader = ImageReader.newInstance(width,height,ImageFormat.YUV_420_888,1);
         List<Surface> outputSurfaces = new ArrayList<>(2);
         outputSurfaces.add(reader.getSurface());
 
@@ -247,12 +251,14 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         captureBuilder.addTarget(reader.getSurface());
         captureBuilder.set(CaptureRequest.CONTROL_MODE,CameraMetadata.CONTROL_MODE_AUTO);
 
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
- //       captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
+  //       int rotation_jpeg = getWindowManager().getDefaultDisplay().getRotation();
+    //     captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation_jpeg));
 
+  //      Toast.makeText(getApplicationContext(),"Starting image avail",Toast.LENGTH_LONG).show();
         ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
             @Override
             public void onImageAvailable(ImageReader reader) {
+                Toast.makeText(getApplicationContext(),"Image avail function",Toast.LENGTH_LONG).show();
                 Image image = null;
 
                 image = reader.acquireLatestImage();
@@ -271,7 +277,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                 }
 
                 rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
-
+                Toast.makeText(getApplicationContext(),"Setting input image",Toast.LENGTH_LONG).show();
                 // initializing InputImage
                 InputImage inputImage = InputImage.fromMediaImage(image, rotationCompensation);
 
@@ -282,10 +288,13 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             }
         };
 
+        reader.setOnImageAvailableListener(readerListener,mBackgroundHandler);
+
 
     }
 
     private void scanBarcodes(InputImage image) {
+        Toast.makeText(getApplicationContext(),"Scanning barcode",Toast.LENGTH_LONG).show();
         // set detector options
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
