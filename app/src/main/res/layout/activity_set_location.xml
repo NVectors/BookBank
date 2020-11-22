@@ -58,7 +58,7 @@
             android:imeOptions="actionSearch"
             android:textColor="#000"
             android:textSize="15dp"
-            android:inputType="textNoSuggestions"
+            android:inputType="text|textPostalAddress"
             android:background="@null" />
 
     </RelativeLayout>
