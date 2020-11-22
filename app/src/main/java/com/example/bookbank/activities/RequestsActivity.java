@@ -75,7 +75,10 @@ public class RequestsActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        requestsDataList.add(document.toObject(Request.class));
+                        Request newRequest = document.toObject(Request.class);
+                        String docId = document.getId();
+                        newRequest.setId(docId);
+                        requestsDataList.add(newRequest);
                     }
                     requestsAdapter.notifyDataSetChanged();
                 } else {

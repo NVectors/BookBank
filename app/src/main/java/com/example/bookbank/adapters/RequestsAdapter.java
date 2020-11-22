@@ -1,6 +1,8 @@
 package com.example.bookbank.adapters;
 
 import android.content.Context;
+import android.nfc.Tag;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firestore.v1.WriteResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,23 +82,37 @@ public class RequestsAdapter extends ArrayAdapter {
         });
         requestStatus.setText(request.getStatus());
 
+        rejectRequestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // deleting the request
+                firestore.runTransaction(new Transaction.Function<Void>() {
+                    public Void apply(Transaction transaction) {
+                        String name = "placement";
+                        return null;
+                    };
+                });
+            }
+        });
+
+
         acceptRequestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // accept this request and delete all other requests for this book
                 // also send notifications to both denied and accepted with people
 
+                // update accepted request
+                DocumentReference requestAcceptedRef = firestore.collection("Request").document(request.getId());
+                requestAcceptedRef.update("status", "Accepted");
+
+                // update book to be accepted
+                DocumentReference bookAcceptedRef = firestore.collection("Book").document(request.getBookId());
+                bookAcceptedRef.update("status", "Accepted");
+
                 firestore.runTransaction(new Transaction.Function<Void>() {
                     @Override
                     public Void apply(Transaction transaction) throws FirebaseFirestoreException {
-                        HashMap<String, Object> acceptedRequest = new HashMap<String, Object>();
-                        acceptedRequest.put("status", "Accepted");
-                        // update accepted request
-                        DocumentReference requestAcceptedRef = firestore.collection("Request").document(request.getId());
-                        transaction.update(requestAcceptedRef, acceptedRequest);
-                        // update book to be accepted
-                        DocumentReference bookAcceptedRef = firestore.collection("Book").document(request.getBookId());
-                        transaction.update(bookAcceptedRef, acceptedRequest);
                         // send Notifications to relavent people
                         //send notification that request was accepted to person borrowing
                         String Id;
@@ -122,10 +139,13 @@ public class RequestsAdapter extends ArrayAdapter {
                                     public Void apply(Transaction transaction) throws FirebaseFirestoreException {
                                         for (DocumentSnapshot document: queryDocumentSnapshots) {
                                             final Request toDeleteRequest = document.toObject(Request.class);
-                                            if (toDeleteRequest.getStatus() != "Accepted") {
+                                            String docId = document.getId();
+                                            toDeleteRequest.setId(docId);
+                                            if (!toDeleteRequest.getStatus().equals("Accepted")) {
+                                                System.out.println(toDeleteRequest.getStatus());
                                                 // delete request for this book since it wasnt accepted
                                                 DocumentReference deleteRequestRef = firestore.collection("Request").document(toDeleteRequest.getId());
-                                                transaction.delete(deleteRequestRef);
+                                                deleteRequestRef.delete();
                                                 // send notification to user saying that their request was denied
                                                 String Id = firestore.collection("Notification").document().getId();
                                                 DocumentReference requestDenied = firestore.collection("Notification").document(Id);
@@ -141,6 +161,7 @@ public class RequestsAdapter extends ArrayAdapter {
                         });
                     }
                 });
+                // start new activity to pick location
             }
         });
 
