@@ -107,10 +107,13 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
         returnBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Phousanak -- new Intent
-                String originalBookID = bookID;
+                //Scanning -- new Intent
+                String originalBookISBN = isbn.getText().toString();
+
                 Intent intent = new Intent(getBaseContext(), ScanBarCodeReturnBookActivity.class);
+
                 intent.putExtra("BOOK_ID", bookID);
+                intent.putExtra("ISBN_OG", originalBookISBN);
                 startActivity(intent);
                 finish();
             }

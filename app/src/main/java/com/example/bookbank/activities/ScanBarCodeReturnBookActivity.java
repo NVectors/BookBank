@@ -20,7 +20,9 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
     
     private Button scanButton;
     private String globalBookID;
+    private String globalISBN;
     private FirebaseFirestore db;
+
 
 
     @Override
@@ -30,11 +32,10 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
 
         /** Get book id of the book that clicked in the list view of BorrowerBooksActivity */
         final String bookID = getIntent().getStringExtra("BOOK_ID");
+        final String ISBN_OG = getIntent().getStringExtra("ISBN_OG").replace("ISBN: ", "");
         globalBookID = bookID;
+        globalISBN = ISBN_OG;
 
-        Log.d("debug", "ARRIVED ScanBarCodeReturnBookActivity. FROM ViewBorrowedBookActivity");
-
-        Log.d("debug", "bookID: " + bookID);
 
         scanButton = findViewById(R.id.ScanButton);
         scanButton.setOnClickListener(this);
@@ -61,13 +62,17 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
             if (result.getContents() != null){
                 String isbnCode = result.getContents().toString();
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(result.getContents());
-                builder.setTitle("Scanning Result");
-                Log.d("debug", "ISBN retrieved: " + isbnCode);
 
                 /*--Change Status + Change BorrowerID--*/
-                updateBook(isbnCode);
-                /*------------------------------------*/
+                boolean updateSuccess = updateBook(isbnCode);
+                if (updateSuccess == true){
+                    builder.setTitle("Scanning Result" + ": Success!");
+                }
+                else {
+                    builder.setTitle("Scanning Result" + ": Fail!");
+                }
+                builder.setMessage(result.getContents());
+
                 builder.setPositiveButton("Scan Again", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -79,9 +84,9 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
                         finish();
                     }
                 });
+
                 AlertDialog dialog = builder.create();
                 dialog.show();
-                Toast.makeText(this, "SUCCESS", Toast.LENGTH_LONG).show();
             }
             else {
                 Toast.makeText(this, "No Results", Toast.LENGTH_LONG).show();
@@ -92,18 +97,18 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
 
     }
 
-    private void updateBook(String isbnCode) {
-        //Log.d("debug", "PARSED VALUE: " + globalBookID);
-        Log.d("debug", "SCANNED VALUE: " + isbnCode);
+    private boolean updateBook(String isbnCode) {
         db = FirebaseFirestore.getInstance();
 
-        /** Update the fields for the document in firestore */
-        db.collection("Book").document(globalBookID).update("status", "Available");
-        db.collection("Book").document(globalBookID).update("borrowerId", "");
-        finish();
-    }
-
-    private void showToast(){
-        Toast.makeText(this, "Success", Toast.LENGTH_LONG).show();
+        if (isbnCode.equals(globalISBN)){
+            /** Update the fields for the document in firestore */
+            db.collection("Book").document(globalBookID).update("status", "Available");
+            db.collection("Book").document(globalBookID).update("borrowerId", "");
+            //finish();
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }
