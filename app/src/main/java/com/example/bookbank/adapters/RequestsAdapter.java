@@ -1,40 +1,39 @@
 package com.example.bookbank.adapters;
 
 import android.content.Context;
-import android.nfc.Tag;
-import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.bookbank.R;
-import com.example.bookbank.models.Book;
+import com.example.bookbank.activities.EditProfileActivity;
+import com.example.bookbank.activities.RequestsActivity;
+import com.example.bookbank.activities.SetLocationActivity;
+import com.example.bookbank.activities.ViewOwnedBooksActivity;
+import com.example.bookbank.activities.ViewSearchBookDetails;
 import com.example.bookbank.models.Notification;
 import com.example.bookbank.models.Request;
 import com.example.bookbank.models.User;
-import com.google.android.gms.common.api.Batch;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseException;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
-import com.google.firebase.firestore.WriteBatch;
-import com.google.firestore.v1.WriteResult;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+
+import static androidx.core.content.ContextCompat.startActivity;
 
 public class RequestsAdapter extends ArrayAdapter {
     private ArrayList<Request> requestList;
@@ -88,9 +87,20 @@ public class RequestsAdapter extends ArrayAdapter {
                 // deleting the request
                 firestore.runTransaction(new Transaction.Function<Void>() {
                     public Void apply(Transaction transaction) {
-                        String name = "placement";
+                        // first delete the request then send notification to requester
+                        String Id;
+                        Id = firestore.collection("Notification").document().getId();
+                        DocumentReference requestAcceptedNotificationRef = firestore.collection("Notification").document(Id);
+                        transaction.set(requestAcceptedNotificationRef, new Notification(Id, request.getRequesterId(), "Your request for " + request.getBookTitle() + " has been rejected"));
                         return null;
                     };
+                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        DocumentReference requestRejectRef = firestore.collection("Request").document(request.getId());
+                        requestRejectRef.delete();
+                        // if adapter list is empty change to Available
+                    }
                 });
             }
         });
@@ -160,8 +170,16 @@ public class RequestsAdapter extends ArrayAdapter {
                             }
                         });
                     }
+                }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Intent intent = new Intent(context, SetLocationActivity.class);
+                            // set location up, need to check if anything else is needed
+                            //context.startActivity(intent);
+                        }
+                    }
                 });
-                // start new activity to pick location
             }
         });
 
