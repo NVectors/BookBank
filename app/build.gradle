@@ -60,6 +60,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-vision:20.1.2'
     // Google Maps API
 
+    //Barcode API Return Book
+    implementation 'com.journeyapps:zxing-android-embedded:3.4.0'
+
 
 
 }
