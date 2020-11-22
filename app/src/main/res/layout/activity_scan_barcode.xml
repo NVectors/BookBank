@@ -9,6 +9,7 @@
     <TextureView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/textureView"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />
@@ -16,6 +17,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/scanButton"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="149dp"
         tools:layout_editor_absoluteY="562dp"
