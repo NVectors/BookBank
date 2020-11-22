@@ -58,7 +58,7 @@
             android:imeOptions="actionSearch"
             android:textColor="#000"
             android:textSize="15dp"
-            android:inputType="text"
+            android:inputType="textNoSuggestions"
             android:background="@null" />
 
     </RelativeLayout>

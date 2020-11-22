@@ -36,7 +36,9 @@ public class RequestsActivity extends AppCompatActivity {
             location.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
                     Intent intent = new Intent(RequestsActivity.this, SetLocationActivity.class);
+                    intent.putExtra("REQUEST_DOC", requestDoc);
                     startActivity(intent);
                 }
             });

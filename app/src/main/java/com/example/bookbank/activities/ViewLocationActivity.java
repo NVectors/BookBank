@@ -163,7 +163,7 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
             Log.d(TAG, "Found: " + address + city + state + country + postalCode + knownName);
 
             /** Get point of location address to set as the title of the pin marker */
-            String info = (address + city + state + country + postalCode);
+            String info = (address);
 
             /** Move to location retrieved from database */
             moveCamera(new LatLng(bookLat, bookLong), DEFAULT_ZOOM, info);

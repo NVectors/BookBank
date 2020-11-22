@@ -60,6 +60,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     private double currentLong;
 
     private FirebaseFirestore db;
+    private List<Address> list;
 
     /**
      * Get Location permission from user after starting the activity
@@ -73,8 +74,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         mGPS = (ImageView) findViewById(R.id.icon_gps);
 
         /** Get request document name from RequestsActivity */
-        // -> ADD THIS -> final String requestDoc = getIntent().getStringExtra("REQUEST_DOC");
-        final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
+        final String requestDoc = getIntent().getStringExtra("REQUEST_DOC");
 
         /** Get instance of Firestore */
         db = FirebaseFirestore.getInstance();
@@ -84,15 +84,16 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
 
         getLocationPermission();
         initMap();  //Initialize the map
-        init();     //Initialize the search bar & current location button
-        /** Permissions is granted, get the device current location */
-        if (mLocationPermissionsGranted){
-            getDeviceLocation();    // Will also mark and move camera to the current location found
+        init();     //Initialize the search bar & current location button widgets
+        /** Permissions is granted, go to device current location */
+        if (mLocationPermissionsGranted) {
+            getDeviceLocation();
         }
         else{
             /** Hide the GPS widget that gets device current location */
             mGPS.setVisibility(View.INVISIBLE); // Device location permission is not granted
         }
+
 
         /** If the confirm button is clicked, store required data into the database and exit */
         Button confirmed = (Button) findViewById(R.id.confirm_location);
@@ -148,7 +149,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                 }
             }
         });
-
         hideSoftKeyboard();
     }
 
@@ -158,30 +158,51 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     private void geoLocate() {
         Log.d(TAG, "Search bar was used! GeoLocating!");
 
-        String searchString = mSearchText.getText().toString();
-        Geocoder geocoder = new Geocoder(SetLocationActivity.this);
-        List<Address> list = new ArrayList<>();
-        try{
-            // Get only 1 result
-            list = geocoder.getFromLocationName(searchString,1);
-        }
-        catch (IOException e){
-            Log.e(TAG,"GeoLocating: IOException: " + e.getMessage());
-            hideSoftKeyboard();
-            Toast.makeText(SetLocationActivity.this, "Unable to get Current Location", Toast.LENGTH_SHORT).show();
-        }
+        final String searchString = mSearchText.getText().toString();
+        final Geocoder geocoder = new Geocoder(SetLocationActivity.this);
 
-        if (list.size() > 0){ // List is not empty
-            Address address = list.get(0);
+        /** Geolocation search on background thread */
+        new Thread(new Runnable() {
+            public void run() {
+                // A potentially time consuming task
+                try {
+                    // Get only 1 result
+                    list = new ArrayList<>();
+                    list = geocoder.getFromLocationName(searchString, 1);
+                    if (list != null && !list.isEmpty()) {
+                        final Address address = list.get(0);
 
-            Log.d(TAG, "Found a location: " + address.toString());
-
-            // Move the camera to the location found and pin mark it with a title
-            currentLat = address.getLatitude();
-            currentLong = address.getLongitude();
-            moveCamera(new LatLng(currentLat, currentLong), DEFAULT_ZOOM, address.getAddressLine(0));
-        }
-
+                        Log.d(TAG, "Found a location: " + address.toString());
+                        currentLat = address.getLatitude();
+                        currentLong = address.getLongitude();
+                        /** Run within the main thread */
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                hideSoftKeyboard();
+                                // Move the camera to the location found and pin mark it with a title
+                                moveCamera(new LatLng(currentLat, currentLong), DEFAULT_ZOOM, address.getAddressLine(0));
+                            }
+                        });
+                    }
+                    else {
+                        /** Run within the main thread */
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(SetLocationActivity.this, "No such location", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                } catch (IOException e) {
+                    Log.e(TAG,"GeoLocating: IOException: " + e.getMessage());
+                    /** Run within the main thread */
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            hideSoftKeyboard();
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     /**
@@ -215,7 +236,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                             Location currentLocation = (Location) task.getResult();
                             currentLat = currentLocation.getLatitude();
                             currentLong = currentLocation.getLongitude();
-                            moveCamera(new LatLng(currentLat, currentLong), DEFAULT_ZOOM, "My Location");
+                            moveCamera(new LatLng(currentLat, currentLong), DEFAULT_ZOOM, "Current Location");
                         } else {
                             Log.d(TAG, "Current location is null!");
                             Toast.makeText(SetLocationActivity.this, "Unable to get Current Location", Toast.LENGTH_SHORT).show();
@@ -237,15 +258,13 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     private void moveCamera(LatLng latLng, float zoom, String title) {
         Log.d(TAG, "Moving camera to: Lat: " + latLng.latitude + ", Lng: " + latLng.longitude);
 
-        hideSoftKeyboard();
+        /** Move camera to new coordinates */
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        if (!title.equals("My Location")){ // Title != "My Location"
-            MarkerOptions options = new MarkerOptions().position(latLng).title(title);
-            /** Allow user to long press the marker to enable dragging */
-            options.draggable(true);    // Allow adjustments to where the marker is on the map
-            mMap.addMarker(options);    // Add marker to the map
-        }
+        MarkerOptions options = new MarkerOptions().position(latLng).title(title);
+        /** Allow user to long press the marker to enable dragging */
+        options.draggable(true);    // Allow adjustments to where the marker is on the map
+        mMap.addMarker(options);    // Add marker to the map
     }
 
     /**
@@ -283,7 +302,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
 
         /** Listen for marker drags by the user */
         mMap.setOnMarkerDragListener(this);
-
         mMap.getUiSettings().setMyLocationButtonEnabled(false); // Remove button to go back to current location
 
         if (mLocationPermissionsGranted) {
@@ -301,7 +319,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
             }
             mMap.setMyLocationEnabled(true); // Set blue marker of where current location is
         }
-
     }
 
     /**
