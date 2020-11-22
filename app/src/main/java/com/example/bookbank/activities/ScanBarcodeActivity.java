@@ -5,9 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -31,6 +34,14 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.bookbank.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.common.InputImage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -209,21 +220,21 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             return;
         }
 
-        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        final CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
         CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraDevice.getId());
 
-        Size[] jpegSizes = null;
+        Size[] yuvSizes = null;
 
-        jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
+        yuvSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.YUV_420_888);
 
         // recommended image size for google ml kit
         int width = 1920;
         int height = 1080;
 
-        if(jpegSizes != null && jpegSizes.length >0){
-            width = jpegSizes[0].getWidth();
-            height = jpegSizes[0].getHeight();
+        if(yuvSizes != null && yuvSizes.length >0){
+            width = yuvSizes[0].getWidth();
+            height = yuvSizes[0].getHeight();
         }
 
         ImageReader reader = ImageReader.newInstance(width,height,ImageFormat.JPEG,1);
@@ -237,7 +248,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         captureBuilder.set(CaptureRequest.CONTROL_MODE,CameraMetadata.CONTROL_MODE_AUTO);
 
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
+ //       captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
 
         ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
             @Override
@@ -246,9 +257,66 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
                 image = reader.acquireLatestImage();
 
+                // calculating the rotation of the image for Input Image
+                Activity currentActivity = ScanBarcodeActivity.this;
+                int deviceRotation = currentActivity.getWindowManager().getDefaultDisplay().getRotation();
+                int rotationCompensation = ORIENTATIONS.get(deviceRotation);
+
+                // getting device's sensor orientation
+                int sensorOrientation = 0;
+                try {
+                    sensorOrientation = cameraManager.getCameraCharacteristics(cameraID).get(CameraCharacteristics.SENSOR_ORIENTATION);
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
+                }
+
+                rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
+
+                // initializing InputImage
+                InputImage inputImage = InputImage.fromMediaImage(image, rotationCompensation);
+
+                // calling barcode scanner function
+                scanBarcodes(inputImage);
+
+
             }
         };
 
+
+    }
+
+    private void scanBarcodes(InputImage image) {
+        // set detector options
+        BarcodeScannerOptions options =
+                new BarcodeScannerOptions.Builder()
+                        .setBarcodeFormats(
+                                Barcode.FORMAT_EAN_13)
+                        .build();
+        BarcodeScanner scanner = BarcodeScanning.getClient();
+
+        // run detector
+        Task<List<Barcode>> result = scanner.process(image).addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+            @Override
+            public void onSuccess(List<Barcode> barcodes) {
+                for (Barcode barcode: barcodes) {
+                    Rect bounds = barcode.getBoundingBox();
+                    Point[] corners = barcode.getCornerPoints();
+                    String rawValue = barcode.getRawValue();
+                    int valueType = barcode.getValueType();
+
+                    Toast.makeText(getApplicationContext(),rawValue,Toast.LENGTH_LONG).show();
+
+                }
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(),"Error!",Toast.LENGTH_LONG).show();
+
+
+            }
+        });
 
     }
 
