@@ -67,7 +67,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
         // initializing the firebase db
         final String TAG = "Search";
-        FirebaseFirestore db;
+        final FirebaseFirestore db;
 
         // setting the view,arraylist and adapter for the list
         searchList = findViewById(R.id.search_list);
@@ -113,7 +113,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
                     // making sure we only query the book which are available
                     String status = (String) doc.getData().get("status");
-                    if(status.equals("Available")){
+                    if(status.equals("Available") || status.equals("Requested")){
                         // fetching all the atributes of the book
                         String author = (String) doc.getData().get("author");
                         String borrowerId = (String) doc.getData().get("borrowerId");
@@ -123,7 +123,23 @@ public class SearchBooksActivity extends AppCompatActivity {
                         String ownerId = (String) doc.getData().get("ownerId");
                         String title = (String) doc.getData().get("title");
 
-                        Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId);
+                        // checking if user has that book requested already
+
+
+                        final Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId);
+
+                        if(status.equals("Requested")) {
+                            // check all books to see if they are on there
+                            db.collection("Request").whereEqualTo("bookId", id).whereEqualTo("requesterId", firebaseAuth.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    Log.d("debug", String.valueOf(queryDocumentSnapshots.size()));
+                                    if (queryDocumentSnapshots.size() != 0) {
+                                        book.setStatus("Requested");
+                                    }
+                                }
+                            });
+                        }
 
                         // if keyword is empty string all available books are added as default
                         if(keyWord.equals("")){

@@ -175,8 +175,10 @@ public class RequestsAdapter extends ArrayAdapter {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
                             Intent intent = new Intent(context, SetLocationActivity.class);
+                            String docId = request.getId();
+                            intent.putExtra("DocumentName", docId);
                             // set location up, need to check if anything else is needed
-                            //context.startActivity(intent);
+                            context.startActivity(intent);
                         }
                     }
                 });

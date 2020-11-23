@@ -85,19 +85,16 @@ public class ViewSearchBookDetails extends AppCompatActivity {
         });
 
 //        // check to see if user has already made a request for this book
-//        db.collection("Request").whereEqualTo("bookId", bookId).whereEqualTo("requesterId", firebaseAuth.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                Log.d("debug", String.valueOf(queryDocumentSnapshots.size()));
-//                if (queryDocumentSnapshots.size() != 0) {
-//                    // user has already requested this book so dont allow them to request it again
-//                    requestBookButton.setVisibility(View.INVISIBLE);
-//                } else {
-//                    // user hasnt requested this book yet, so allow them too
-//                    requestBookButton.setVisibility(View.INVISIBLE);
-//                }
-//            }
-//        });
+        db.collection("Request").whereEqualTo("bookId", bookId).whereEqualTo("requesterId", firebaseAuth.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.d("debug", String.valueOf(queryDocumentSnapshots.size()));
+                if (queryDocumentSnapshots.size() != 0) {
+                    // user has already requested this book so dont allow them to request it again
+                    requestBookButton.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
         // on view owner profile button. open ViewSearchUser Activity
         viewOwnerButton.setOnClickListener(new View.OnClickListener() {
