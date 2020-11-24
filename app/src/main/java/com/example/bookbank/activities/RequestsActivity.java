@@ -30,6 +30,8 @@ public class RequestsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RequestsActivity.this, ScanBarcodeActivity.class);
+                String bookID = "fe3b2289-cdd8-4a0b-b032-b931b7c761c6";
+                intent.putExtra("BOOK_ID", bookID);
                 startActivity(intent);
             }
         });

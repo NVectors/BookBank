@@ -28,10 +28,14 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.example.bookbank.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
@@ -59,7 +63,9 @@ public class ScanBarcodeActivity extends AppCompatActivity {
     private ExecutorService executor;
     private BarcodeScanner scanner;
 
-    private BarcodeImageAnalysis imageAnalysis;
+    private FirebaseFirestore db;
+    private String bookID;
+    private DocumentReference docRef;
 
 
     @SuppressLint("RestrictedApi")
@@ -71,6 +77,16 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         /** References to layout objects */
         previewView = findViewById(R.id.cameraPreview);
         scanBarcode = findViewById(R.id.barcodeButton);
+
+        /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
+        bookID = getIntent().getStringExtra("BOOK_ID");
+
+        /** Get instance of Firestore */
+        db = FirebaseFirestore.getInstance();
+
+        /** Get top level reference to the book in collection  by ID */
+        docRef = db.collection("Book").document(bookID);
+
 
         Log.d(TAG, "Start the scanner!");
         /** Check if camera permission is granted by user */
@@ -134,7 +150,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             public void onCaptureSuccess(@NonNull ImageProxy image) {
                 Log.d(TAG, "Picture is taken!");
 
-                imageAnalysis.analyze(image);
+                //imageAnalysis.analyze(image);
 
             }
 
@@ -191,10 +207,20 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
                                         for (Barcode barcode: barcodes){
                                             String rawValue = barcode.getRawValue();
+                                            Integer type = barcode.getFormat();
                                             Log.d(TAG, "BAR CODE IS " + rawValue);
+                                            Log.d(TAG, "BAR CODE TYPE IS " + type.toString());
 
-                                            
-                                            finish();
+                                            if ( (type != Barcode.FORMAT_EAN_8) || (type != Barcode.FORMAT_DATA_MATRIX) ){
+                                                Toast.makeText(getApplicationContext(), "Not an ISBN barcode", Toast.LENGTH_SHORT).show();
+                                                try {
+                                                    wait(20000);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                finish();
+                                            }
+                                            ownerScan(rawValue);
                                         }
                                         Log.d(TAG,"Done analyzing");
                                         image.close();
@@ -217,6 +243,31 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                 cameraSelector,
                 imageAnalysis,
                 preview);
+    }
+
+    private void ownerScan(String rawValue) {
+        Log.d(TAG, "In ownerScan function!");
+
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        String bookISBN = String.valueOf(document.getData().get("isbn"));
+                        String bookStatus = document.getString("status");
+                        Log.d(TAG, "BOOK ISBN: " + bookISBN);
+                        Log.d(TAG, "BOOK STATUS: " + bookStatus);
+
+
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "Failed with ", task.getException());
+                }
+            }
+        });
     }
 
     /**
