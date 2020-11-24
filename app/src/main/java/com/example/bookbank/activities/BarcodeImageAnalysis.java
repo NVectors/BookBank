@@ -24,12 +24,10 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
     private BarcodeScanner scanner;
 
     public BarcodeImageAnalysis() {
-        /** Configure the barcode scanner to recognize only ISBN or QR/Aztec format */
+        /** Configure the barcode scanner to recognize only ISBN format */
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(
-                                Barcode.FORMAT_QR_CODE,
-                                Barcode.FORMAT_AZTEC,
                                 Barcode.FORMAT_EAN_13,
                                 Barcode.FORMAT_EAN_8)
                         .build();
@@ -75,9 +73,6 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
 
                                     case Barcode.FORMAT_EAN_8:
 
-                                    case Barcode.FORMAT_QR_CODE:
-
-                                    case Barcode.FORMAT_AZTEC:
 
                                 }
                             }
