@@ -19,7 +19,10 @@ import com.google.mlkit.vision.common.InputImage;
 import java.util.List;
 
 public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
-        public BarcodeImageAnalysis(){
+    private static final String TAG = "ANALYZE";
+
+    public BarcodeImageAnalysis(){
+            /** Configure the barcode scanner to recognize only ISBN or QR/Aztec format */
             BarcodeScannerOptions options =
                     new BarcodeScannerOptions.Builder()
                             .setBarcodeFormats(
@@ -31,11 +34,15 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
 
         }
 
-
-        @Override
+    /**
+     * Analyze the image that was captured by the user
+     * @param image
+     */
+    @Override
         @androidx.camera.core.ExperimentalGetImage
         public void analyze(@NonNull ImageProxy image) {
 
+            /** Image does not exists */
             if(image == null || image.getImage() == null){
                 return;
             }
@@ -51,13 +58,13 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                         @Override
                         public void onSuccess(List<Barcode> barcodes) {
                             // Task completed successfully
-                            Log.d("MOHIT","BARCODE SCANNER");
+                            Log.d(TAG,"Scanned the image!");
 
                             //Toast.makeText(getActivity().getApplicationContext(),"ScanningBarcode",Toast.LENGTH_LONG).show();
 
                             for(Barcode barcode: barcodes){
                                 String data = barcode.getRawValue();
-                                Log.d("MOHIT","BARCODE IS " + data );
+                                Log.d(TAG,"BARCODE IS " + data );
                             }
 
                         }
@@ -66,7 +73,7 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             // Task failed with an exception
-                            Log.d("MOHIT","BARCODE SCAN FAILED");
+                            Log.d(TAG,"BARCODE SCAN FAILED");
                         }
                     });
         }

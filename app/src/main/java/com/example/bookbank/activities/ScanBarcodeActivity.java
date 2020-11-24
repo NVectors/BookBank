@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,15 +58,19 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         previewView = findViewById(R.id.cameraPreview);
         scanBarcode = findViewById(R.id.barcodeButton);
 
-        Log.d("MOHIT", "START");
+        Log.d(TAG, "Start the scanner!");
+        /** Check if camera permission is granted by user */
         if (checkCameraPermission() == false) {
-            getCameraPermission();
+            getCameraPermission(); // Get camera permission
         }
 
+        /** Initialize object to execute Runnable Task(s) */
         executor = Executors.newSingleThreadExecutor();
+
+        /** Get instance of the Image Analyzer class */
         imageAnalysis = new BarcodeImageAnalysis();
 
-
+        /** Get instance of the */
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(new Runnable() {
             @Override
@@ -76,88 +81,81 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
-
-
             }
         }, ContextCompat.getMainExecutor(this));
 
+        /** Configure the Image Capture object to be able to take photos*/
         imageCapture = new ImageCapture.Builder()
                 .setBufferFormat(ImageFormat.YUV_420_888)
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build();
 
-        // Button on click listener to scan bar code
+        /** "Take Photo" button is clicked */
         scanBarcode.setOnClickListener( new View.OnClickListener(){
-
             @Override
             public void onClick(View v) {
-                Log.d("MOHIT", "ONCLICK BUTTON");
-                takePhoto();
+                Log.d(TAG, "Button is pressed!");
+                takePhoto(); // Call function to handle captured photo
             }
         });
     }
 
+    /**
+     * Use Image Capture object to take photo, if successful send image to the analyzer
+     */
     private void takePhoto() {
-        Log.d("MOHIT", "take Photo Function");
+        Log.d(TAG, "Taking a photo!");
         imageCapture.takePicture(executor, new ImageCapture.OnImageCapturedCallback() {
             @SuppressLint("UnsafeExperimentalUsageError")
             @Override
             public void onCaptureSuccess(@NonNull ImageProxy image) {
-                Log.d("MOHIT", "Picture Taken");
+                Log.d(TAG, "Picture is taken!");
                 imageAnalysis.analyze(image);
+
+
             }
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
-                Log.d("MOHIT", "PIC FAILED");
-
-
+                Log.d(TAG, "Picture not taken!");
+                Toast.makeText(getApplicationContext(), "Failed to capture the image", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
+    /**
+     * Allows the camera to be displayed on the phone's screen
+     * @param cameraProvider
+     */
     private void showPreview(ProcessCameraProvider cameraProvider) {
+        /** Construct a preview stream to display the camera on-screen*/
         Preview preview = new Preview.Builder().build();
+
+        /** Use the back side camera */
         CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
+
+        /** Create a surface for the camera preview layout that's connected to the preview stream*/
         preview.setSurfaceProvider(previewView.createSurfaceProvider());
+
+        /** Bind the lifecycle of camera to LifecycleOwner within application's process */
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) this,
                 cameraSelector,
                 imageCapture,
                 preview);
-
     }
 
+    /**
+     * Get camera permission from user
+     */
     private void getCameraPermission() {
         ActivityCompat.requestPermissions(this, CAMERA_PERMISSION, CAMERA_REQUEST_CODE);
     }
 
+    /**
+     * Check and return if camera permission is granted
+     * @return
+     */
     private boolean checkCameraPermission() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
-
-
-//    public void onClick(View v) {
-//        if(v.getId() == R.id.barcodeButton){
-//            Log.d("MOHIT", "ONCLICK BUTTON");
-//            imageCapture.takePicture(executor, new ImageCapture.OnImageCapturedCallback() {
-//                @SuppressLint("UnsafeExperimentalUsageError")
-//                @Override
-//                public void onCaptureSuccess(@NonNull ImageProxy image) {
-//                    Log.d("MOHIT", "IMAGE SUCCESS");
-//                    imageAnalysis.analyze(image);
-//
-//                }
-//
-//                @Override
-//                public void onError(@NonNull ImageCaptureException exception) {
-//                    Log.d("MOHIT", "IMAGE CAPTURE ERROR");
-//                }
-//            });
-//
-//        }
-//
-//    }
-
-
 }
