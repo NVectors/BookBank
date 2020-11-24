@@ -86,7 +86,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
         /** Configure the Image Capture object to be able to take photos*/
         imageCapture = new ImageCapture.Builder()
-                .setBufferFormat(ImageFormat.YUV_420_888)
+                .setBufferFormat(ImageFormat.YUV_420_888) //Using Camera2 API
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build();
 
@@ -111,7 +111,6 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             public void onCaptureSuccess(@NonNull ImageProxy image) {
                 Log.d(TAG, "Picture is taken!");
                 imageAnalysis.analyze(image);
-
 
             }
 

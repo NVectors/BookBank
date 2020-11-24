@@ -33,7 +33,7 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                         .build();
 
         /** Get instance of BarcodeScanner */
-        scanner = BarcodeScanning.getClient();
+        scanner = BarcodeScanning.getClient(options);
     }
 
     /**
@@ -60,7 +60,6 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                         public void onSuccess(List<Barcode> barcodes) {
                             // Task completed successfully
                             Log.d(TAG,"Scanned the image!");
-                            image.close();
 
                             //Toast.makeText(getActivity().getApplicationContext(),"ScanningBarcode",Toast.LENGTH_LONG).show();
 
@@ -71,13 +70,15 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                                 int valueType = barcode.getValueType();
                                 switch (valueType) {
                                     case Barcode.FORMAT_EAN_13:
-
+                                        Log.d(TAG,"BARCODE IS EAN-13");
+                                        Log.d(TAG,"BARCODE IS " + barcode.getDisplayValue() );
                                     case Barcode.FORMAT_EAN_8:
-
-
+                                        Log.d(TAG,"BARCODE IS " + barcode.getDisplayValue() );
+                                        Log.d(TAG,"BARCODE IS EAN-8");
                                 }
                             }
-
+                            Log.d(TAG,"Done analyzing");
+                            image.close();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -85,6 +86,8 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                         public void onFailure(@NonNull Exception e) {
                             // Task failed with an exception
                             Log.d(TAG,"BARCODE SCAN FAILED");
+                            Log.d(TAG,"Done analyzing");
+                            image.close();
                         }
                     });
         }
