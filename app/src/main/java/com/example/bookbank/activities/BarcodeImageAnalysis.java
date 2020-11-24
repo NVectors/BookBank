@@ -1,10 +1,7 @@
 package com.example.bookbank.activities;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.media.Image;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.camera.core.ImageAnalysis;
@@ -22,7 +19,12 @@ import com.google.mlkit.vision.common.InputImage;
 import java.util.List;
 
 public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
-    public BarcodeImageAnalysis(){
+
+    private static final String TAG = "ANALYZE";
+    private BarcodeScanner scanner;
+
+    public BarcodeImageAnalysis() {
+        /** Configure the barcode scanner to recognize only ISBN or QR/Aztec format */
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(
@@ -32,45 +34,62 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                                 Barcode.FORMAT_EAN_8)
                         .build();
 
+        /** Get instance of BarcodeScanner */
+        scanner = BarcodeScanning.getClient();
     }
 
-
+    /**
+     * Analyze the image that was captured by the user
+     * @param image
+     */
     @Override
-    @androidx.camera.core.ExperimentalGetImage
-    public void analyze(@NonNull ImageProxy image) {
+        @androidx.camera.core.ExperimentalGetImage
+        public void analyze(@NonNull ImageProxy image) {
 
-        if(image == null || image.getImage() == null){
-            return;
-        }
+            /** Image does not exists */
+            if(image == null || image.getImage() == null){
+                return;
+            }
 
-        Image barcodeImage = image.getImage();
-        int rotationDegrees = image.getImageInfo().getRotationDegrees();
+            Image barcodeImage = image.getImage();
+            int rotationDegrees = image.getImageInfo().getRotationDegrees();
+            InputImage inputImage = InputImage.fromMediaImage(barcodeImage,rotationDegrees);
 
-        InputImage inputImage = InputImage.fromMediaImage(barcodeImage,rotationDegrees);
+            /** Process the image captured */
+            Task<List<Barcode>> result = scanner.process(inputImage)
+                    .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+                        @Override
+                        public void onSuccess(List<Barcode> barcodes) {
+                            // Task completed successfully
+                            Log.d(TAG,"Scanned the image!");
 
-        BarcodeScanner scanner = BarcodeScanning.getClient();
+                            //Toast.makeText(getActivity().getApplicationContext(),"ScanningBarcode",Toast.LENGTH_LONG).show();
 
-        Task<List<Barcode>> result = scanner.process(inputImage)
-                .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
-                    @Override
-                    public void onSuccess(List<Barcode> barcodes) {
-                        Log.d("MOHIT","BARCODE SCANNER");
-                        Toast.makeText(getActivity().getApplicationContext(),"ScanningBarcode",Toast.LENGTH_LONG).show();
+                            for(Barcode barcode: barcodes){
+                                String data = barcode.getRawValue();
+                                Log.d(TAG,"BARCODE IS " + data );
 
+                                int valueType = barcode.getValueType();
+                                switch (valueType) {
+                                    case Barcode.FORMAT_EAN_13:
 
-                        for(Barcode barcode: barcodes){
-                            String data = barcode.getRawValue();
-                            Log.d("MOHIT","BARCODE IS " + data );
+                                    case Barcode.FORMAT_EAN_8:
+
+                                    case Barcode.FORMAT_QR_CODE:
+
+                                    case Barcode.FORMAT_AZTEC:
+
+                                }
+                            }
+
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("MOHIT","BARCODE SCAN FAILED");
-
-                    }
-                });
-
-    }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Task failed with an exception
+                            Log.d(TAG,"BARCODE SCAN FAILED");
+                        }
+                    });
+        }
 }
