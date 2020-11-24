@@ -192,6 +192,8 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                                         for (Barcode barcode: barcodes){
                                             String rawValue = barcode.getRawValue();
                                             Log.d(TAG, "BAR CODE IS " + rawValue);
+
+                                            
                                             finish();
                                         }
                                         Log.d(TAG,"Done analyzing");
@@ -216,7 +218,6 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                 imageAnalysis,
                 preview);
     }
-
 
     /**
      * Get camera permission from user
