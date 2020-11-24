@@ -2,6 +2,7 @@ package com.example.bookbank.activities;
 
 import android.media.Image;
 import android.util.Log;
+import android.util.Size;
 
 import androidx.annotation.NonNull;
 import androidx.camera.core.ImageAnalysis;
@@ -33,7 +34,7 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                         .build();
 
         /** Get instance of BarcodeScanner */
-        scanner = BarcodeScanning.getClient(options);
+        scanner = BarcodeScanning.getClient();
     }
 
     /**
@@ -41,54 +42,57 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
      * @param image
      */
     @Override
-        @androidx.camera.core.ExperimentalGetImage
-        public void analyze(@NonNull ImageProxy image) {
+    @androidx.camera.core.ExperimentalGetImage
+    public void analyze(ImageProxy image) {
 
-            /** Image does not exists */
-            if(image == null || image.getImage() == null){
-                return;
-            }
+    Image inputImage = image.getImage();
 
-            Image barcodeImage = image.getImage();
-            int rotationDegrees = image.getImageInfo().getRotationDegrees();
-            InputImage inputImage = InputImage.fromMediaImage(barcodeImage,rotationDegrees);
+    /** Image does not exists */
+    if(inputImage == null ){
+        return;
+    }
 
-            /** Process the image captured */
-            Task<List<Barcode>> result = scanner.process(inputImage)
-                    .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
-                        @Override
-                        public void onSuccess(List<Barcode> barcodes) {
-                            // Task completed successfully
-                            Log.d(TAG,"Scanned the image!");
+    int rotationDegrees = image.getImageInfo().getRotationDegrees();
+    InputImage barcodeImage = InputImage.fromMediaImage(inputImage,rotationDegrees);
 
-                            //Toast.makeText(getActivity().getApplicationContext(),"ScanningBarcode",Toast.LENGTH_LONG).show();
+    /** Process the image captured */
+    Task<List<Barcode>> result = scanner.process(barcodeImage)
+            .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+                @Override
+                public void onSuccess(List<Barcode> barcodes) {
+                    // Task completed successfully
+                    Log.d(TAG,"Scanned the image!");
 
-                            for(Barcode barcode: barcodes){
-                                String data = barcode.getRawValue();
-                                Log.d(TAG,"BARCODE IS " + data );
+                    //Toast.makeText(getActivity().getApplicationContext(),"ScanningBarcode",Toast.LENGTH_LONG).show();
 
-                                int valueType = barcode.getValueType();
-                                switch (valueType) {
-                                    case Barcode.FORMAT_EAN_13:
-                                        Log.d(TAG,"BARCODE IS EAN-13");
-                                        Log.d(TAG,"BARCODE IS " + barcode.getDisplayValue() );
-                                    case Barcode.FORMAT_EAN_8:
-                                        Log.d(TAG,"BARCODE IS " + barcode.getDisplayValue() );
-                                        Log.d(TAG,"BARCODE IS EAN-8");
-                                }
-                            }
-                            Log.d(TAG,"Done analyzing");
-                            image.close();
+                    for(Barcode barcode: barcodes){
+                        String data = barcode.getRawValue();
+                        Log.d(TAG,"BARCODE IS " + data );
+
+                        int valueType = barcode.getValueType();
+                        switch (valueType) {
+                            case Barcode.FORMAT_EAN_13:
+                                Log.d(TAG,"BARCODE IS EAN-13");
+                                Log.d(TAG,"BARCODE IS " + barcode.getDisplayValue() );
+                                break;
+                            case Barcode.FORMAT_EAN_8:
+                                Log.d(TAG,"BARCODE IS " + barcode.getDisplayValue() );
+                                Log.d(TAG,"BARCODE IS EAN-8");
+                                break;
                         }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            // Task failed with an exception
-                            Log.d(TAG,"BARCODE SCAN FAILED");
-                            Log.d(TAG,"Done analyzing");
-                            image.close();
-                        }
-                    });
-        }
+                    }
+                    Log.d(TAG,"Done analyzing");
+                    image.close();
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    // Task failed with an exception
+                    Log.d(TAG,"BARCODE SCAN FAILED");
+                    Log.d(TAG,"Done analyzing");
+                    image.close();
+                }
+            });
+    }
 }
