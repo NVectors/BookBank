@@ -33,7 +33,7 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                         .build();
 
         /** Get instance of BarcodeScanner */
-        scanner = BarcodeScanning.getClient();
+        scanner = BarcodeScanning.getClient(options);
     }
 
     /**
