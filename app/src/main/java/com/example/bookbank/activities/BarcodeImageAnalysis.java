@@ -19,20 +19,24 @@ import com.google.mlkit.vision.common.InputImage;
 import java.util.List;
 
 public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
+
     private static final String TAG = "ANALYZE";
+    private BarcodeScanner scanner;
 
-    public BarcodeImageAnalysis(){
-            /** Configure the barcode scanner to recognize only ISBN or QR/Aztec format */
-            BarcodeScannerOptions options =
-                    new BarcodeScannerOptions.Builder()
-                            .setBarcodeFormats(
-                                    Barcode.FORMAT_QR_CODE,
-                                    Barcode.FORMAT_AZTEC,
-                                    Barcode.FORMAT_EAN_13,
-                                    Barcode.FORMAT_EAN_8)
-                            .build();
+    public BarcodeImageAnalysis() {
+        /** Configure the barcode scanner to recognize only ISBN or QR/Aztec format */
+        BarcodeScannerOptions options =
+                new BarcodeScannerOptions.Builder()
+                        .setBarcodeFormats(
+                                Barcode.FORMAT_QR_CODE,
+                                Barcode.FORMAT_AZTEC,
+                                Barcode.FORMAT_EAN_13,
+                                Barcode.FORMAT_EAN_8)
+                        .build();
 
-        }
+        /** Get instance of BarcodeScanner */
+        scanner = BarcodeScanning.getClient();
+    }
 
     /**
      * Analyze the image that was captured by the user
@@ -49,10 +53,9 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
 
             Image barcodeImage = image.getImage();
             int rotationDegrees = image.getImageInfo().getRotationDegrees();
-
             InputImage inputImage = InputImage.fromMediaImage(barcodeImage,rotationDegrees);
 
-            BarcodeScanner scanner = BarcodeScanning.getClient();
+            /** Process the image captured */
             Task<List<Barcode>> result = scanner.process(inputImage)
                     .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
                         @Override
@@ -65,6 +68,18 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                             for(Barcode barcode: barcodes){
                                 String data = barcode.getRawValue();
                                 Log.d(TAG,"BARCODE IS " + data );
+
+                                int valueType = barcode.getValueType();
+                                switch (valueType) {
+                                    case Barcode.FORMAT_EAN_13:
+
+                                    case Barcode.FORMAT_EAN_8:
+
+                                    case Barcode.FORMAT_QR_CODE:
+
+                                    case Barcode.FORMAT_AZTEC:
+
+                                }
                             }
 
                         }
