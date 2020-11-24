@@ -60,6 +60,7 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
                         public void onSuccess(List<Barcode> barcodes) {
                             // Task completed successfully
                             Log.d(TAG,"Scanned the image!");
+                            image.close();
 
                             //Toast.makeText(getActivity().getApplicationContext(),"ScanningBarcode",Toast.LENGTH_LONG).show();
 
