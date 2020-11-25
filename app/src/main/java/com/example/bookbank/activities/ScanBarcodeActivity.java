@@ -2,6 +2,8 @@ package com.example.bookbank.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.media.Image;
@@ -66,6 +68,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String bookID;
     private DocumentReference docRef;
+    private Intent resultIntent;
 
 
     @SuppressLint("RestrictedApi")
@@ -74,9 +77,11 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_barcode);
 
-        /** References to layout objects */
+        /** References to camera preview layout object */
         previewView = findViewById(R.id.cameraPreview);
-        scanBarcode = findViewById(R.id.barcodeButton);
+
+        /** Create intent to send back data to main activity later */
+        resultIntent = new Intent();
 
         /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
         bookID = getIntent().getStringExtra("BOOK_ID");
@@ -116,51 +121,15 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             public void run() {
                 try {
                     ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                    /** Link the layout view finder to the camera preview for live display */
                     ScanBarcodeActivity.this.showPreview(cameraProvider);
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }, ContextCompat.getMainExecutor(this));
-
-        /** Configure the Image Capture object to be able to take photos*/
-        imageCapture = new ImageCapture.Builder()
-                .setBufferFormat(ImageFormat.NV21) //YUV_420_888) //Using Camera2 API
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .build();
-
-        /** "Take Photo" button is clicked */
-        scanBarcode.setOnClickListener( new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Button is pressed!");
-                takePhoto(); // Call function to handle captured photo
-            }
-        });
     }
 
-    /**
-     * Use Image Capture object to take photo, if successful send image to the analyzer
-     */
-    private void takePhoto() {
-        Log.d(TAG, "Taking a photo!");
-        imageCapture.takePicture(executor, new ImageCapture.OnImageCapturedCallback() {
-            @SuppressLint("UnsafeExperimentalUsageError")
-            @Override
-            public void onCaptureSuccess(@NonNull ImageProxy image) {
-                Log.d(TAG, "Picture is taken!");
-
-                //imageAnalysis.analyze(image);
-
-            }
-
-            @Override
-            public void onError(@NonNull ImageCaptureException exception) {
-                Log.d(TAG, "Picture not taken!");
-                Toast.makeText(getApplicationContext(), "Failed to capture the image", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     /**
      * Allows the camera to be displayed on the phone's screen
@@ -176,8 +145,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         /** Create a surface for the camera preview layout that's connected to the preview stream*/
         preview.setSurfaceProvider(previewView.createSurfaceProvider());
 
-        //Image Analysis Function
-        //Set static size according to your device or write a dynamic function for it
+        /** Image Analysis Function, only accept one image at a time for processing */
         ImageAnalysis imageAnalysis =
                 new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -204,6 +172,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                                     public void onSuccess(List<Barcode> barcodes) {
                                         // Task completed successfully
                                         Log.d(TAG,"Scanned the image!");
+                                        Toast.makeText(getApplicationContext(), "Scanning", Toast.LENGTH_SHORT).show();
 
                                         for (Barcode barcode: barcodes){
                                             String rawValue = barcode.getRawValue();
@@ -211,19 +180,18 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                                             Log.d(TAG, "BAR CODE IS " + rawValue);
                                             Log.d(TAG, "BAR CODE TYPE IS " + type.toString());
 
-                                            if ( (type != Barcode.FORMAT_EAN_8) || (type != Barcode.FORMAT_DATA_MATRIX) ){
-                                                Toast.makeText(getApplicationContext(), "Not an ISBN barcode", Toast.LENGTH_SHORT).show();
-                                                try {
-                                                    wait(20000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                finish();
+                                            if ( (type != Barcode.FORMAT_EAN_8) && (type != Barcode.FORMAT_EAN_13) ) {
+                                                resultIntent.putExtra("WRONG_FORMAT", "Not an ISBN barcode");
+                                                setResult(Activity.RESULT_OK, resultIntent);
                                             }
-                                            ownerScan(rawValue);
+
+                                            resultIntent.putExtra("CORRECT_FORMAT", "Valid ISBN barcode");
+                                            setResult(Activity.RESULT_OK, resultIntent);
+
                                         }
                                         Log.d(TAG,"Done analyzing");
                                         image.close();
+                                        finish();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -232,7 +200,11 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                                         // Task failed with an exception
                                         Log.d(TAG,"BARCODE SCAN FAILED");
                                         Log.d(TAG,"Done analyzing");
+
+                                        resultIntent.putExtra("ERROR", "There was an error: " + e.getMessage());
+                                        setResult(Activity.RESULT_OK, resultIntent);
                                         image.close();
+                                        finish();
                                     }
                                 });
                     }
@@ -254,12 +226,37 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
+                        /** Get the ISBN and Status of the book in the database */
                         String bookISBN = String.valueOf(document.getData().get("isbn"));
                         String bookStatus = document.getString("status");
+
                         Log.d(TAG, "BOOK ISBN: " + bookISBN);
+                        Log.d(TAG,"BARCODE ISBN: " + rawValue);
                         Log.d(TAG, "BOOK STATUS: " + bookStatus);
 
+                        /** ISBN of the book scanned matches with the ISBN of book in database */
+                        if (bookISBN.equals(rawValue)) {
+                            Log.d(TAG, "ISBN MATCHES");
 
+                            if(bookStatus.toLowerCase().equals("accepted")) {
+                                Log.d(TAG, "STATUS IS CORRECT");
+                                resultIntent.putExtra("WRONG_ISBN", "The scanned ISBN value doesn't match ");
+                                setResult(Activity.RESULT_OK, resultIntent);
+                            }
+                            else if (!bookStatus.toLowerCase().equals("accepted")){
+                                Log.d(TAG, "STATUS IS INCORRECT");
+                                resultIntent.putExtra("WRONG_STATUS", "The book's request is not accepted!");
+                                setResult(Activity.RESULT_OK, resultIntent);
+                            }
+                        }
+                        else if (!bookISBN.equals(rawValue)){
+                            Log.d(TAG, "ISBN DON'T MATCH");
+                            resultIntent.putExtra("WRONG_ISBN", "The scanned ISBN value doesn't match!");
+                            setResult(Activity.RESULT_OK, resultIntent);
+                        }
+
+                        /** CLose the scanner */
+                        finish();
                     } else {
                         Log.d(TAG, "No such document");
                     }
