@@ -46,6 +46,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri uri;
     private static final String TAG = "SCANNED";
+    private String bookID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
-        final String bookID = getIntent().getStringExtra("BOOK_ID");
+        bookID = getIntent().getStringExtra("BOOK_ID");
 
         /** Get instance of Firestore */
         db = FirebaseFirestore.getInstance();
@@ -231,14 +232,20 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     Log.d(TAG,"Barcode value returned: " + barcodeValue);
 
                     /** Handle firestore in ownerScanned() */
-                    ownerScanned(barcodeValue);
+                    ownerScan(barcodeValue);
                 }
                 break;
             }
         }
     }
 
-    private void ownerScanned(String barcodeValue) {
+    /**
+     * Handles the cases after the barcode of the book is scanned.
+     * If the ISBN of the book scanned matches the ISBN of the book in the database.
+     * Then the boolean will be updated to True.
+     * @param barcodeValue
+     */
+    private void ownerScan(String barcodeValue) {
         Log.d(TAG, "In ownerScan function!");
 
         bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -258,23 +265,33 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                         /** ISBN of the book scanned matches with the ISBN of book in database */
                         if (bookISBN.equals(barcodeValue)) {
                             Log.d(TAG, "ISBN MATCHES");
+                                /** Status of the book is correct should be "Accepted"*/
                             if(bookStatus.toLowerCase().equals("accepted")) {
                                 Log.d(TAG, "STATUS IS CORRECT");
+                                Log.d(TAG, "BOOLEAN IS: " + document.getData().get("ownerScanHandOver"));
 
+                                /** Check if the boolean to keep track of owner scanning first is null */
+                                if ( (document.getData().get("ownerScanHandOver")) == null){
+                                    /** Update the boolean to True for the book */
+                                    db.collection("Book").document(bookID).update("ownerScanHandOver", true);
+                                }
+
+                                /** Notify user the next steps in handing over the book */
                                 Toast.makeText(getApplicationContext(), "Borrow must scan book now", Toast.LENGTH_LONG).show();
-
                             }
+                                    /** ISBN of the book scanned matches but status is not "Accepted" */
                             else if (!bookStatus.toLowerCase().equals("accepted")){
                                 Log.d(TAG, "STATUS IS INCORRECT");
                                 Toast.makeText(getApplicationContext(), "Accept request for the book first", Toast.LENGTH_LONG).show();
                             }
                         }
+                                /** ISBN of the book scanned doesn't match the ISBN of the book in database */
                         else if (!bookISBN.equals(barcodeValue)){
                             Log.d(TAG, "ISBN DON'T MATCH");
-                            Toast.makeText(getApplicationContext(), "Book scanned doesn't match selected book", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Book scanned doesn't match the selected book", Toast.LENGTH_LONG).show();
                         }
 
-                    } else {
+                    } else { /** Book not in the database */
                         Log.d(TAG, "No such document");
                         Toast.makeText(getApplicationContext(), "Book scanned is not in your list", Toast.LENGTH_LONG).show();
                     }
