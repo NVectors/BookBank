@@ -123,7 +123,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                         String ownerId = (String) doc.getData().get("ownerId");
                         String title = (String) doc.getData().get("title");
 
-                        Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId);
+                        Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId, false);
 
                         // if keyword is empty string all available books are added as default
                         if(keyWord.equals("")){

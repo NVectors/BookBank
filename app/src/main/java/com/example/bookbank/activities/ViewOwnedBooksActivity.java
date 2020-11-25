@@ -227,8 +227,8 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     String barcodeValue = data.getStringExtra("VALUE");
 
                     /** Display the barcode value to the user */
-                    //Toast.makeText(getApplicationContext(), "Scanned: " + barcodeValue, Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getApplicationContext(), "Barcode value returned: " + barcodeValue, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Barcode value returned: " + barcodeValue, Toast.LENGTH_SHORT).show();
+                    Log.d(TAG,"Barcode value returned: " + barcodeValue);
 
                     /** Handle firestore in ownerScanned() */
                     ownerScanned(barcodeValue);
