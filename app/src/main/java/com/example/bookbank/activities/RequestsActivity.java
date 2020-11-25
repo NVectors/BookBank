@@ -56,9 +56,15 @@ public class RequestsActivity extends AppCompatActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     /** Get string from key of resultIntent passed back from child activity */
                     String returnValue = data.getStringExtra("RESULT");
-                    
+
                     /** Display the string to the user */
                     Toast.makeText(getApplicationContext(), returnValue, Toast.LENGTH_SHORT).show();
+
+                    /** Get the value of the barcode scanned */
+                    String barcodeValue = data.getStringExtra("VALUE");
+
+                    /** Display the barcode value to the user */
+                    Toast.makeText(getApplicationContext(), "Scanned: " + barcodeValue, Toast.LENGTH_SHORT).show();
                 }
                 break;
             }

@@ -186,7 +186,9 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                                             }
 
                                             resultIntent.putExtra("RESULT", "Valid ISBN barcode");
+                                            resultIntent.putExtra("VALUE", rawValue);
                                             setResult(Activity.RESULT_OK, resultIntent);
+
                                             finish();
 
                                         }
