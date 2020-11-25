@@ -9,12 +9,14 @@ public class Book {
     private String ownerId;
     private String borrowerId;
     private String status;
+    private boolean borrowerScanReturn;
+    private boolean ownerScanReturn;
 
     public Book() {
         // required for Firestore to be able to convert this object
     }
 
-    public Book(String id, String title, String author, long isbn, String description, String status, String ownerId, String borrowerId) {
+    public Book(String id, String title, String author, long isbn, String description, String status, String ownerId, String borrowerId, Boolean borrowerScanReturn, Boolean ownerScanReturn) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -23,6 +25,11 @@ public class Book {
         this.ownerId = ownerId;
         this.borrowerId = borrowerId;
         this.status = status;
+
+        //Boolean borrowerScanReturn, Boolean ownerScanReturn
+        this.borrowerScanReturn = borrowerScanReturn;
+        this.ownerScanReturn = ownerScanReturn;
+
     }
 
     public String getId() {
@@ -87,5 +94,21 @@ public class Book {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isBorrowerScanReturn() {
+        return borrowerScanReturn;
+    }
+
+    public void setBorrowerScanReturn(boolean borrowerScanReturn) {
+        this.borrowerScanReturn = borrowerScanReturn;
+    }
+
+    public boolean isOwnerScanReturn() {
+        return ownerScanReturn;
+    }
+
+    public void setOwnerScanReturn(boolean ownerScanReturn) {
+        this.ownerScanReturn = ownerScanReturn;
     }
 }

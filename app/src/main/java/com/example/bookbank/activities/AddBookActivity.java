@@ -182,7 +182,9 @@ public class AddBookActivity extends AppCompatActivity {
                             description.getText().toString(),
                             "Available",
                             ownerId,
-                            borrowerId
+                            borrowerId,
+                            false,
+                            false
                     )
             ).addOnCompleteListener(new OnCompleteListener<Void>() {
                 /**

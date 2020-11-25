@@ -90,8 +90,8 @@ public class BorrowedBooksActivity extends AppCompatActivity implements AdapterV
 
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     if (borrowerID.equals(currentUser.getUid())) { //Display books that only belong to that user
-                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
-                        originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); //For Filter functionality
+                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false, false)); // Add book from FireStore
+                        originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false, false)); //For Filter functionality
                     }
                 }
                 bookAdapter.notifyDataSetChanged(); //Notify the adapter of data change

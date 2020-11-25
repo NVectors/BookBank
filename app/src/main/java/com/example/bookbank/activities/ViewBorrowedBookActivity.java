@@ -30,6 +30,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 public class ViewBorrowedBookActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private FirebaseAuth firebaseAuth;
+    private boolean ownerScan;
+    private boolean borrowerScan;
+    private String borrowerID;
+    private String ownerID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,23 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                 status.setText("Status: " + value.getString("status"));
 
+
+
+                /*
+                testing purpose: Previous book don't have ownerScan/borrowerScan.
+                Should re-add all books again.
+                 */
+                borrowerID = value.getString("borrowerId");
+                ownerID = value.getString("ownerId");
+                try {
+                    ownerScan = value.getBoolean("ownerScanReturn");
+                    borrowerScan = value.getBoolean("borrowerScanReturn");
+                } catch (Exception e) {
+                    ownerScan = false;
+                    borrowerScan = false;
+                }
+
+
                 if (value.getString("ownerId") == "") {
                     owner.setText("Owner: None");
                 } else { // Will have to test this later
@@ -102,7 +123,7 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
             }
         });
 
-        /** Request button is clicked */
+        /** Return button is clicked */
         final Button returnBook = findViewById(R.id.return_book_button);
         returnBook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,8 +133,14 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(getBaseContext(), ScanBarCodeReturnBookActivity.class);
 
-                intent.putExtra("BOOK_ID", bookID);
-                intent.putExtra("ISBN_OG", originalBookISBN);
+                //Log.d("DEBUG OWNER SCAN",String.valueOf(ownerScan));
+                //Log.d("DEBUG BORROWER SCAN", String.valueOf(borrowerScan));
+                intent.putExtra("BOOK_ID", bookID); //string
+                intent.putExtra("ISBN_OG", originalBookISBN); //string
+                intent.putExtra("OWNER_SCAN", ownerScan); //bool
+                intent.putExtra("BORROWER_SCAN", borrowerScan); //bool
+                intent.putExtra("BORROWER_ID", borrowerID); //string
+                intent.putExtra("OWNER_ID", ownerID); //string
                 startActivity(intent);
                 finish();
             }
