@@ -62,7 +62,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         /** Get instance of Firestore */
         db = FirebaseFirestore.getInstance();
 
-
         /** Get top level reference to the book in collection  by ID */
         bookReference = db.collection("Book").document(bookID);
 
@@ -128,8 +127,8 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         });
 
         /** Hand Over button is clicked, go to Barcode Scanner to scan book */
-        final Button request = findViewById(R.id.hand_over_button);
-        request.setOnClickListener(new View.OnClickListener() {
+        final Button handOver = findViewById(R.id.hand_over_button);
+        handOver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
@@ -231,7 +230,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     //Toast.makeText(getApplicationContext(), "Barcode value returned: " + barcodeValue, Toast.LENGTH_SHORT).show();
                     Log.d(TAG,"Barcode value returned: " + barcodeValue);
 
-                    /** Handle firestore in ownerScanned() */
+                    /** Handle firestore in ownerScan() */
                     ownerScan(barcodeValue);
                 }
                 break;
