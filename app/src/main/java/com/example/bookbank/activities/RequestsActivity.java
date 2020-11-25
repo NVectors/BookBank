@@ -26,20 +26,7 @@ public class RequestsActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        Button handOverBook = (Button) findViewById(R.id.hand_over_button);
-        handOverBook.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(RequestsActivity.this, ScanBarcodeActivity.class);
-                String bookID = "fe3b2289-cdd8-4a0b-b032-b931b7c761c6";
-                intent.putExtra("BOOK_ID", bookID);
-                startActivityForResult(intent, 0);
 
-
-
-
-            }
-        });
 
 
         // --------------------------Required for Toolbar---------------------------------//
@@ -48,28 +35,6 @@ public class RequestsActivity extends AppCompatActivity {
         setSupportActionBar(tb);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
-            case (0) : {
-                if (resultCode == Activity.RESULT_OK) {
-                    /** Get string from key of resultIntent passed back from child activity */
-                    String returnValue = data.getStringExtra("RESULT");
-
-                    /** Display the string to the user */
-                    Toast.makeText(getApplicationContext(), returnValue, Toast.LENGTH_SHORT).show();
-
-                    /** Get the value of the barcode scanned */
-                    String barcodeValue = data.getStringExtra("VALUE");
-
-                    /** Display the barcode value to the user */
-                    Toast.makeText(getApplicationContext(), "Scanned: " + barcodeValue, Toast.LENGTH_SHORT).show();
-                }
-                break;
-            }
-        }
-    }
 
     // --------------------------Create Toolbar Menu---------------------------------//
     @Override

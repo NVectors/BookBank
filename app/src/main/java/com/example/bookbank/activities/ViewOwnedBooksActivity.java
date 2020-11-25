@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -39,10 +40,12 @@ import javax.annotation.Nullable;
 
 public class ViewOwnedBooksActivity extends AppCompatActivity {
     private FirebaseFirestore db;
+    private DocumentReference bookReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri uri;
+    private static final String TAG = "SCANNED";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +63,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
 
 
         /** Get top level reference to the book in collection  by ID */
-        final DocumentReference bookReference = db.collection("Book").document(bookID);
+        bookReference = db.collection("Book").document(bookID);
 
+        /** Get top level reference to the photo in storage */
         final StorageReference imageRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
 
         /** Get references in the layout*/
@@ -89,7 +93,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
 
                 if (value.getString("borrowerId") == "") {
                     borrower.setText("Borrower: None");
-                } else { // Will have to test this later
+                } else {
                     DocumentReference documentRef = db.collection("User").document(value.getString("borrowerId"));
                     documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         /**
@@ -122,12 +126,15 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
-        /** Request button is clicked */
-        final Button request = findViewById(R.id.request_button);
+        /** Hand Over button is clicked, go to Barcode Scanner to scan book */
+        final Button request = findViewById(R.id.hand_over_button);
         request.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class));
+                Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
+                intent.putExtra("BOOK_ID", bookID);
+                /** Barcode Scanner activity will return the value of the barcode and error messages */
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -136,8 +143,10 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /** Delete image first always */
                 StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
                 photoRef.delete();
+                /** Delete the document from the collection in firestore */
                 db.collection("Book").document(bookID).delete();
             }
         });
@@ -193,6 +202,88 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         // set tool bar
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(tb);
+    }
+
+    /**
+     * Handle data that is sent back by the child activity via intent
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            /** Case 0 = Barcode Scanner child activity */
+            case (0) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    /** Get string from key of resultIntent passed back from child activity */
+                    String returnValue = data.getStringExtra("RESULT");
+
+                    /** Display the string to the user */
+                    Toast.makeText(getApplicationContext(), returnValue, Toast.LENGTH_SHORT).show();
+
+                    /** Get the value of the barcode scanned */
+                    String barcodeValue = data.getStringExtra("VALUE");
+
+                    /** Display the barcode value to the user */
+                    //Toast.makeText(getApplicationContext(), "Scanned: " + barcodeValue, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Barcode value returned: " + barcodeValue, Toast.LENGTH_SHORT).show();
+
+                    /** Handle firestore in ownerScanned() */
+                    ownerScanned(barcodeValue);
+                }
+                break;
+            }
+        }
+    }
+
+    private void ownerScanned(String barcodeValue) {
+        Log.d(TAG, "In ownerScan function!");
+
+        bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        /** Get the ISBN and Status of the book in the database */
+                        String bookISBN = String.valueOf(document.getData().get("isbn"));
+                        String bookStatus = document.getString("status");
+
+                        Log.d(TAG, "BOOK ISBN: " + bookISBN);
+                        Log.d(TAG,"BARCODE ISBN: " + barcodeValue);
+                        Log.d(TAG, "BOOK STATUS: " + bookStatus);
+
+                        /** ISBN of the book scanned matches with the ISBN of book in database */
+                        if (bookISBN.equals(barcodeValue)) {
+                            Log.d(TAG, "ISBN MATCHES");
+                            if(bookStatus.toLowerCase().equals("accepted")) {
+                                Log.d(TAG, "STATUS IS CORRECT");
+
+                                Toast.makeText(getApplicationContext(), "Borrow must scan book now", Toast.LENGTH_LONG).show();
+
+                            }
+                            else if (!bookStatus.toLowerCase().equals("accepted")){
+                                Log.d(TAG, "STATUS IS INCORRECT");
+                                Toast.makeText(getApplicationContext(), "Accept request for the book first", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                        else if (!bookISBN.equals(barcodeValue)){
+                            Log.d(TAG, "ISBN DON'T MATCH");
+                            Toast.makeText(getApplicationContext(), "Book scanned doesn't match selected book", Toast.LENGTH_LONG).show();
+                        }
+
+                    } else {
+                        Log.d(TAG, "No such document");
+                        Toast.makeText(getApplicationContext(), "Book scanned is not in your list", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Log.d(TAG, "Failed with ", task.getException());
+                    Toast.makeText(getApplicationContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     /**

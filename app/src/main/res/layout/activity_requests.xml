@@ -21,10 +21,4 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <Button
-        android:id="@+id/hand_over_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hand Over" />
-
 </LinearLayout>

@@ -57,11 +57,9 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
     private static final String TAG = "SCANNER";
 
-    private Button scanBarcode;
     private PreviewView previewView;
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-    private ImageCapture imageCapture;
     private ExecutorService executor;
     private BarcodeScanner scanner;
 
