@@ -120,29 +120,29 @@ public class RequestsActivity extends AppCompatActivity {
             }
         });
 
-        // Google Services are okay
+        // Google Services are okay, can use Google Maps API now
         if (checkServices()){
-            Button location = (Button) findViewById(R.id.map_button);
-            location.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
-                    Intent intent = new Intent(RequestsActivity.this, SetLocationActivity.class);
-                    intent.putExtra("REQUEST_DOC", requestDoc);
-                    startActivity(intent);
-                }
-            });
-
-            Button viewLocation = (Button) findViewById(R.id.view_location);
-            viewLocation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
-                    Intent intent = new Intent(RequestsActivity.this, ViewLocationActivity.class);
-                    intent.putExtra("REQUEST_DOC", requestDoc);
-                    startActivity(intent);
-                }
-            });
+//            Button location = (Button) findViewById(R.id.map_button);
+//            location.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
+//                    Intent intent = new Intent(RequestsActivity.this, SetLocationActivity.class);
+//                    intent.putExtra("REQUEST_DOC", requestDoc);
+//                    startActivity(intent);
+//                }
+//            });
+//
+//            Button viewLocation = (Button) findViewById(R.id.view_location);
+//            viewLocation.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
+//                    Intent intent = new Intent(RequestsActivity.this, ViewLocationActivity.class);
+//                    intent.putExtra("REQUEST_DOC", requestDoc);
+//                    startActivity(intent);
+//                }
+//            });
         }
 
 
