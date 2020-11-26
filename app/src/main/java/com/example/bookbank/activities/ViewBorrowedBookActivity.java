@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.bookbank.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,6 +40,11 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
     private boolean borrowerScan;
     private String borrowerID;
     private String ownerID;
+    private DocumentReference bookReference;
+    private String bookID;
+    private static String TAG = "SCANNER";
+    private Boolean ownerScanned; //Phousanak added while merging with Dimitri's
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +55,13 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         /** Get book id of the book that clicked in the list view of BorrowerBooksActivity */
-        final String bookID = getIntent().getStringExtra("BOOK_ID");
+        bookID = getIntent().getStringExtra("BOOK_ID");
 
         /** Get instance of Firestore */
         firestore = FirebaseFirestore.getInstance();
 
         /** Get top level reference to the book in collection  by ID */
-        final DocumentReference bookReference = firestore.collection("Book").document(bookID);
+        bookReference = firestore.collection("Book").document(bookID);
 
         /** Get references in the layout*/
         final TextView title = findViewById(R.id.book_title);
@@ -127,7 +138,29 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
         final Button returnBook = findViewById(R.id.return_book_button);
         returnBook.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
+                final DocumentReference bookReference = firestore.collection("book").document(bookID);
+                bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        //Phousanak: Added to Dimitri's part since not all books have ownerScanHandOver at the momment
+                        try{
+                            ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        } catch (Exception e){
+                            ownerScanned = false;
+                        }
+                        //Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        ownerScanned = false;
+                        if (!ownerScanned) {
+                            // scan barcode here, if good --> update
+
+
+                            bookReference.update("ownerScanHandOver", true);
+                        }
+                    }
+                });
+
                 //Scanning -- new Intent
                 String originalBookISBN = isbn.getText().toString();
 
@@ -143,6 +176,7 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 intent.putExtra("OWNER_ID", ownerID); //string
                 startActivity(intent);
                 finish();
+
             }
         });
 
@@ -191,7 +225,7 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 startActivity(new Intent(ViewBorrowedBookActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(ViewBorrowedBookActivity.this, RequestsActivity.class));
+                startActivity(new Intent(ViewBorrowedBookActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

@@ -13,7 +13,16 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera.any" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+    // Camera features
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.any" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <meta-data
         android:name="com.google.android.gms.vision.DEPENDENCIES"
@@ -62,6 +71,7 @@
         <activity android:name=".activities.SearchBooksActivity" />
         <activity android:name=".activities.SignUpActivity" />
         <activity android:name=".activities.EditDescriptionActivity" />
+        <activity android:name=".activities.ViewLocationActivity" />
         <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

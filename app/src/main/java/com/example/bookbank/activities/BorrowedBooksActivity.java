@@ -90,8 +90,8 @@ public class BorrowedBooksActivity extends AppCompatActivity implements AdapterV
 
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     if (borrowerID.equals(currentUser.getUid())) { //Display books that only belong to that user
-                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false, false)); // Add book from FireStore
-                        originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false, false)); //For Filter functionality
+                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false, false, false)); // Add book from FireStore
+                        originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false, false, false)); //For Filter functionality
                     }
                 }
                 bookAdapter.notifyDataSetChanged(); //Notify the adapter of data change
@@ -187,7 +187,7 @@ public class BorrowedBooksActivity extends AppCompatActivity implements AdapterV
                 startActivity(new Intent(BorrowedBooksActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(BorrowedBooksActivity.this, RequestsActivity.class));
+                startActivity(new Intent(BorrowedBooksActivity.this, MyCurrentRequestsActivity.class)); //RequestsActivity.class
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

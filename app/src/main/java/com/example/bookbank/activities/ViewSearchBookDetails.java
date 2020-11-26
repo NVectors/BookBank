@@ -1,5 +1,6 @@
 package com.example.bookbank.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -15,11 +16,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bookbank.R;
+import com.example.bookbank.models.Request;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ViewSearchBookDetails extends AppCompatActivity {
     private FirebaseFirestore db;
@@ -31,8 +38,10 @@ public class ViewSearchBookDetails extends AppCompatActivity {
         setContentView(R.layout.activity_view_search_book_details);
 
         db = FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
 
         Button viewOwnerButton = findViewById(R.id.button_view_owner);
+        final Button requestBookButton = findViewById(R.id.text_request_book);
 
         // getting all the views from the layout
         TextView textTitle = findViewById(R.id.text_title);
@@ -45,12 +54,24 @@ public class ViewSearchBookDetails extends AppCompatActivity {
 
         // fetching the intent
         Intent intent = getIntent();
-        String title = intent.getStringExtra("TITLE");
+        final String title = intent.getStringExtra("TITLE");
         String isbn = intent.getStringExtra("ISBN");
         String description = intent.getStringExtra("DESCRIPTION");
-        String bookId = intent.getStringExtra("BOOK_ID");
+        final String bookId = intent.getStringExtra("BOOK_ID");
         String author = intent.getStringExtra("AUTHOR");
         final String ownerID = intent.getStringExtra("OWNER_ID");
+
+        // check to see if user has already made a request for this book
+        db.collection("Request").whereEqualTo("bookId", bookId).whereEqualTo("requesterId", firebaseAuth.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.d("debug", String.valueOf(queryDocumentSnapshots.size()));
+                if (queryDocumentSnapshots.size() != 0) {
+                    // user has already requested this book so dont allow them to request it again
+                    requestBookButton.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
         // setting all the views
         textTitle.setText(title);
@@ -82,6 +103,40 @@ public class ViewSearchBookDetails extends AppCompatActivity {
                 Intent intent = new Intent(ViewSearchBookDetails.this, ViewSearchUserActivity.class);
                 intent.putExtra("USER_ID", ownerID);
                 startActivity(intent);
+            }
+        });
+
+        // on request book button. create Request object and add to firestore
+        requestBookButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id = db.collection("Request").getId();
+                Request request = new Request(
+                        id,
+                        bookId,
+                        title,
+                        firebaseAuth.getUid(),
+                        ownerID,
+                        "Pending",
+                        null,
+                        null
+                );
+                db.collection("Request").add(request).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(ViewSearchBookDetails.this, "successfully requested book", Toast.LENGTH_SHORT).show();
+                        requestBookButton.setVisibility(View.INVISIBLE);
+                        // set the book to a status of requested
+                        HashMap<String, Object> map = new HashMap<String, Object>();
+                        map.put("status", "Requested");
+                        db.collection("Book").document(bookId).update(map);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ViewSearchBookDetails.this, "failed to request book", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
@@ -130,7 +185,7 @@ public class ViewSearchBookDetails extends AppCompatActivity {
                 startActivity(new Intent(ViewSearchBookDetails.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(ViewSearchBookDetails.this, RequestsActivity.class));
+                startActivity(new Intent(ViewSearchBookDetails.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

@@ -69,7 +69,7 @@ public class NotificationsActivity extends AppCompatActivity {
                 startActivity(new Intent(NotificationsActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(NotificationsActivity.this, RequestsActivity.class));
+                startActivity(new Intent(NotificationsActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

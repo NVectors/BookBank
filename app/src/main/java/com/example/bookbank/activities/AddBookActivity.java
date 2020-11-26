@@ -184,6 +184,7 @@ public class AddBookActivity extends AppCompatActivity {
                             ownerId,
                             borrowerId,
                             false,
+                            false,
                             false
                     )
             ).addOnCompleteListener(new OnCompleteListener<Void>() {

@@ -11,12 +11,13 @@ public class Book {
     private String status;
     private boolean borrowerScanReturn;
     private boolean ownerScanReturn;
+    private Boolean ownerScanHandOver;
 
     public Book() {
         // required for Firestore to be able to convert this object
     }
 
-    public Book(String id, String title, String author, long isbn, String description, String status, String ownerId, String borrowerId, Boolean borrowerScanReturn, Boolean ownerScanReturn) {
+    public Book(String id, String title, String author, long isbn, String description, String status, String ownerId, String borrowerId, Boolean borrowerScanReturn, Boolean ownerScanReturn, Boolean ownerScanHandOver) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -25,11 +26,10 @@ public class Book {
         this.ownerId = ownerId;
         this.borrowerId = borrowerId;
         this.status = status;
-
         //Boolean borrowerScanReturn, Boolean ownerScanReturn
         this.borrowerScanReturn = borrowerScanReturn;
         this.ownerScanReturn = ownerScanReturn;
-
+        this.ownerScanHandOver = ownerScanHandOver;
     }
 
     public String getId() {
@@ -96,6 +96,14 @@ public class Book {
         this.status = status;
     }
 
+    public boolean isOwnerScanReturn() {
+        return ownerScanReturn;
+    }
+
+    public void setOwnerScanReturn0(boolean ownerScanReturn) {
+        this.ownerScanReturn = ownerScanReturn;
+    }
+
     public boolean isBorrowerScanReturn() {
         return borrowerScanReturn;
     }
@@ -104,11 +112,12 @@ public class Book {
         this.borrowerScanReturn = borrowerScanReturn;
     }
 
-    public boolean isOwnerScanReturn() {
-        return ownerScanReturn;
+    public Boolean getOwnerScanHandOver() {
+        return ownerScanHandOver;
     }
 
-    public void setOwnerScanReturn(boolean ownerScanReturn) {
-        this.ownerScanReturn = ownerScanReturn;
+    public void setOwnerScanReturn(boolean ownerScanHandOver) {
+        this.ownerScanHandOver = ownerScanHandOver;
     }
+
 }
