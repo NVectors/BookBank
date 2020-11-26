@@ -102,12 +102,23 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
             }
         });
 
-        /** Request button is clicked */
+        /** returnBook button is clicked */
         final Button returnBook = findViewById(R.id.return_book_button);
         returnBook.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-               finish();
+            public void onClick(View view) {
+                final DocumentReference bookReference = firestore.collection("book").document(bookID);
+                bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        if (!ownerScanned) {
+                            // scan barcode here, if good --> update
+                            bookReference.update("ownerScanHandOver", true);
+                        }
+                    }
+                });
             }
         });
 

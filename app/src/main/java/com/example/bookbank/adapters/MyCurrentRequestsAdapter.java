@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import com.example.bookbank.models.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,10 +45,13 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
         // inflate our custom layout (R.layout.gear_list_view) instead of the default view
         // LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         // View view = inflater.inflate(R.layout.list_item, null);
-        View view = convertView;
 
-        if (view == null){
+        final View view;
+
+        if (convertView == null){
             view = LayoutInflater.from(context).inflate(R.layout.my_current_requests_item,parent,false);
+        } else {
+            view = convertView;
         }
 
         firestore  = FirebaseFirestore.getInstance();
@@ -60,7 +65,10 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
         final TextView bookISBN = view.findViewById(R.id.book_isbn);
         final TextView bookStatus = view.findViewById(R.id.book_status);
         final ImageView bookImage = view.findViewById(R.id.book_image);
+        Button viewMap = view.findViewById(R.id.view_map);
+        final Button scanBook = view.findViewById(R.id.scan_book);
         Log.d("debug", request.getBookId());
+
         firestore.collection("Book").document(request.getBookId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -71,9 +79,44 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
                     bookAuthor.setText("By " + book.getAuthor());
                     bookISBN.setText("ISBN: " + book.getIsbn().toString());
                     bookStatus.setText("Status: " + book.getStatus());
+
+                    String status = book.getStatus();
+                    if(status.equals("Accepted") && book.getOwnerScanHandOver()) {
+                        scanBook.setVisibility(view.VISIBLE);
+                    }
                     //set book imageto ImageView
                     ViewBookPhotoActivity.setImage(book.getId(), bookImage);
                 }
+            }
+        });
+
+        viewMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // get map coordinates from request
+            }
+        });
+
+        scanBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final DocumentReference bookReference = firestore.collection("book").document(request.getBookId());
+                bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        String bookStatus =  snapshot.getString("status");
+                        Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        if (bookStatus.equals("Accepted") && ownerScanned) {
+                            // wip scan barcode and if good update -->
+                            bookReference.update("status", "Borrowed");
+                            // get current user
+                            String borrowerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                            bookReference.update("borrowerId", borrowerId);
+                            bookReference.update("ownerScanHandOver", false);
+                        }
+                    }
+                });
             }
         });
 

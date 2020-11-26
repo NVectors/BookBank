@@ -149,8 +149,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // check status of book
-                String bookStatus = "";
-                final Boolean ownerScanned = false;
                 bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
