@@ -61,6 +61,18 @@ public class ViewSearchBookDetails extends AppCompatActivity {
         String author = intent.getStringExtra("AUTHOR");
         final String ownerID = intent.getStringExtra("OWNER_ID");
 
+        // check to see if user has already made a request for this book
+        db.collection("Request").whereEqualTo("bookId", bookId).whereEqualTo("requesterId", firebaseAuth.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.d("debug", String.valueOf(queryDocumentSnapshots.size()));
+                if (queryDocumentSnapshots.size() != 0) {
+                    // user has already requested this book so dont allow them to request it again
+                    requestBookButton.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
         // setting all the views
         textTitle.setText(title);
         textAuthor.setText("Author: " + author);
@@ -80,18 +92,6 @@ public class ViewSearchBookDetails extends AppCompatActivity {
                     String ownerNameText = documentSnapshot.getString("fullname");
                     textOwnerName.setText("Owner: " + ownerNameText);
 
-                }
-            }
-        });
-
-//        // check to see if user has already made a request for this book
-        db.collection("Request").whereEqualTo("bookId", bookId).whereEqualTo("requesterId", firebaseAuth.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                Log.d("debug", String.valueOf(queryDocumentSnapshots.size()));
-                if (queryDocumentSnapshots.size() != 0) {
-                    // user has already requested this book so dont allow them to request it again
-                    requestBookButton.setVisibility(View.INVISIBLE);
                 }
             }
         });

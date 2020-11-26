@@ -72,6 +72,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         final TextView status = findViewById(R.id.status);
         final TextView borrower = findViewById(R.id.borrower);
         final TextView description = findViewById(R.id.description);
+        final Button request = findViewById(R.id.request_button);
 
         final ImageView bookImage = findViewById(R.id.owner_book_image);
         ViewBookPhotoActivity.setImage(bookID, bookImage);
@@ -87,6 +88,26 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 author.setText("By: " + value.getString("author"));
                 isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                 status.setText("Status: " + value.getString("status"));
+
+                Boolean ownerScanned = value.getBoolean("ownerScanHandOver");
+                String bookStatus = value.getString("status");
+                // changing request button to handOver
+                if (bookStatus.equals("Accepted") && !ownerScanned) {
+                    request.setText("HAND OVER");
+                }
+                else if (bookStatus.equals("Accepted") && ownerScanned) {
+                    request.setText("CANCEL HAND OVER");
+                }
+                // receiving book back from borrower
+                else if (bookStatus.equals("Borrowed") && ownerScanned) {
+                    request.setText("RECEIVE BOOK");
+                }
+                // dont need button if no request or book is borrowed and not in middle of handover
+                else if ((bookStatus.equals("Borrowed") && !ownerScanned) || bookStatus.equals("Available")) {
+                    request.setVisibility(View.INVISIBLE);
+                }
+
+                // if borrowed and handOver != true --> set button to invisible
 
                 if (value.getString("borrowerId") == "") {
                     borrower.setText("Borrower: None");
@@ -124,13 +145,49 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         });
 
         /** Request button is clicked */
-        final Button request = findViewById(R.id.request_button);
         request.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class);
-                intent.putExtra("BOOK_ID", bookID);
-                startActivity(intent);
+                // check status of book
+                String bookStatus = "";
+                final Boolean ownerScanned = false;
+                bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        String bookStatus =  snapshot.getString("status");
+                        Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        // to check all requests for book
+                        if (bookStatus.equals("Requested")) {
+                            Intent intent = new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class);
+                            intent.putExtra("BOOK_ID", bookID);
+                            startActivity(intent);
+                        }
+                        // Owner Handover of book
+                        else if (bookStatus.equals("Accepted") && (!ownerScanned)){
+                            // change handedOver to true and start handover
+                            Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
+                            startActivity(intent);
+                            // wip scan barcode to verify then update -->
+                            bookReference.update("ownerScanReturn", true);
+                        }
+                        // canceling handover
+                        // moment borrower scans changes status to Borrowed, and ownerScanned to false
+                        else if (bookStatus.equals("Accepted") && ownerScanned) {
+                            bookReference.update("ownerScanReturn", false);
+                        }
+                        // Owner recieving book from borrower. when borrower scans --> set ownerScanHandOver = true
+                        else if (bookStatus.equals("Borrowed") && ownerScanned) {
+                            Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
+                            startActivity(intent);
+                            // wip scan barcode to verify then update -->
+                            bookReference.update("status", "Available");
+                            bookReference.update("borrowerId", "");
+                            bookReference.update("ownerScanHandOver", false);
+                        }
+                    }
+                });
+
             }
         });
 
