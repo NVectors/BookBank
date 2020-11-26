@@ -169,12 +169,12 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                             Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
                             startActivity(intent);
                             // wip scan barcode to verify then update -->
-                            bookReference.update("ownerScanReturn", true);
+                            bookReference.update("ownerScanHandOver", true);
                         }
                         // canceling handover
                         // moment borrower scans changes status to Borrowed, and ownerScanned to false
                         else if (bookStatus.equals("Accepted") && ownerScanned) {
-                            bookReference.update("ownerScanReturn", false);
+                            bookReference.update("ownerScanHandOver", false);
                         }
                         // Owner recieving book from borrower. when borrower scans --> set ownerScanHandOver = true
                         else if (bookStatus.equals("Borrowed") && ownerScanned) {
