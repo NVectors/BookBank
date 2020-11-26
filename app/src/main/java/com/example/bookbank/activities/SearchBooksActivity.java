@@ -113,7 +113,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
                     // making sure we only query the book which are available
                     String status = (String) doc.getData().get("status");
-                    if(status.equals("Available") || status.equals("Requested")){
+                    if(status.equals("Available")){
                         // fetching all the atributes of the book
                         String author = (String) doc.getData().get("author");
                         String borrowerId = (String) doc.getData().get("borrowerId");
@@ -124,9 +124,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                         String title = (String) doc.getData().get("title");
 
                         // checking if user has that book requested already
-
-
-                        final Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId);
+                        final Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId, false);
 
                         if(status.equals("Requested")) {
                             // check all books to see if they are on there
@@ -140,6 +138,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                                 }
                             });
                         }
+                        Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId, false);
 
                         // if keyword is empty string all available books are added as default
                         if(keyWord.equals("")){

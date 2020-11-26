@@ -4,14 +4,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.bookbank.R;
 import com.example.bookbank.adapters.MyCurrentRequestsAdapter;
@@ -22,6 +30,8 @@ import com.example.bookbank.models.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,11 +39,17 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.StorageReference;
 
 public class RequestsActivity extends AppCompatActivity {
 
-    private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firestore;
+    private DocumentReference bookReference;
+    private FirebaseAuth firebaseAuth;
+    private static final String TAG = "SCANNED";
     private ListView requestsList;
     private ArrayList<Request> requestsDataList;
     private RequestsAdapter requestsAdapter;
@@ -43,6 +59,7 @@ public class RequestsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_requests);
 
+        /** Get references to the layout objects */
         final TextView bookTitle = findViewById(R.id.book_title);
         final TextView bookAuthor = findViewById(R.id.book_author);
         final TextView bookISBN = findViewById(R.id.book_isbn);
@@ -50,7 +67,13 @@ public class RequestsActivity extends AppCompatActivity {
         /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
         final String bookID = getIntent().getStringExtra("BOOK_ID");
 
+        /** Get instance of Firestore */
         firestore = FirebaseFirestore.getInstance();
+
+        /** Get top level reference to the book in collection  by ID */
+        bookReference = firestore.collection("Book").document(bookID);
+
+
         firebaseAuth = FirebaseAuth.getInstance();
         requestsList = findViewById(R.id.requests_list);
         requestsDataList = new ArrayList<>();
