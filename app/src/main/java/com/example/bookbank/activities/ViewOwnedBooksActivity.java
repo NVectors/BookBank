@@ -75,7 +75,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         final TextView status = findViewById(R.id.status);
         final TextView borrower = findViewById(R.id.borrower);
         final TextView description = findViewById(R.id.description);
-        final Button request = findViewById(R.id.request_button);
+        final Button handOver = findViewById(R.id.hand_over_button);
 
         final ImageView bookImage = findViewById(R.id.owner_book_image);
         ViewBookPhotoActivity.setImage(bookID, bookImage);
@@ -96,18 +96,18 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 String bookStatus = value.getString("status");
                 // changing request button to handOver
                 if (bookStatus.equals("Accepted") && !ownerScanned) {
-                    request.setText("HAND OVER");
+                    handOver.setText("HAND OVER");
                 }
                 else if (bookStatus.equals("Accepted") && ownerScanned) {
-                    request.setText("CANCEL HAND OVER");
+                    handOver.setText("CANCEL HAND OVER");
                 }
                 // receiving book back from borrower
                 else if (bookStatus.equals("Borrowed") && ownerScanned) {
-                    request.setText("RECEIVE BOOK");
+                    handOver.setText("RECEIVE BOOK");
                 }
                 // dont need button if no request or book is borrowed and not in middle of handover
                 else if ((bookStatus.equals("Borrowed") && !ownerScanned) || bookStatus.equals("Available")) {
-                    request.setVisibility(View.INVISIBLE);
+                    handOver.setVisibility(View.INVISIBLE);
                 }
 
                 // if borrowed and handOver != true --> set button to invisible
@@ -147,8 +147,8 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
-        /** Request button is clicked */
-        request.setOnClickListener(new View.OnClickListener() {
+        /** Hand Over button is clicked */
+        handOver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // check status of book
@@ -166,7 +166,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                         }
                         // Owner Handover of book
                         else if (bookStatus.equals("Accepted") && (!ownerScanned)){
-                            // change handedOver to true and start handover
                             /** Hand Over button is clicked, go to Barcode Scanner to scan book */
                             final Button handOver = findViewById(R.id.hand_over_button);
                             handOver.setOnClickListener(new View.OnClickListener() {

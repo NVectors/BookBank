@@ -114,7 +114,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                     // making sure we only query the book which are available
                     String status = (String) doc.getData().get("status");
                     if(status.equals("Available")){
-                        // fetching all the atributes of the book
+                        // fetching all the attributes of the book
                         String author = (String) doc.getData().get("author");
                         String borrowerId = (String) doc.getData().get("borrowerId");
                         String description = (String) doc.getData().get("description");
@@ -138,7 +138,6 @@ public class SearchBooksActivity extends AppCompatActivity {
                                 }
                             });
                         }
-                        Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId, false);
 
                         // if keyword is empty string all available books are added as default
                         if(keyWord.equals("")){
@@ -147,7 +146,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
                         // if there's a search keyword we search for the keyword in title, author and ISBN fields
                         else{
-                            // making author, title and the keyword lowerase for both case searching
+                            // making author, title and the keyword lowercase for both case searching
                             String lowerTitle = title.toLowerCase();
                             String lowerAuthor = author.toLowerCase();
                             keyWord = keyWord.trim().toLowerCase();
@@ -160,12 +159,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                                 bookArrayList.add(book);
                             }
                         }
-
-
-
                     }
-
-
                 }
                 // notifying the adapter for the change
                 bookAdapter.notifyDataSetChanged();
@@ -247,7 +241,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();
-                Toast.makeText(SearchBooksActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchBooksActivity.this, "Successfully Signed Out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(SearchBooksActivity.this, LoginActivity.class));
                 break;
             default:

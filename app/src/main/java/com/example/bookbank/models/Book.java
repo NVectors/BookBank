@@ -93,9 +93,7 @@ public class Book {
         this.status = status;
     }
 
-
-
-    public Boolean getOwnerScanHandOVer() {
+    public Boolean getOwnerScanHandOver() {
         return ownerScanHandOver;
     }
 
