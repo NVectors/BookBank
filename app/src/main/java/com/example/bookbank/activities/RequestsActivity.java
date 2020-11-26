@@ -135,8 +135,9 @@ public class RequestsActivity extends AppCompatActivity {
                                 Log.d(TAG, "STATUS IS CORRECT");
                                 Log.d(TAG, "BOOLEAN IS: " + document.getData().get("ownerScanHandOver"));
 
-                                /** Check if the boolean to keep track of owner scanning first is null */
-                                if ((document.getData().get("ownerScanHandOver")) == null){
+                                /** Check if the boolean to keep track of owner scanning first is false by default */
+                                Boolean check = (Boolean) document.getData().get("ownerScanHandOver");
+                                if (check == false){
                                     /** Notify user the correct steps in handing over the book */
                                     Toast.makeText(getApplicationContext(), "Owner of book must scan book first", Toast.LENGTH_LONG).show();
                                 }
@@ -145,7 +146,7 @@ public class RequestsActivity extends AppCompatActivity {
                                 db.collection("Book").document(bookID).update("status", "Borrowed");
 
                                 /** Update the boolean to True for the book */
-                                db.collection("Book").document(bookID).update("ownerScanHandOver", null);
+                                db.collection("Book").document(bookID).update("ownerScanHandOver", false);
 
                                 /** Notify user handing off the book was a success*/
                                 Toast.makeText(getApplicationContext(), "Borrower can loan the book now", Toast.LENGTH_LONG).show();

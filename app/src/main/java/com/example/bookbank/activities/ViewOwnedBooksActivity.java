@@ -269,8 +269,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                 Log.d(TAG, "STATUS IS CORRECT");
                                 Log.d(TAG, "BOOLEAN IS: " + document.getData().get("ownerScanHandOver"));
 
-                                /** Check if the boolean to keep track of owner scanning first is null */
-                                if ( (document.getData().get("ownerScanHandOver")) == null){
+                                /** Check if the boolean to keep track of owner scanning first is false by default */
+                                Boolean check = (Boolean) document.getData().get("ownerScanHandOver");
+                                if (check == false){
                                     /** Update the boolean to True for the book */
                                     db.collection("Book").document(bookID).update("ownerScanHandOver", true);
                                 }
