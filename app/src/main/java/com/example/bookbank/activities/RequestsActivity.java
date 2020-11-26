@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,9 +16,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.view.View;
 import android.widget.Button;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -32,6 +38,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,6 +57,8 @@ public class RequestsActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private DocumentReference bookReference;
     private FirebaseAuth firebaseAuth;
+    private static final int ERROR_DIALOG_REQUEST = 9001;
+
     private static final String TAG = "SCANNED";
     private ListView requestsList;
     private ArrayList<Request> requestsDataList;
@@ -110,11 +120,63 @@ public class RequestsActivity extends AppCompatActivity {
             }
         });
 
+        // Google Services are okay
+        if (checkServices()){
+            Button location = (Button) findViewById(R.id.map_button);
+            location.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
+                    Intent intent = new Intent(RequestsActivity.this, SetLocationActivity.class);
+                    intent.putExtra("REQUEST_DOC", requestDoc);
+                    startActivity(intent);
+                }
+            });
+
+            Button viewLocation = (Button) findViewById(R.id.view_location);
+            viewLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
+                    Intent intent = new Intent(RequestsActivity.this, ViewLocationActivity.class);
+                    intent.putExtra("REQUEST_DOC", requestDoc);
+                    startActivity(intent);
+                }
+            });
+        }
+
+
         // --------------------------Required for Toolbar---------------------------------//
         // set tool bar
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(tb);
     }
+
+
+    /**
+     * Check Google Services to make sure map requests is possible for user
+     * @return
+     */
+    public boolean checkServices(){
+        Log.d("LOCATION", "Check Google Services Version!");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(RequestsActivity.this);
+
+        if (available == ConnectionResult.SUCCESS){
+            Log.d("LOCATION", "Google Play Services is working!");
+            return  true;
+        }
+        else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            Log.d("Location", "Fixable error!");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(RequestsActivity.this, available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+        }
+        else{
+            Toast.makeText(this, "We can't make map requests!", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
 
     // --------------------------Create Toolbar Menu---------------------------------//
     @Override
@@ -159,7 +221,7 @@ public class RequestsActivity extends AppCompatActivity {
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();
-                Toast.makeText(RequestsActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RequestsActivity.this, "Successfully Signed Out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(RequestsActivity.this, LoginActivity.class));
                 break;
             default:

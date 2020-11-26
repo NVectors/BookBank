@@ -34,9 +34,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import javax.annotation.Nullable;
+
 
 public class ViewOwnedBooksActivity extends AppCompatActivity {
     private FirebaseFirestore db;
@@ -47,6 +47,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
     private Uri uri;
     private String bookID;
     private static final String TAG = "SCANNED";
+    private static final String tag = "VIEW OWNED BOOK";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +129,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                 if (document.exists()) {
                                     String name = document.getString("fullname");
                                     // Test
-                                    Log.d("NAME", name);
+                                    Log.d(tag,"Book name: " + name);
 
                                     borrower.setVisibility(View.VISIBLE); // Default of Borrower text view
                                     borrower.setText("Borrower: " + name);
@@ -138,7 +139,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                     borrower.setText("Borrower: FAILED");
                                 }
                             } else {
-                                Log.d("TAG", "get failed with ", task.getException());
+                                Log.d("TAG", "Failed with ", task.getException());
                             }
                         }
                     });
@@ -251,6 +252,18 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        /** Image add buton is clicked */
+        final Button addImage = findViewById(R.id.add_image_button);
+        addImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "Adding an image");
+
+                //Implement
+            }
+        });
+
 
         /** Image delete button is clicked */
         final Button deleteImage = findViewById(R.id.delete_image);
@@ -425,7 +438,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();
-                Toast.makeText(ViewOwnedBooksActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewOwnedBooksActivity.this, "Successfully Signed Out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(ViewOwnedBooksActivity.this, LoginActivity.class));
                 break;
             default:

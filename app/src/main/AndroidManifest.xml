@@ -65,6 +65,7 @@
         <activity android:name=".activities.SearchBooksActivity" />
         <activity android:name=".activities.SignUpActivity" />
         <activity android:name=".activities.EditDescriptionActivity" />
+        <activity android:name=".activities.ViewLocationActivity" />
         <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
