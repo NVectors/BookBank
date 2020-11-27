@@ -1,13 +1,17 @@
 package com.example.bookbank.adapters;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +25,8 @@ import com.example.bookbank.activities.ViewSearchBookDetails;
 import com.example.bookbank.models.Notification;
 import com.example.bookbank.models.Request;
 import com.example.bookbank.models.User;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -39,6 +45,7 @@ public class RequestsAdapter extends ArrayAdapter {
     private ArrayList<Request> requestList;
     private Context context;
     private FirebaseFirestore firestore;
+    private static final int ERROR_DIALOG_REQUEST = 9001;
 
     public RequestsAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Request> requestList) {
         super(context, 0, requestList);
@@ -173,12 +180,14 @@ public class RequestsAdapter extends ArrayAdapter {
                 }).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            Intent intent = new Intent(context, SetLocationActivity.class);
-                            String docId = request.getId();
-                            intent.putExtra("DocumentName", docId);
-                            // set location up, need to check if anything else is needed
-                            context.startActivity(intent);
+                        if(task.isSuccessful()) {
+
+                            if (checkServices()) {
+                                Intent intent = new Intent(context, SetLocationActivity.class);
+                                String docId = request.getId();
+                                intent.putExtra("REQUEST_DOC", docId);
+                                context.startActivity(intent);
+                            }
                         }
                     }
                 });
@@ -186,5 +195,29 @@ public class RequestsAdapter extends ArrayAdapter {
         });
 
         return view;
+    }
+
+    /**
+     * Check Google Services to make sure map requests is possible for user
+     * @return
+     */
+    public boolean checkServices(){
+        Log.d("LOCATION", "Check Google Services Version!");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
+
+        if (available == ConnectionResult.SUCCESS){
+            Log.d("LOCATION", "Google Play Services is working!");
+            return  true;
+        }
+        else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            Log.d("Location", "Fixable error!");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog((Activity) context, available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+        }
+        else{
+            Toast.makeText(context, "We can't make map requests!", Toast.LENGTH_SHORT).show();
+        }
+        return false;
     }
 }

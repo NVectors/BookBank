@@ -136,7 +136,7 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
             }
         });
 
-        /** Return button is clicked */
+        /** returnBook button is clicked */
         final Button returnBook = findViewById(R.id.return_book_button);
         returnBook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,22 +176,6 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
 
                     }
                 });
-
-                //Scanning -- new Intent
-                /*String originalBookISBN = isbn.getText().toString();
-
-                Intent intent = new Intent(getBaseContext(), ScanBarCodeReturnBookActivity.class);
-
-                //Log.d("DEBUG OWNER SCAN",String.valueOf(ownerScan));
-                //Log.d("DEBUG BORROWER SCAN", String.valueOf(borrowerScan));
-                intent.putExtra("BOOK_ID", bookID); //string
-                intent.putExtra("ISBN_OG", originalBookISBN); //string
-                intent.putExtra("OWNER_SCAN", ownerScan); //bool
-                intent.putExtra("BORROWER_SCAN", borrowerScan); //bool
-                intent.putExtra("BORROWER_ID", borrowerID); //string
-                intent.putExtra("OWNER_ID", ownerID); //string
-                startActivity(intent);
-                finish();*/
             }
         });
 
