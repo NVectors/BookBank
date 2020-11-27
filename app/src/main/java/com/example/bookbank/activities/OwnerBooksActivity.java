@@ -61,7 +61,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
         db = FirebaseFirestore.getInstance();
 
         /** Get top level reference to the collection Book */
-       final CollectionReference collectionReference = db.collection("Book");
+        final CollectionReference collectionReference = db.collection("Book");
 
         /** Find reference to the add book button */
         final FloatingActionButton addBookButton = findViewById(R.id.owner_add_book);
