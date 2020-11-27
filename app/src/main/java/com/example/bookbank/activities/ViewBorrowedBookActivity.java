@@ -127,7 +127,7 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                             // scan barcode here, if good --> update
 
 
-                            bookReference.update("ownerScanHandOver", true);
+                            //bookReference.update("ownerScanHandOver", true);
                         }
                     }
                 });
