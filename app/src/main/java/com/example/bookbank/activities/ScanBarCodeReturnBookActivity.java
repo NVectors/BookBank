@@ -39,7 +39,9 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
         /** Get book id of the book that clicked in the list view of BorrowerBooksActivity */
         globalBookID = getIntent().getStringExtra("BOOK_ID");
         globalISBN = getIntent().getStringExtra("ISBN_OG").replace("ISBN: ", "");
+
         borrowerScan = getIntent().getBooleanExtra("BORROWER_SCAN", false);
+
         ownerScan = getIntent().getBooleanExtra("OWNER_SCAN", false);
         ownerID = getIntent().getStringExtra("OWNER_ID");
         borrowerID = getIntent().getStringExtra("BORROWER_ID");
@@ -72,6 +74,7 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
                 /*--Change Status + Change BorrowerID--*/
+                Log.d("debug", "HEREEE");
                 boolean updateSuccess = updateBook(isbnCode);
                 if (updateSuccess == true){
                     builder.setTitle("Scanning Result" + ": Success!");
@@ -106,6 +109,8 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
 
     }
 
+    //ownerScanHandOver = borrowerScan.
+
     private boolean updateBook(String isbnCode) {
         db = FirebaseFirestore.getInstance();
         String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -115,17 +120,23 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
         if (isbnCode.equals(globalISBN)){
 
             if (currentUser.equals(ownerID)){
-                ownerScan = true;
+                borrowerScan = false;
+                db.collection("Book").document(globalBookID).update("ownerScanHandOver", false);
             }
+            Log.d("currentUserID ", currentUser);
+            Log.d("borrowerID ", borrowerID);
             if (currentUser.equals(borrowerID)){
                 borrowerScan = true;
+                db.collection("Book").document(globalBookID).update("ownerScanHandOver", borrowerScan);
             }
-            db.collection("Book").document(globalBookID).update("borrowerScanReturn", borrowerScan);
+            //db.collection("Book").document(globalBookID).update("borrowerScanReturn", borrowerScan);
+            db.collection("Book").document(globalBookID).update("ownerScanHandOver", borrowerScan);
 
             /** Update the fields for the document in firestore */
-            if (ownerScan == true && borrowerScan == true){
+            if (borrowerScan == false){
                 db.collection("Book").document(globalBookID).update("status", "Available");
                 db.collection("Book").document(globalBookID).update("borrowerId", "");
+                //db.collection("Book").document(globalBookID).update("ownerScanHandOver", false);
                 //finish();
                 borrowerScan = false;
                 ownerScan = false;

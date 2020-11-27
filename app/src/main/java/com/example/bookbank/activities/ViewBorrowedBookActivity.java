@@ -93,7 +93,9 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 ownerID = value.getString("ownerId");
                 try {
                     ownerScan = value.getBoolean("ownerScanReturn");
-                    borrowerScan = value.getBoolean("borrowerScanReturn");
+
+                    //borrowerScan = value.getBoolean("borrowerScanReturn");
+                    borrowerScan = value.getBoolean("ownerScanHandOver");
                 } catch (Exception e) {
                     ownerScan = false;
                     borrowerScan = false;
@@ -144,25 +146,39 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         DocumentSnapshot snapshot = task.getResult();
-                        //Phousanak: Added to Dimitri's part since not all books have ownerScanHandOver at the momment
-                        try{
-                            ownerScanned = snapshot.getBoolean("ownerScanHandOver");
-                        } catch (Exception e){
-                            ownerScanned = false;
-                        }
                         //Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
-                        ownerScanned = false;
-                        if (!ownerScanned) {
+                        //Boolean ownerScanned changes to true when borrower scan
+
+                        //ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        //if (!borrowerScan) {
                             // scan barcode here, if good --> update
 
 
-                            bookReference.update("ownerScanHandOver", true);
-                        }
+                            //bookReference.update("ownerScanHandOver", true);
+                        //}
+                        //Scanning -- new Intent
+                        String originalBookISBN = isbn.getText().toString();
+
+                        Intent intent = new Intent(getBaseContext(), ScanBarCodeReturnBookActivity.class);
+
+                        //Log.d("DEBUG OWNER SCAN",String.valueOf(ownerScan));
+                        //Log.d("DEBUG BORROWER SCAN", String.valueOf(borrowerScan));
+                        intent.putExtra("BOOK_ID", bookID); //string
+                        intent.putExtra("ISBN_OG", originalBookISBN); //string
+                        intent.putExtra("OWNER_SCAN", ownerScan); //bool
+
+                        //intent.putExtra("BORROWER_SCAN", borrowerScan); //bool
+                        intent.putExtra("BORROWER_SCAN", borrowerScan);
+                        intent.putExtra("BORROWER_ID", borrowerID); //string
+                        intent.putExtra("OWNER_ID", ownerID); //string
+                        startActivity(intent);
+                        finish();
+
                     }
                 });
 
                 //Scanning -- new Intent
-                String originalBookISBN = isbn.getText().toString();
+                /*String originalBookISBN = isbn.getText().toString();
 
                 Intent intent = new Intent(getBaseContext(), ScanBarCodeReturnBookActivity.class);
 
@@ -175,8 +191,7 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 intent.putExtra("BORROWER_ID", borrowerID); //string
                 intent.putExtra("OWNER_ID", ownerID); //string
                 startActivity(intent);
-                finish();
-
+                finish();*/
             }
         });
 
