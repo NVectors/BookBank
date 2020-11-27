@@ -1,6 +1,7 @@
 package com.example.bookbank.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -23,8 +24,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -69,23 +73,34 @@ public class RequestsActivity extends AppCompatActivity {
                 }
             }
         });
-
-        firestore.collection("Request").whereEqualTo("bookId", bookID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        final CollectionReference collectionReference = firestore.collection("Request");
+        // update collection here
+        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Request newRequest = document.toObject(Request.class);
-                        String docId = document.getId();
-                        newRequest.setId(docId);
-                        requestsDataList.add(newRequest);
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                requestsDataList.clear();
+
+                collectionReference.whereEqualTo("bookId", bookID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Request newRequest = document.toObject(Request.class);
+                                String docId = document.getId();
+                                newRequest.setId(docId);
+                                requestsDataList.add(newRequest);
+                            }
+                            requestsAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.d("debug", "Error getting documents: ", task.getException());
+                        }
                     }
-                    requestsAdapter.notifyDataSetChanged();
-                } else {
-                    Log.d("debug", "Error getting documents: ", task.getException());
-                }
+                });
+                requestsAdapter.notifyDataSetChanged();
             }
         });
+
+
 
         // --------------------------Required for Toolbar---------------------------------//
         // set tool bar
