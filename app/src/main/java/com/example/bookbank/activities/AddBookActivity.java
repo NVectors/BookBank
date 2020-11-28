@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bookbank.R;
+import com.example.bookbank.helperClasses.FetchBooks;
 import com.example.bookbank.helperClasses.InputValidator;
 import com.example.bookbank.models.Book;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -75,6 +76,7 @@ public class AddBookActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(intent.hasExtra("BARCODE")){
             Barcode = intent.getStringExtra("BARCODE");
+            searchBooks(Barcode);
 
         }
 
@@ -120,6 +122,10 @@ public class AddBookActivity extends AppCompatActivity {
                 openImageSelect();
             }
         });
+    }
+
+    private void searchBooks(String barcode) {
+        new FetchBooks().execute(barcode);
     }
 
     /**
