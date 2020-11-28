@@ -77,6 +77,12 @@ public class FetchBooks extends AsyncTask<String,Void,String> {
                             bookDescription = volumeInfo.getString("description");
                             bookAuthors = volumeInfo.getString("authors");
 
+                            /** format book Authors to be displayed */
+                            bookAuthors = bookAuthors
+                                    .replace("[","")
+                                    .replace("]","")
+                                    .replace("\"","");
+
                             /** Set Edit text fields */
                             title.setText(bookTitle);
                             description.setText(bookDescription);
