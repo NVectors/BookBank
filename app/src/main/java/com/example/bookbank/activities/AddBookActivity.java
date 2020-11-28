@@ -31,6 +31,9 @@ import java.util.UUID;
 
 public class AddBookActivity extends AppCompatActivity {
 
+    /** Barcode String*/
+    private String Barcode;
+
     private EditText description;
     private EditText title;
     private TextView titleError;
@@ -39,6 +42,7 @@ public class AddBookActivity extends AppCompatActivity {
     private EditText author;
     private TextView authorError;
     private FirebaseFirestore firestore;
+    private Button scanBarcodeButton;
 
     private StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -63,8 +67,26 @@ public class AddBookActivity extends AppCompatActivity {
         isbn = findViewById(R.id.isbnEditText);
         isbnError = findViewById(R.id.isbnError);
         description = findViewById(R.id.descriptionEditText);
+        scanBarcodeButton = findViewById(R.id.addBookBarcode);
 
         storageReference = FirebaseStorage.getInstance().getReference("images");
+
+        /** Get intent String of Barcode and set the fields, if passed */
+        Intent intent = getIntent();
+        if(intent.hasExtra("BARCODE")){
+            Barcode = intent.getStringExtra("BARCODE");
+
+        }
+
+        /** On click Listener for 'Scan Barcode' Button */
+        scanBarcodeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent barcodeActivity = new Intent(AddBookActivity.this,ScanBarcodeActivity.class);
+                startActivity(barcodeActivity);
+            }
+        });
+
 
         final Button addBook = findViewById(R.id.addBookButton);
         addBook.setOnClickListener(new View.OnClickListener() {
