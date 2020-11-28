@@ -28,6 +28,7 @@ public class FetchBooks extends AsyncTask<String,Void,String> {
 
     @Override
     protected String doInBackground(String... strings) {
+        /** Calling NetworkUtils helper class's getBookInfo to get the JSON string for query */
         return NetworkUtils.getBookInfo(strings[0]);
     }
 
@@ -42,6 +43,7 @@ public class FetchBooks extends AsyncTask<String,Void,String> {
             /** Fetch the JSON array of book items */
             JSONArray jsonArray = jsonObject.getJSONArray("items");
 
+            /** initializing loop variable and Strings to put fetched book data in */
             int i = 0;
             String bookTitle= null;
             String bookAuthors = null;
@@ -50,29 +52,27 @@ public class FetchBooks extends AsyncTask<String,Void,String> {
 
             /** bool to see if we found the book with exact isbn number */
             boolean bookFound = false;
-            Log.d("Fetch", "Starting loop");
 
             /** loop through the items array find a book result with all 3 details */
             while ((i < jsonArray.length()) && bookFound == false){
 
-                /** get the current book details */
+                /** get the current book volume details */
                 JSONObject book = jsonArray.getJSONObject(i);
                 JSONObject volumeInfo = book.getJSONObject("volumeInfo");
 
-                Log.d("Fetch", volumeInfo.toString());
-
-                /** fetching ISBN_13 info of book */
+                /** check if "industryIdentifiers" is present in this book */
                 if(volumeInfo.has("industryIdentifiers")){
+
+                    /** fetching ISBN_13 info of book */
                     JSONArray industryIdentifiers = volumeInfo.getJSONArray("industryIdentifiers");
                     JSONObject IdentifierArray_ISBN_13 = industryIdentifiers.getJSONObject(1);
 
-                    Log.d("Fetch", industryIdentifiers.toString());
-
-                    /** check if ISBN matches, if yes set fields*/
                     try{
                         bookISBN = IdentifierArray_ISBN_13.getString("identifier");
-                        if(bookISBN.equals(ISBN)){
 
+                        /** check if ISBN scanned matches book ISBN */
+                        if(bookISBN.equals(ISBN)){
+                            /** get title,description and Authors */
                             bookTitle = volumeInfo.getString("title");
                             bookDescription = volumeInfo.getString("description");
                             bookAuthors = volumeInfo.getString("authors");
@@ -82,6 +82,7 @@ public class FetchBooks extends AsyncTask<String,Void,String> {
                             description.setText(bookDescription);
                             author.setText(bookAuthors);
 
+                            /** set loop variable to true */
                             bookFound = true;
 
                         }
