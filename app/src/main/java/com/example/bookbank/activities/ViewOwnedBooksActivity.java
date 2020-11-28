@@ -304,7 +304,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     Log.d(TAG,"Barcode value returned: " + barcodeValue);
 
                     /** Handle firestore in ownerScan() */
-                    ownerScan(barcodeValue);
+                    if (!barcodeValue.equals("ERROR")) {
+                        ownerScan(barcodeValue);
+                    }
                 }
                 break;
             }
