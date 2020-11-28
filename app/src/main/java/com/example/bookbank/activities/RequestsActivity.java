@@ -96,8 +96,10 @@ public class RequestsActivity extends AppCompatActivity {
                     //Toast.makeText(getApplicationContext(), "Barcode value returned: " + barcodeValue, Toast.LENGTH_SHORT).show();
                     Log.d(TAG,"Barcode value returned: " + barcodeValue);
 
-                    /** Handle firestore in borrowerScan() */
-                    borrowerScan(barcodeValue);
+                    /** Handle firestore in ownerScan() */
+                    if (!barcodeValue.equals("ERROR")) {
+                        borrowerScan(barcodeValue);
+                    }
                 }
                 break;
             }

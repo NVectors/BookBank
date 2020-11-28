@@ -180,6 +180,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                                             if ( (type != Barcode.FORMAT_EAN_8) && (type != Barcode.FORMAT_EAN_13) ) {
                                                 resultIntent.putExtra("RESULT", "Not an ISBN barcode");
                                                 setResult(Activity.RESULT_OK, resultIntent);
+                                                resultIntent.putExtra("VALUE", "ERROR");
                                                 finish();
                                             }
 
