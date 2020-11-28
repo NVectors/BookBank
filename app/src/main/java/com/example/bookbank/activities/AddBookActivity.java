@@ -85,8 +85,10 @@ public class AddBookActivity extends AppCompatActivity {
         scanBarcodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent barcodeActivity = new Intent(AddBookActivity.this,ScanBarcodeActivity.class);
-                startActivity(barcodeActivity);
+//                Intent barcodeActivity = new Intent(AddBookActivity.this,ScanBarcodeActivity.class);
+//                startActivity(barcodeActivity);
+                isbn.setText("9780826215499");
+                searchBooks("9780826215499");
             }
         });
 
@@ -126,7 +128,7 @@ public class AddBookActivity extends AppCompatActivity {
     }
 
     private void searchBooks(String barcode) {
-        new FetchBooks(title,author,description).execute(barcode);
+        new FetchBooks(title,author,description,barcode).execute(barcode);
     }
 
     /**

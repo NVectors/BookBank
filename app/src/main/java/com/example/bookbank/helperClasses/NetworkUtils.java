@@ -79,7 +79,6 @@ public class NetworkUtils {
 
         }
 
-        Log.d(LOG_TAG, bookJsonString);
         return bookJsonString;
     }
 }
