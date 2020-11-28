@@ -76,6 +76,7 @@ public class AddBookActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(intent.hasExtra("BARCODE")){
             Barcode = intent.getStringExtra("BARCODE");
+            isbn.setText(Barcode);
             searchBooks(Barcode);
 
         }
@@ -125,7 +126,7 @@ public class AddBookActivity extends AppCompatActivity {
     }
 
     private void searchBooks(String barcode) {
-        new FetchBooks().execute(barcode);
+        new FetchBooks(title,author,description).execute(barcode);
     }
 
     /**
