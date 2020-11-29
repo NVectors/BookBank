@@ -187,6 +187,9 @@ public class RequestsAdapter extends ArrayAdapter {
                                 String docId = request.getId();
                                 intent.putExtra("REQUEST_DOC", docId);
                                 context.startActivity(intent);
+
+                                //Close adapter to go back to main activity
+                                ((Activity)context).finish();
                             }
                         }
                     }

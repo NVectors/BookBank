@@ -63,11 +63,6 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
         bookLong = getLongitude;
 
         initMap();  //Initialize the map
-        try {
-            geoLocate(bookLat,bookLong);
-        } catch (IOException e) {
-            Toast.makeText(ViewLocationActivity.this, "No location is found in the database", Toast.LENGTH_SHORT).show();
-        }
 
         /** If exit button is clicked, close the activity */
         Button exit = (Button) findViewById(R.id.exit_button);
@@ -120,6 +115,12 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "Map is ready!");
         mMap = googleMap;
+        try {
+            geoLocate(bookLat,bookLong);
+        } catch (IOException e) {
+            finish();
+            Toast.makeText(getApplicationContext(), "Error " + e.getLocalizedMessage() , Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -147,7 +148,7 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
             String info = (address);
 
             /** Move to location retrieved from database */
-            moveCamera(new LatLng(bookLat, bookLong), DEFAULT_ZOOM, info);
+            moveCamera(new LatLng(latitude, longitude), DEFAULT_ZOOM, info);
 
         } catch (IOException e) {
             Log.e(TAG, "GeoLocating: IOException: " + e.getMessage());
