@@ -133,7 +133,7 @@ public class MyCurrentRequestsActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (document != null) {
+                    if (document != null && document.exists()) {
                         /** Get the ISBN and Status of the book in the database */
                         String bookISBN = String.valueOf(document.getData().get("isbn"));
                         String bookStatus = document.getString("status");
