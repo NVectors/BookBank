@@ -81,9 +81,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         final TextView borrower = findViewById(R.id.borrower);
         final TextView description = findViewById(R.id.description);
         final Button handOver = findViewById(R.id.hand_over_button);
-
         final ImageView bookImage = findViewById(R.id.owner_book_image);
-        ViewBookPhotoActivity.setImage(bookID, bookImage);
 
         /**  Realtime updates, snapshot is the state of the database at any given point of time */
         bookReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -93,6 +91,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (value != null && value.exists()) {
+                    //Set the image if there is any
+                    ViewBookPhotoActivity.setImage(bookID, bookImage);
+
                     // Set the text views
                     title.setText(value.getString("title"));
                     author.setText("By: " + value.getString("author"));
@@ -217,23 +218,36 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /** Delete image first always */
-                StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
-                if (photoRef != null) {
-                    photoRef.delete();
+                /** Delete image */
+                FirebaseStorage mStorageReference = FirebaseStorage.getInstance();
+                StorageReference folderRef = mStorageReference.getReferenceFromUrl("gs://bookbank-ddffd.appspot.com/");
+                StorageReference photoRef = folderRef.child("images/" + bookID);
+                photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                    Log.d("IMAGE", "onSuccess: Deleted photo");
                 }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        Log.d("IMAGE", "onFailure: Did not delete photo");
+                    }
+                });
+
                 /** Delete the document from the collection in firestore */
                 db.collection("Book").document(bookID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(getApplicationContext(), "Successfully deleted book", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Successfully deleted book!", Toast.LENGTH_LONG).show();
                         finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(), "Did not delete book", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Error occurred! Couldn't delete book", Toast.LENGTH_LONG).show();
                         finish();
                     }
                 });

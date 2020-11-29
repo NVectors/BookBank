@@ -71,14 +71,18 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
         final TextView owner = findViewById(R.id.owner);
         final TextView description = findViewById(R.id.description);
         final ImageView bookImage = findViewById(R.id.owner_book_image);
-        ViewBookPhotoActivity.setImage(bookID, bookImage);
 
         /**  Realtime updates, snapshot is the state of the database at any given point of time */
         bookReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            /** Method is executed whenever any new event occurs in the remote database */
+            /**
+             * Method is executed whenever any new event occurs in the remote database
+             */
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (value != null && value.exists()) {
+                    //Set the image if there is any
+                    ViewBookPhotoActivity.setImage(bookID, bookImage);
+
                     // Set the text views
                     title.setText(value.getString("title"));
                     author.setText("By: " + value.getString("author"));
