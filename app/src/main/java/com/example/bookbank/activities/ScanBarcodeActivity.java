@@ -63,8 +63,6 @@ public class ScanBarcodeActivity extends AppCompatActivity {
     private String returnKeyword;
     private Intent returnIntent;
 
-    private ImageCapture imageCapture;
-
     private String bookID;
     private Intent resultIntent;
 
@@ -107,8 +105,6 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                                 Barcode.FORMAT_EAN_8)
                         .build();
 
-        /** Get instance of BarcodeScanner */
-        scanner = BarcodeScanning.getClient();
 
         /** Configure the Image Capture object to be able to take photos*/
         imageCapture = new ImageCapture.Builder()
