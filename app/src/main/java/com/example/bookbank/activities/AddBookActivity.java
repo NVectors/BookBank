@@ -85,10 +85,10 @@ public class AddBookActivity extends AppCompatActivity {
         scanBarcodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent barcodeActivity = new Intent(AddBookActivity.this,ScanBarcodeActivity.class);
-//                startActivity(barcodeActivity);
-                isbn.setText("9780826215499");
-                searchBooks("9780826215499");
+                Intent barcodeActivity = new Intent(AddBookActivity.this,ScanBarcodeActivity.class);
+                intent.putExtra("RETURN","ADDBOOK");
+                startActivity(barcodeActivity);
+
             }
         });
 
