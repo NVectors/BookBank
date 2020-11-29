@@ -110,15 +110,15 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 }
                 // receiving book back from borrower
                 else if (bookStatus.equals("Borrowed") && ownerScanned) {
-                    request.setVisibility(View.INVISIBLE);
-                    request.setText("RECEIVE BOOK");
+                    handOver.setVisibility(View.INVISIBLE);
+                    handOver.setText("RECEIVE BOOK");
                 }
                 // dont need button if no request or book is borrowed and not in middle of handover
                 else if ((bookStatus.equals("Borrowed") && !ownerScanned) || bookStatus.equals("Available")) {
                     handOver.setVisibility(View.INVISIBLE);
                 }
                 else if (bookStatus.equals("Requested")) {
-                    request.setVisibility(View.VISIBLE);
+                    handOver.setVisibility(View.VISIBLE);
                 }
 
                 // if borrowed and handOver != true --> set button to invisible

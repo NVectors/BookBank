@@ -2,6 +2,7 @@ package com.example.bookbank.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
@@ -35,6 +36,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.common.InputImage;
 
@@ -62,6 +64,8 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
     private String returnKeyword;
     private Intent returnIntent;
+
+    private ImageCapture imageCapture;
 
 
     @SuppressLint("RestrictedApi")
@@ -107,6 +111,12 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
         /** Get instance of BarcodeScanner */
         scanner = BarcodeScanning.getClient();
+
+        /** Configure the Image Capture object to be able to take photos*/
+        imageCapture = new ImageCapture.Builder()
+                .setBufferFormat(ImageFormat.YUV_420_888)
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .build();
 
 
         /** Get instance of the */
@@ -212,7 +222,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
 
         /** Create a surface for the camera preview layout that's connected to the preview stream*/
-        preview.setSurfaceProvider(previewView.createSurfaceProvider());
+        preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
         /** Image Analysis Function, only accept one image at a time for processing */
         ImageAnalysis imageAnalysis =
