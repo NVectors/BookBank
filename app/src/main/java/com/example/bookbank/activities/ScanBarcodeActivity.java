@@ -45,20 +45,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static androidx.camera.core.ImageAnalysis.*;
+
 public class ScanBarcodeActivity extends AppCompatActivity {
 
     // Strings for permission
     private static final String[] CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int CAMERA_REQUEST_CODE = 10;
 
-    private static final String TAG = "SCANNER";
-
-    private Button scanBarcode;
     private PreviewView previewView;
-
+    private ExecutorService executor;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
-    private ExecutorService executor;
+    private BarcodeScannerOptions options;
 
     private String returnKeyword;
     private Intent returnIntent;
@@ -66,21 +65,25 @@ public class ScanBarcodeActivity extends AppCompatActivity {
     private String bookID;
     private Intent resultIntent;
 
+    private static final String TAG = "SCANNER";
+    private Button scanBarcode;
+    private ImageAnalysis imageAnalysis;
+
     @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_barcode);
 
-        /** getting the intent and checking the RETURN */
-        Intent intent = getIntent();
-        if(intent.hasExtra("RETURN")){
-            returnKeyword = intent.getStringExtra("RETURN");
-        }
-
         /** References to layout objects */
         previewView = findViewById(R.id.cameraPreview);
         scanBarcode = findViewById(R.id.barcodeButton);
+
+        /** Getting the intent and checking the RETURN */
+//        Intent intent = getIntent();
+//        if(intent.hasExtra("RETURN")){
+//            returnKeyword = intent.getStringExtra("RETURN");
+//        }
 
         /** Create intent to send back data to main activity later */
         resultIntent = new Intent();
@@ -98,7 +101,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         executor = Executors.newSingleThreadExecutor();
 
         /** Configure the barcode scanner to recognize only ISBN format */
-        BarcodeScannerOptions options =
+        options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(
                                 Barcode.FORMAT_EAN_13,
@@ -112,8 +115,14 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build();
 
+        /** Image Analysis Function, only accept one image at a time for processing */
+        imageAnalysis =
+                new Builder()
+                        .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
+                        .build();
 
-        /** Get instance of the */
+
+        /** Get instance of the process camera provider */
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(new Runnable() {
             @Override
@@ -127,11 +136,6 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             }
         }, ContextCompat.getMainExecutor(this));
 
-        /** Configure the Image Capture object to be able to take photos*/
-        imageCapture = new ImageCapture.Builder()
-                .setBufferFormat(ImageFormat.YUV_420_888)
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .build();
 
         /** "Take Photo" button is clicked */
         scanBarcode.setOnClickListener( new View.OnClickListener(){
@@ -154,6 +158,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             public void onCaptureSuccess(@NonNull ImageProxy image) {
                 Log.d(TAG, "Picture is taken!");
                 analyze(image);
+                //image.close();
             }
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
@@ -163,21 +168,27 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Analyze the image captured, imageAnalysis only accept one image at a time for processing
+     * @param image
+     */
     @SuppressLint("UnsafeExperimentalUsageError")
-    public void analyze(@NonNull ImageProxy image) {
+    public void analyze(@NonNull ImageProxy image){
+        Log.d("SCANNER" , "Inside analyzeBarcode");
+
+        Image inputImage = image.getImage();
 
         /** Image does not exists */
-        if(image == null || image.getImage() == null){
+        if(inputImage == null ){
             return;
         }
 
-        Image barcodeImage = image.getImage();
         int rotationDegrees = image.getImageInfo().getRotationDegrees();
-        InputImage inputImage = InputImage.fromMediaImage(barcodeImage,rotationDegrees);
+        InputImage barcodeImage = InputImage.fromMediaImage(inputImage,rotationDegrees);
         BarcodeScanner scanner = BarcodeScanning.getClient();
 
         /** Process the image captured */
-        Task<List<Barcode>> result = scanner.process(inputImage)
+        Task<List<Barcode>> result = scanner.process(barcodeImage)
                 .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
                     @Override
                     public void onSuccess(List<Barcode> barcodes) {
@@ -214,6 +225,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Task failed with an exception
+                        image.close();
                         resultIntent.putExtra("RESULT", "Barcode scanner failed");
                         setResult(Activity.RESULT_OK, resultIntent);
                         finish();
