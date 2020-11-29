@@ -22,6 +22,14 @@
             android:textAlignment="center"
             android:textSize="24sp" />
 
+        <Button
+            android:id="@+id/addBookBarcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:background="#1dd7de"
+            android:text="Scan Barcode" />
+
         <EditText
             android:id="@+id/titleEditText"
             android:layout_width="match_parent"

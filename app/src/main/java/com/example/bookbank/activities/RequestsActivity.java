@@ -1,13 +1,15 @@
 package com.example.bookbank.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.bookbank.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,6 +24,15 @@ public class RequestsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_requests);
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        Button handOverBook = (Button) findViewById(R.id.hand_over_button);
+        handOverBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RequestsActivity.this, ScanBarcodeActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // --------------------------Required for Toolbar---------------------------------//
         // set tool bar
