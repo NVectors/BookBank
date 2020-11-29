@@ -127,8 +127,8 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     if (value.getString("borrowerId") == "") {
                         borrower.setText("Borrower: None");
                     } else {
-                        DocumentReference documentRef = db.collection("User").document(value.getString("borrowerId"));
-                        documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        DocumentReference borrowerRef = db.collection("User").document(value.getString("borrowerId"));
+                        borrowerRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()) {
@@ -219,8 +219,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             public void onClick(View v) {
                 /** Delete image first always */
                 StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
-                photoRef.delete();
-
+                if (photoRef != null) {
+                    photoRef.delete();
+                }
                 /** Delete the document from the collection in firestore */
                 db.collection("Book").document(bookID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
