@@ -36,7 +36,7 @@ public class RequestsActivity extends AppCompatActivity {
             location.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
+                    final String requestDoc = "1RfgtOXeIMrPLgeNueN2"; //Just to test for now
                     Intent intent = new Intent(RequestsActivity.this, SetLocationActivity.class);
                     intent.putExtra("REQUEST_DOC", requestDoc);
                     startActivity(intent);
@@ -47,7 +47,7 @@ public class RequestsActivity extends AppCompatActivity {
             viewLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
+                    final String requestDoc = "1RfgtOXeIMrPLgeNueN1"; //Just to test for now
                     Intent intent = new Intent(RequestsActivity.this, ViewLocationActivity.class);
                     intent.putExtra("REQUEST_DOC", requestDoc);
                     startActivity(intent);

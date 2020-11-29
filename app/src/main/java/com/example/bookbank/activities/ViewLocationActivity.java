@@ -2,12 +2,14 @@ package com.example.bookbank.activities;
 
 import android.location.Address;
 import android.location.Geocoder;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
@@ -18,6 +20,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -60,29 +64,39 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
         final DocumentReference requestReference = db.collection("Request").document(requestDoc);
 
         initMap();  //Initialize the map
-        /**  Realtime updates, snapshot is the state of the database at any given point of time */
-        requestReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            /**
-             * Method is executed whenever any new event occurs in the remote database
-             */
+
+        requestReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                String docLat = value.getData().get("latitude").toString();
-                String docLong = value.getData().get("longitude").toString();
-                // Tests
-                Log.d(TAG, "BOOK LOCATION-> Latitude: " + String.valueOf(docLat)
-                        + " Longitude: " + String.valueOf(docLong));
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null  && document.exists()) {
+                        String docLat = document.getData().get("latitude").toString();
+                        String docLong = document.getData().get("longitude").toString();
 
-                bookLat = (Double) Double.parseDouble(docLat.toString());
-                bookLong = (Double) Double.parseDouble(docLong.toString());
+                        // Tests
+                        Log.d(TAG, "BOOK LOCATION-> Latitude: " + String.valueOf(docLat)
+                                + " Longitude: " + String.valueOf(docLong));
 
-                try {
-                    geoLocate(bookLat,bookLong);
-                } catch (IOException e) {
-                    Toast.makeText(ViewLocationActivity.this, "No location is found in the database", Toast.LENGTH_SHORT).show();
+                        bookLat = (Double) Double.parseDouble(docLat.toString());
+                        bookLong = (Double) Double.parseDouble(docLong.toString());
+
+                        try {
+                            geoLocate(bookLat,bookLong);
+                        } catch (IOException e) {
+                            Toast.makeText(ViewLocationActivity.this, "No location is found in the database", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else { // Document is null
+                        finish();
+                        Toast.makeText(getApplicationContext(), "Location does not exist", Toast.LENGTH_LONG).show();
+                    }
+                } else { // Task is not successful
+                    Toast.makeText(getApplicationContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
+
 
 
         /** If exit button is clicked, close the activity */
@@ -136,7 +150,6 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(this, "Map is ready!", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Map is ready!");
         mMap = googleMap;
     }
