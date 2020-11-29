@@ -27,9 +27,9 @@ public class ViewBookPhotoActivity extends AppCompatActivity {
      */
     static public void setImage(String bookId, final ImageView bookImage) {
         final StorageReference imageRef = FirebaseStorage.getInstance().getReference("images/" + bookId);
-        bookImage.setImageResource(R.drawable.default_book_image);
         long FIVE_MEGABYTE = 1024 * 1024 * 5;
-
+        bookImage.setImageResource(R.drawable.default_book_image);
+        
         imageRef.getBytes(FIVE_MEGABYTE)
                 .addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
