@@ -97,7 +97,8 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
                     bookStatus.setText("Status: " + book.getStatus());
 
                     String status = book.getStatus();
-                    if(status.equals("Accepted") && book.getOwnerScanHandOver()) {
+                    Boolean scannedOver = documentSnapshot.getBoolean("ownerScanHandOver");
+                    if(status.equals("Accepted") && scannedOver) {
                         scanBook.setVisibility(view.VISIBLE);
                     }
                     //set book imageto ImageView
@@ -126,13 +127,12 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
         scanBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final DocumentReference bookReference = firestore.collection("book").document(request.getBookId());
-                bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                firestore.collection("Book").document(request.getBookId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot snapshot = task.getResult();
-                        String bookStatus =  snapshot.getString("status");
-                        Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String bookStatus =  documentSnapshot.getString("status");
+                        Boolean ownerScanned = documentSnapshot.getBoolean("ownerScanHandOver");
+                        System.out.println(bookStatus + ownerScanned);
                         if (bookStatus.equals("Accepted") && ownerScanned) {
                             // wip scan barcode and if good update -->
                             Intent intent = new Intent(context, ScanBarcodeActivity.class);

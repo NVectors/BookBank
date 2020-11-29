@@ -122,6 +122,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                         handOver.setVisibility(View.INVISIBLE);
                     } else if (bookStatus.equals("Requested")) {
                         handOver.setVisibility(View.VISIBLE);
+                        handOver.setText("Requests");
                     }
 
                     // Set the borrower name text view next
