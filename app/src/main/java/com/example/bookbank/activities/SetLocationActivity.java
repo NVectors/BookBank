@@ -107,6 +107,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                         /** Update the fields for the document in firestore */
                         db.collection("Request").document(requestDoc).update("latitude", currentLat);
                         db.collection("Request").document(requestDoc).update("longitude", currentLong);
+
                         finish();
                     }
                     else{
