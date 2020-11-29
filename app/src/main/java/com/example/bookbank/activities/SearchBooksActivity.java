@@ -113,7 +113,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
                     // making sure we only query the book which are available
                     String status = (String) doc.getData().get("status");
-                    if(status.equals("Available")){
+                    if(status.equals("Available") || status.equals("Requested") ){
                         // fetching all the attributes of the book
                         String author = (String) doc.getData().get("author");
                         String borrowerId = (String) doc.getData().get("borrowerId");
