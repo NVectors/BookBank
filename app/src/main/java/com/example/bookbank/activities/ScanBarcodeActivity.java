@@ -45,25 +45,23 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ScanBarcodeActivity extends AppCompatActivity {
+public class  ScanBarcodeActivity extends AppCompatActivity {
+    private static final String TAG = "SCANNER";
 
-    // Strings for permission
+    /** Strings for permission */
     private static final String[] CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final int CAMERA_REQUEST_CODE = 10;
 
-    private static final String TAG = "SCANNER";
-
+    /** view objects */
     private Button scanBarcode;
     private PreviewView previewView;
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
     private ExecutorService executor;
-
-    private String returnKeyword;
-    private Intent returnIntent;
-
     private String bookID;
+
+    /** resultIntent to return back to the caller activity */
     private Intent resultIntent;
 
     @SuppressLint("RestrictedApi")
@@ -71,12 +69,6 @@ public class ScanBarcodeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_barcode);
-
-        /** getting the intent and checking the RETURN */
-        Intent intent = getIntent();
-        if(intent.hasExtra("RETURN")){
-            returnKeyword = intent.getStringExtra("RETURN");
-        }
 
         /** References to layout objects */
         previewView = findViewById(R.id.cameraPreview);
@@ -89,6 +81,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         bookID = getIntent().getStringExtra("BOOK_ID");
 
         Log.d(TAG, "Start the scanner!");
+
         /** Check if camera permission is granted by user */
         if (checkCameraPermission() == false) {
             getCameraPermission(); // Get camera permission
