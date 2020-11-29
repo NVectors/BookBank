@@ -38,7 +38,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".activities.ViewSearchBookDetails" />
+        <activity android:name=".activities.ViewSearchBookDetails"></activity>
         <activity
             android:name=".activities.MainNavigationActivity"
             android:theme="@style/AppTheme.NoActionBar.NoActionBar" />
@@ -58,7 +58,7 @@
             android:name=".activities.SetLocationActivity"
             android:label="@string/title_activity_set_location" />
         <activity android:name=".activities.RequestsActivity" />
-        <activity android:name=".activities.LoginActivity" />
+        <activity android:name=".activities.ScanBarcodeActivity" />
         <activity android:name=".activities.ViewBorrowedBookActivity" />
         <activity android:name=".activities.BorrowedBooksActivity" />
         <activity android:name=".activities.ViewBookPhotoActivity" />
@@ -73,7 +73,8 @@
         <activity android:name=".activities.SearchBooksActivity" />
         <activity android:name=".activities.SignUpActivity" />
         <activity android:name=".activities.EditDescriptionActivity" />
-        <activity android:name=".activities.ScanBarcodeActivity">
+        <activity android:name=".activities.ViewLocationActivity" />
+        <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

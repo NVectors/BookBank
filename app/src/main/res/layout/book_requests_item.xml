@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="2">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <TextView
+                android:id="@+id/requester_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Strangers of Sea"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:textColor="#000"/>
+            <TextView
+                android:id="@+id/request_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Strangers of Sea"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:textColor="#000"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <Button
+                android:id="@+id/accept_request_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#00c8de"
+                android:layout_marginBottom="10dp"
+                android:text="Accept"/>
+            <Button
+                android:id="@+id/reject_request_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#f0002c"
+                android:text="Reject"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

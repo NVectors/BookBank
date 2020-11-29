@@ -178,7 +178,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 startActivity(new Intent(EditProfileActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(EditProfileActivity.this, RequestsActivity.class));
+                startActivity(new Intent(EditProfileActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

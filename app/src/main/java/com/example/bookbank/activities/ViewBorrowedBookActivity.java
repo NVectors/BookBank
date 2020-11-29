@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.bookbank.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +36,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 public class ViewBorrowedBookActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private FirebaseAuth firebaseAuth;
+    private DocumentReference bookReference;
+    private String bookID;
+    private static String TAG = "SCANNER";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +50,13 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         /** Get book id of the book that clicked in the list view of BorrowerBooksActivity */
-        final String bookID = getIntent().getStringExtra("BOOK_ID");
+        bookID = getIntent().getStringExtra("BOOK_ID");
 
         /** Get instance of Firestore */
         firestore = FirebaseFirestore.getInstance();
 
         /** Get top level reference to the book in collection  by ID */
-        final DocumentReference bookReference = firestore.collection("Book").document(bookID);
+        bookReference = firestore.collection("Book").document(bookID);
 
         /** Get references in the layout*/
         final TextView title = findViewById(R.id.book_title);
@@ -102,12 +112,25 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
             }
         });
 
-        /** Request button is clicked */
+        /** returnBook button is clicked */
         final Button returnBook = findViewById(R.id.return_book_button);
         returnBook.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-               finish();
+            public void onClick(View view) {
+                final DocumentReference bookReference = firestore.collection("book").document(bookID);
+                bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        if (!ownerScanned) {
+                            // scan barcode here, if good --> update
+
+
+                            //bookReference.update("ownerScanHandOver", true);
+                        }
+                    }
+                });
             }
         });
 
@@ -156,7 +179,7 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 startActivity(new Intent(ViewBorrowedBookActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(ViewBorrowedBookActivity.this, RequestsActivity.class));
+                startActivity(new Intent(ViewBorrowedBookActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

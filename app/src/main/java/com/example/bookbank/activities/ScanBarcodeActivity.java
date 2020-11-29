@@ -8,6 +8,7 @@ import android.graphics.ImageFormat;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -16,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.ImageProxy;
@@ -49,13 +51,14 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
     private static final String TAG = "SCANNER";
 
-    private Button scanBarcode;
     private PreviewView previewView;
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-    private ImageCapture imageCapture;
     private ExecutorService executor;
-    private BarcodeImageAnalysis imageAnalysis;
+    private BarcodeScanner scanner;
+
+    private String bookID;
+    private Intent resultIntent;
 
     private String returnKeyword;
     private Intent returnIntent;
@@ -76,8 +79,14 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
 
         /** References to layout objects */
+        /** References to camera preview layout object */
         previewView = findViewById(R.id.cameraPreview);
-        scanBarcode = findViewById(R.id.barcodeButton);
+
+        /** Create intent to send back data to main activity later */
+        resultIntent = new Intent();
+
+        /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
+        bookID = getIntent().getStringExtra("BOOK_ID");
 
         Log.d(TAG, "Start the scanner!");
         /** Check if camera permission is granted by user */
@@ -88,8 +97,17 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         /** Initialize object to execute Runnable Task(s) */
         executor = Executors.newSingleThreadExecutor();
 
-        /** Get instance of the Image Analyzer class */
-        imageAnalysis = new BarcodeImageAnalysis(returnKeyword);
+        /** Configure the barcode scanner to recognize only ISBN format */
+        BarcodeScannerOptions options =
+                new BarcodeScannerOptions.Builder()
+                        .setBarcodeFormats(
+                                Barcode.FORMAT_EAN_13,
+                                Barcode.FORMAT_EAN_8)
+                        .build();
+
+        /** Get instance of BarcodeScanner */
+        scanner = BarcodeScanning.getClient();
+
 
         /** Get instance of the */
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
@@ -98,27 +116,13 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             public void run() {
                 try {
                     ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-                    showPreview(cameraProvider);
+                    /** Link the layout view finder to the camera preview for live display */
+                    ScanBarcodeActivity.this.showPreview(cameraProvider);
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }, ContextCompat.getMainExecutor(this));
-
-        /** Configure the Image Capture object to be able to take photos*/
-        imageCapture = new ImageCapture.Builder()
-                .setBufferFormat(ImageFormat.YUV_420_888)
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .build();
-
-        /** "Take Photo" button is clicked */
-        scanBarcode.setOnClickListener( new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Button is pressed!");
-                takePhoto(); // Call function to handle captured photo
-            }
-        });
     }
 
     /**
@@ -210,10 +214,84 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         /** Create a surface for the camera preview layout that's connected to the preview stream*/
         preview.setSurfaceProvider(previewView.createSurfaceProvider());
 
+        /** Image Analysis Function, only accept one image at a time for processing */
+        ImageAnalysis imageAnalysis =
+                new ImageAnalysis.Builder()
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build();
+
+        imageAnalysis.setAnalyzer(executor, new ImageAnalysis.Analyzer() {
+                    @Override
+                    @SuppressLint("UnsafeExperimentalUsageError")
+                    public void analyze(@NonNull ImageProxy image) {
+                        Image inputImage = image.getImage();
+
+                        /** Image does not exists */
+                        if(inputImage == null ){
+                            return;
+                        }
+
+                        int rotationDegrees = image.getImageInfo().getRotationDegrees();
+                        InputImage barcodeImage = InputImage.fromMediaImage(inputImage,rotationDegrees);
+
+                        /** Process the image captured */
+                        Task<List<Barcode>> result = scanner.process(barcodeImage)
+                                .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+                                    @Override
+                                    public void onSuccess(List<Barcode> barcodes) {
+                                        // Task completed successfully
+                                        Log.d(TAG,"Scanned the image!");
+
+                                        for (Barcode barcode: barcodes){
+                                            String rawValue = barcode.getRawValue();
+                                            Integer type = barcode.getFormat();
+                                            Log.d(TAG, "BAR CODE IS " + rawValue);
+                                            Log.d(TAG, "BAR CODE TYPE IS " + type.toString());
+
+                                            /** Not the correct ISBN barcode format */
+                                            if ( (type != Barcode.FORMAT_EAN_8) && (type != Barcode.FORMAT_EAN_13) ) {
+                                                /** Pass back data to activity that called ScanBarcodeActivity */
+                                                resultIntent.putExtra("RESULT", "Not an ISBN barcode");
+                                                resultIntent.putExtra("VALUE", "ERROR");
+                                                resultIntent.putExtra("BOOK", bookID);
+                                                setResult(Activity.RESULT_OK, resultIntent);
+
+                                                finish();
+                                            }
+
+                                            /** Pass back data to activity that called ScanBarcodeActivity */
+                                            resultIntent.putExtra("RESULT", "Valid ISBN barcode");
+                                            resultIntent.putExtra("VALUE", rawValue);
+                                            resultIntent.putExtra("BOOK", bookID);
+                                            setResult(Activity.RESULT_OK, resultIntent);
+
+                                            finish();
+
+                                        }
+                                        Log.d(TAG,"Done analyzing");
+                                        image.close();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        // Task failed with an exception
+                                        Log.d(TAG,"BARCODE SCAN FAILED");
+                                        Log.d(TAG,"Done analyzing");
+
+                                        resultIntent.putExtra("RESULT", "There was an error: " + e.getMessage());
+                                        setResult(Activity.RESULT_OK, resultIntent);
+                                        image.close();
+
+                                    }
+                                });
+                    }
+                });
+
         /** Bind the lifecycle of camera to LifecycleOwner within application's process */
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) this,
                 cameraSelector,
-                imageCapture,
+                imageAnalysis,
                 preview);
     }
 

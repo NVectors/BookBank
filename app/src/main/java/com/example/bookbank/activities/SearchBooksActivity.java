@@ -67,7 +67,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
         // initializing the firebase db
         final String TAG = "Search";
-        FirebaseFirestore db;
+        final FirebaseFirestore db;
 
         // setting the view,arraylist and adapter for the list
         searchList = findViewById(R.id.search_list);
@@ -114,7 +114,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                     // making sure we only query the book which are available
                     String status = (String) doc.getData().get("status");
                     if(status.equals("Available")){
-                        // fetching all the atributes of the book
+                        // fetching all the attributes of the book
                         String author = (String) doc.getData().get("author");
                         String borrowerId = (String) doc.getData().get("borrowerId");
                         String description = (String) doc.getData().get("description");
@@ -123,7 +123,21 @@ public class SearchBooksActivity extends AppCompatActivity {
                         String ownerId = (String) doc.getData().get("ownerId");
                         String title = (String) doc.getData().get("title");
 
-                        Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId);
+                        // checking if user has that book requested already
+                        final Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId, false);
+
+                        if(status.equals("Requested")) {
+                            // check all books to see if they are on there
+                            db.collection("Request").whereEqualTo("bookId", id).whereEqualTo("requesterId", firebaseAuth.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    Log.d("debug", String.valueOf(queryDocumentSnapshots.size()));
+                                    if (queryDocumentSnapshots.size() != 0) {
+                                        book.setStatus("Requested");
+                                    }
+                                }
+                            });
+                        }
 
                         // if keyword is empty string all available books are added as default
                         if(keyWord.equals("")){
@@ -132,7 +146,7 @@ public class SearchBooksActivity extends AppCompatActivity {
 
                         // if there's a search keyword we search for the keyword in title, author and ISBN fields
                         else{
-                            // making author, title and the keyword lowerase for both case searching
+                            // making author, title and the keyword lowercase for both case searching
                             String lowerTitle = title.toLowerCase();
                             String lowerAuthor = author.toLowerCase();
                             keyWord = keyWord.trim().toLowerCase();
@@ -145,12 +159,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                                 bookArrayList.add(book);
                             }
                         }
-
-
-
                     }
-
-
                 }
                 // notifying the adapter for the change
                 bookAdapter.notifyDataSetChanged();
@@ -228,11 +237,11 @@ public class SearchBooksActivity extends AppCompatActivity {
                 startActivity(new Intent(SearchBooksActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(SearchBooksActivity.this, RequestsActivity.class));
+                startActivity(new Intent(SearchBooksActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();
-                Toast.makeText(SearchBooksActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchBooksActivity.this, "Successfully Signed Out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(SearchBooksActivity.this, LoginActivity.class));
                 break;
             default:

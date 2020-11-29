@@ -1,12 +1,7 @@
 package com.example.bookbank.activities;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +12,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.bookbank.R;
 import com.example.bookbank.adapters.OwnerBooksAdapter;
@@ -103,8 +102,8 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
 //
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     if (ownerID.equals(currentUser.getUid())) { //Display books that only belong to that user
-                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID)); // Add book from FireStore
-                        originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID));
+                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false)); // Add book from FireStore
+                        originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false));
                     }
                 }
                 bookAdapter.notifyDataSetChanged(); //Notify the adapter of data change
@@ -200,7 +199,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
                 startActivity(new Intent(OwnerBooksActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(OwnerBooksActivity.this, RequestsActivity.class));
+                startActivity(new Intent(OwnerBooksActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();

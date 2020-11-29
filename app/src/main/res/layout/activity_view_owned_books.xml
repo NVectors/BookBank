@@ -28,13 +28,13 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/request_button"
+            android:id="@+id/hand_over_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="#1dd7de"
             android:fontFamily="sans-serif-black"
-            android:text="REQUESTS"
+            android:text="HAND OVER BOOK"
             android:textColor="#000000" />
 
         <Button

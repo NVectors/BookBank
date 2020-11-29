@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -33,16 +34,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import javax.annotation.Nullable;
 
+
 public class ViewOwnedBooksActivity extends AppCompatActivity {
     private FirebaseFirestore db;
+    private DocumentReference bookReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri uri;
+    private String bookID;
+    private static final String TAG = "SCANNED";
+    private static final String tag = "VIEW OWNED BOOK";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,15 +58,15 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
-        final String bookID = getIntent().getStringExtra("BOOK_ID");
+        bookID = getIntent().getStringExtra("BOOK_ID");
 
         /** Get instance of Firestore */
         db = FirebaseFirestore.getInstance();
 
-
         /** Get top level reference to the book in collection  by ID */
-        final DocumentReference bookReference = db.collection("Book").document(bookID);
+        bookReference = db.collection("Book").document(bookID);
 
+        /** Get top level reference to the photo in storage */
         final StorageReference imageRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
 
         /** Get references in the layout*/
@@ -71,6 +76,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         final TextView status = findViewById(R.id.status);
         final TextView borrower = findViewById(R.id.borrower);
         final TextView description = findViewById(R.id.description);
+        final Button handOver = findViewById(R.id.hand_over_button);
 
         final ImageView bookImage = findViewById(R.id.owner_book_image);
         ViewBookPhotoActivity.setImage(bookID, bookImage);
@@ -87,9 +93,34 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                 status.setText("Status: " + value.getString("status"));
 
+                Boolean ownerScanned = value.getBoolean("ownerScanHandOver");
+                String bookStatus = value.getString("status");
+                // first state of the button is Requests
+                // changing request button to handOver
+                if (bookStatus.equals("Accepted") && !ownerScanned) {
+                    handOver.setText("HAND OVER");
+                }
+                else if (bookStatus.equals("Accepted") && ownerScanned) {
+                    handOver.setText("CANCEL HAND OVER");
+                }
+                // receiving book back from borrower
+                else if (bookStatus.equals("Borrowed") && ownerScanned) {
+                    request.setVisibility(View.INVISIBLE);
+                    request.setText("RECEIVE BOOK");
+                }
+                // dont need button if no request or book is borrowed and not in middle of handover
+                else if ((bookStatus.equals("Borrowed") && !ownerScanned) || bookStatus.equals("Available")) {
+                    handOver.setVisibility(View.INVISIBLE);
+                }
+                else if (bookStatus.equals("Requested")) {
+                    request.setVisibility(View.VISIBLE);
+                }
+
+                // if borrowed and handOver != true --> set button to invisible
+
                 if (value.getString("borrowerId") == "") {
                     borrower.setText("Borrower: None");
-                } else { // Will have to test this later
+                } else {
                     DocumentReference documentRef = db.collection("User").document(value.getString("borrowerId"));
                     documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         /**
@@ -103,7 +134,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                 if (document.exists()) {
                                     String name = document.getString("fullname");
                                     // Test
-                                    Log.d("NAME", name);
+                                    Log.d(tag,"Book name: " + name);
 
                                     borrower.setVisibility(View.VISIBLE); // Default of Borrower text view
                                     borrower.setText("Borrower: " + name);
@@ -113,7 +144,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                     borrower.setText("Borrower: FAILED");
                                 }
                             } else {
-                                Log.d("TAG", "get failed with ", task.getException());
+                                Log.d("TAG", "Failed with ", task.getException());
                             }
                         }
                     });
@@ -122,12 +153,53 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
-        /** Request button is clicked */
-        final Button request = findViewById(R.id.request_button);
-        request.setOnClickListener(new View.OnClickListener() {
+        /** Hand Over button is clicked */
+        handOver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class));
+                // check status of book
+                bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot snapshot = task.getResult();
+                        String bookStatus =  snapshot.getString("status");
+                        Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        // to check all requests for book
+                        if (bookStatus.equals("Requested")) {
+                            Intent intent = new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class);
+                            intent.putExtra("BOOK_ID", bookID);
+                            startActivity(intent);
+                        }
+                        // Owner Handover of book
+                        else if (bookStatus.equals("Accepted") && (!ownerScanned)){
+                            /** Hand Over button is clicked, go to Barcode Scanner to scan book */
+                            final Button handOver = findViewById(R.id.hand_over_button);
+                            handOver.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
+                                    /** Barcode Scanner activity will return the value of the barcode and error messages */
+                                    startActivityForResult(intent, 0);
+                                }
+                            });
+                        }
+                        // canceling handover
+                        // moment borrower scans changes status to Borrowed, and ownerScanned to false
+                        else if (bookStatus.equals("Accepted") && ownerScanned) {
+                            bookReference.update("ownerScanHandOver", false);
+                        }
+                        // Owner receiving book from borrower. when borrower scans --> set ownerScanHandOver = true
+                        else if (bookStatus.equals("Borrowed") && ownerScanned) {
+                            Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
+                            startActivity(intent);
+                            // wip scan barcode to verify then update -->
+                            bookReference.update("status", "Available");
+                            bookReference.update("borrowerId", "");
+                            bookReference.update("ownerScanHandOver", false);
+                        }
+                    }
+                });
+
             }
         });
 
@@ -136,8 +208,10 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /** Delete image first always */
                 StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
                 photoRef.delete();
+                /** Delete the document from the collection in firestore */
                 db.collection("Book").document(bookID).delete();
             }
         });
@@ -178,6 +252,18 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
+        /** Image add buton is clicked */
+        final Button addImage = findViewById(R.id.add_image_button);
+        addImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(tag, "Adding an image");
+
+                //Implement
+            }
+        });
+
+
         /** Image delete button is clicked */
         final Button deleteImage = findViewById(R.id.delete_image);
         deleteImage.setOnClickListener(new View.OnClickListener() {
@@ -193,6 +279,92 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
         // set tool bar
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(tb);
+    }
+
+    /**
+     * Handle data that is sent back by the child activity via intent
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            /** Case 0 = Barcode Scanner child activity */
+            case (0) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    /** Get string from key of resultIntent passed back from child activity */
+                    String returnValue = data.getStringExtra("RESULT");
+
+                    /** Get the value of the barcode scanned */
+                    String barcodeValue = data.getStringExtra("VALUE");
+
+                    /** Display the string to the user */
+                    Toast.makeText(getApplicationContext(), returnValue, Toast.LENGTH_SHORT).show();
+
+                    /** Display the barcode value to the user */
+                    if (!barcodeValue.equals("ERROR")) {
+                        Toast.makeText(getApplicationContext(), "Correct Barcode Type", Toast.LENGTH_LONG).show();
+                        ownerScan(barcodeValue);  // Handle firestore code in ownerScan()
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(), "Incorrect Barcode Type", Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * Handles the cases after the barcode of the book is scanned.
+     * If the ISBN of the book scanned matches the ISBN of the book in the database.
+     * Then the boolean will be updated to True.
+     * @param barcodeValue
+     */
+    private void ownerScan(String barcodeValue) {
+        bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        /** Get the ISBN and Status of the book in the database */
+                        String bookISBN = String.valueOf(document.getData().get("isbn"));
+                        String bookStatus = document.getString("status");
+
+                        /** ISBN of the book scanned matches with the ISBN of book in database */
+                        if (bookISBN.equals(barcodeValue)) {
+                            /** Status of the book is correct should be "Accepted"*/
+                            if(bookStatus.toLowerCase().equals("accepted")) {
+                                /** Check if the boolean to keep track of owner scanning first is false by default */
+                                Boolean check = (Boolean) document.getData().get("ownerScanHandOver");
+                                if (check == false){
+                                    /** Update the boolean to True for the book */
+                                    db.collection("Book").document(bookID).update("ownerScanHandOver", true);
+                                }
+
+                                /** Notify user the next steps in handing over the book */
+                                Toast.makeText(getApplicationContext(), "Success! Borrow must scan book now", Toast.LENGTH_LONG).show();
+                            }
+                            /** ISBN of the book scanned matches but status is not "Accepted" */
+                            else if (!bookStatus.toLowerCase().equals("accepted")){
+                                Toast.makeText(getApplicationContext(), "Accept request for the book first", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                        /** ISBN of the book scanned doesn't match the ISBN of the book in database */
+                        else if (!bookISBN.equals(barcodeValue)){
+                            Toast.makeText(getApplicationContext(), "Book scanned doesn't match the selected book", Toast.LENGTH_LONG).show();
+                        }
+                    } else { // Document is null
+                        Toast.makeText(getApplicationContext(), "Book scanned is not in your list", Toast.LENGTH_LONG).show();
+                    }
+                } else { // Task not successful
+                    Toast.makeText(getApplicationContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     /**
@@ -248,11 +420,11 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 startActivity(new Intent(ViewOwnedBooksActivity.this, SearchUsernameActivity.class));
                 break;
             case R.id.nav_my_requests:
-                startActivity(new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class));
+                startActivity(new Intent(ViewOwnedBooksActivity.this, MyCurrentRequestsActivity.class));
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();
-                Toast.makeText(ViewOwnedBooksActivity.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewOwnedBooksActivity.this, "Successfully Signed Out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(ViewOwnedBooksActivity.this, LoginActivity.class));
                 break;
             default:
