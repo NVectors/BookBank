@@ -43,15 +43,12 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
     private Context context;
     private FirebaseFirestore firestore;
     private static final int ERROR_DIALOG_REQUEST = 9001;
-    private static String TAG = "Scanner";
     private String bookId;
 
     public MyCurrentRequestsAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Request> requestList) {
         super(context, 0, requestList);
         this.requestList = requestList;
         this.context = context;
-
-
     }
 
     @NonNull
@@ -135,11 +132,10 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
                         if (bookStatus.equals("Accepted") && ownerScanned) {
                             // wip scan barcode and if good update -->
                             Intent intent = new Intent(context, ScanBarcodeActivity.class);
-                            String bookID = request.getBookId();
-                            intent.putExtra("BOOK_ID", bookID);
+                            String bookID = request.getBookId(); // Get the book id
+                            intent.putExtra("BOOK_ID", bookID); // Pass along book id
                             /** Barcode Scanner activity will return the value of the barcode and error messages */
                             ((Activity) context).startActivityForResult(intent, 1);
-
                         }
                     }
                 });
@@ -148,115 +144,6 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
 
         return view;
 
-    }
-
-    /**
-     * Handle data that is sent back by the child activity via intent
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
-            /** Case 0 = Barcode Scanner child activity */
-            case (1) : {
-                if (resultCode == Activity.RESULT_OK) {
-                    /** Get string from key of resultIntent passed back from child activity */
-                    String returnValue = data.getStringExtra("RESULT");
-
-                    /** Display the string to the user */
-                    Toast.makeText(context, returnValue, Toast.LENGTH_SHORT).show();
-
-                    /** Get the value of the barcode scanned */
-                    String barcodeValue = data.getStringExtra("VALUE");
-
-                    /** Display the barcode value to the user */
-                    //Toast.makeText(getApplicationContext(), "Barcode value returned: " + barcodeValue, Toast.LENGTH_SHORT).show();
-                    Log.d(TAG,"Barcode value returned: " + barcodeValue);
-
-                    /** Handle firestore in ownerScan() */
-                    if (!barcodeValue.equals("ERROR")) {
-                        borrowerScan(barcodeValue);
-                    }
-                }
-                break;
-            }
-        }
-    }
-
-    /**
-     * Handles the cases after the barcode of the book is scanned.
-     * If the ISBN of the book scanned matches the ISBN of the book in the database.
-     * And only if the boolean is True then set book status to "Borrowed"
-     * @param barcodeValue
-     */
-    private void borrowerScan(String barcodeValue) {
-        Log.d(TAG, "In borrowerScan function!");
-
-         /** Get top level reference to the book in collection  by ID */
-        DocumentReference bookReference = firestore.collection("Book").document(bookId);
-
-        bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null) {
-                        /** Get the ISBN and Status of the book in the database */
-                        String bookISBN = String.valueOf(document.getData().get("isbn"));
-                        String bookStatus = document.getString("status");
-
-                        Log.d(TAG, "BOOK ISBN: " + bookISBN);
-                        Log.d(TAG,"BARCODE ISBN: " + barcodeValue);
-                        Log.d(TAG, "BOOK STATUS: " + bookStatus);
-
-                        /** ISBN of the book scanned matches with the ISBN of book in database */
-                        if (bookISBN.equals(barcodeValue)) {
-                            Log.d(TAG, "ISBN MATCHES");
-                            /** Status of the book is correct should be "Accepted"*/
-                            if(bookStatus.toLowerCase().equals("accepted")) {
-                                Log.d(TAG, "STATUS IS CORRECT");
-                                Log.d(TAG, "BOOLEAN IS: " + document.getData().get("ownerScanHandOver"));
-
-                                /** Check if the boolean to keep track of owner scanning first is false by default */
-                                Boolean check = (Boolean) document.getData().get("ownerScanHandOver");
-                                if (check == false){
-                                    /** Notify user the correct steps in handing over the book */
-                                    Toast.makeText(context, "Owner of book must scan book first", Toast.LENGTH_LONG).show();
-                                }
-
-                                /** Update the status of the book to "Borrowed" */
-                                firestore.collection("Book").document(bookId).update("status", "Borrowed");
-
-                                /** Update the boolean to True for the book */
-                                firestore.collection("Book").document(bookId).update("ownerScanHandOver", false);
-
-                                /** Notify user handing off the book was a success*/
-                                Toast.makeText(context, "Borrower can loan the book now", Toast.LENGTH_LONG).show();
-                            }
-                            /** ISBN of the book scanned matches but status is not "Accepted" */
-                            else if (!bookStatus.toLowerCase().equals("accepted")){
-                                Log.d(TAG, "STATUS IS INCORRECT");
-                                Toast.makeText(context, "Owner must accept request for the book first", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                        /** ISBN of the book scanned doesn't match the ISBN of the book in database */
-                        else if (!bookISBN.equals(barcodeValue)){
-                            Log.d(TAG, "ISBN DON'T MATCH");
-                            Toast.makeText(context, "Book scanned doesn't match the requested book", Toast.LENGTH_LONG).show();
-                        }
-
-                    } else { /** Book not in the database */
-                        Log.d(TAG, "No such document");
-                        Toast.makeText(context, "Book scanned is not the requested book", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Log.d(TAG, "Failed with ", task.getException());
-                    Toast.makeText(context, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
     }
 
     /**

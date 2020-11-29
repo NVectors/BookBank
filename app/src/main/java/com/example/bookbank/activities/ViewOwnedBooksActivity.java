@@ -173,7 +173,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(View v) {
                                     Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
-                                    intent.putExtra("BOOK_ID", bookID);
                                     /** Barcode Scanner activity will return the value of the barcode and error messages */
                                     startActivityForResult(intent, 0);
                                 }
@@ -293,19 +292,19 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     /** Get string from key of resultIntent passed back from child activity */
                     String returnValue = data.getStringExtra("RESULT");
 
-                    /** Display the string to the user */
-                    Toast.makeText(getApplicationContext(), returnValue, Toast.LENGTH_SHORT).show();
-
                     /** Get the value of the barcode scanned */
                     String barcodeValue = data.getStringExtra("VALUE");
 
-                    /** Display the barcode value to the user */
-                    //Toast.makeText(getApplicationContext(), "Barcode value returned: " + barcodeValue, Toast.LENGTH_SHORT).show();
-                    Log.d(TAG,"Barcode value returned: " + barcodeValue);
+                    /** Display the string to the user */
+                    Toast.makeText(getApplicationContext(), returnValue, Toast.LENGTH_SHORT).show();
 
-                    /** Handle firestore in ownerScan() */
+                    /** Display the barcode value to the user */
                     if (!barcodeValue.equals("ERROR")) {
-                        ownerScan(barcodeValue);
+                        Toast.makeText(getApplicationContext(), "Correct Barcode Type", Toast.LENGTH_LONG).show();
+                        ownerScan(barcodeValue);  // Handle firestore code in ownerScan()
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(), "Incorrect Barcode Type", Toast.LENGTH_LONG).show();
                     }
                 }
                 break;
@@ -320,8 +319,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
      * @param barcodeValue
      */
     private void ownerScan(String barcodeValue) {
-        Log.d(TAG, "In ownerScan function!");
-
         bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -332,18 +329,10 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                         String bookISBN = String.valueOf(document.getData().get("isbn"));
                         String bookStatus = document.getString("status");
 
-                        Log.d(TAG, "BOOK ISBN: " + bookISBN);
-                        Log.d(TAG,"BARCODE ISBN: " + barcodeValue);
-                        Log.d(TAG, "BOOK STATUS: " + bookStatus);
-
                         /** ISBN of the book scanned matches with the ISBN of book in database */
                         if (bookISBN.equals(barcodeValue)) {
-                            Log.d(TAG, "ISBN MATCHES");
-                                /** Status of the book is correct should be "Accepted"*/
+                            /** Status of the book is correct should be "Accepted"*/
                             if(bookStatus.toLowerCase().equals("accepted")) {
-                                Log.d(TAG, "STATUS IS CORRECT");
-                                Log.d(TAG, "BOOLEAN IS: " + document.getData().get("ownerScanHandOver"));
-
                                 /** Check if the boolean to keep track of owner scanning first is false by default */
                                 Boolean check = (Boolean) document.getData().get("ownerScanHandOver");
                                 if (check == false){
@@ -352,26 +341,21 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                 }
 
                                 /** Notify user the next steps in handing over the book */
-                                Toast.makeText(getApplicationContext(), "Borrow must scan book now", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Success! Borrow must scan book now", Toast.LENGTH_LONG).show();
                             }
-                                    /** ISBN of the book scanned matches but status is not "Accepted" */
+                            /** ISBN of the book scanned matches but status is not "Accepted" */
                             else if (!bookStatus.toLowerCase().equals("accepted")){
-                                Log.d(TAG, "STATUS IS INCORRECT");
                                 Toast.makeText(getApplicationContext(), "Accept request for the book first", Toast.LENGTH_LONG).show();
                             }
                         }
-                                /** ISBN of the book scanned doesn't match the ISBN of the book in database */
+                        /** ISBN of the book scanned doesn't match the ISBN of the book in database */
                         else if (!bookISBN.equals(barcodeValue)){
-                            Log.d(TAG, "ISBN DON'T MATCH");
                             Toast.makeText(getApplicationContext(), "Book scanned doesn't match the selected book", Toast.LENGTH_LONG).show();
                         }
-
-                    } else { /** Book not in the database */
-                        Log.d(TAG, "No such document");
+                    } else { // Document is null
                         Toast.makeText(getApplicationContext(), "Book scanned is not in your list", Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    Log.d(TAG, "Failed with ", task.getException());
+                } else { // Task not successful
                     Toast.makeText(getApplicationContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                 }
             }

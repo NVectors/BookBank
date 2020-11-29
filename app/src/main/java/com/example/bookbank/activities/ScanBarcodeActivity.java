@@ -63,9 +63,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
     private ExecutorService executor;
     private BarcodeScanner scanner;
 
-    private FirebaseFirestore db;
     private String bookID;
-    private DocumentReference docRef;
     private Intent resultIntent;
 
 
@@ -83,13 +81,6 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
         /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
         bookID = getIntent().getStringExtra("BOOK_ID");
-
-        /** Get instance of Firestore */
-        db = FirebaseFirestore.getInstance();
-
-        /** Get top level reference to the book in collection  by ID */
-        docRef = db.collection("Book").document(bookID);
-
 
         Log.d(TAG, "Start the scanner!");
         /** Check if camera permission is granted by user */
@@ -177,15 +168,21 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                                             Log.d(TAG, "BAR CODE IS " + rawValue);
                                             Log.d(TAG, "BAR CODE TYPE IS " + type.toString());
 
+                                            /** Not the correct ISBN barcode format */
                                             if ( (type != Barcode.FORMAT_EAN_8) && (type != Barcode.FORMAT_EAN_13) ) {
+                                                /** Pass back data to activity that called ScanBarcodeActivity */
                                                 resultIntent.putExtra("RESULT", "Not an ISBN barcode");
-                                                setResult(Activity.RESULT_OK, resultIntent);
                                                 resultIntent.putExtra("VALUE", "ERROR");
+                                                resultIntent.putExtra("BOOK", bookID);
+                                                setResult(Activity.RESULT_OK, resultIntent);
+
                                                 finish();
                                             }
 
+                                            /** Pass back data to activity that called ScanBarcodeActivity */
                                             resultIntent.putExtra("RESULT", "Valid ISBN barcode");
                                             resultIntent.putExtra("VALUE", rawValue);
+                                            resultIntent.putExtra("BOOK", bookID);
                                             setResult(Activity.RESULT_OK, resultIntent);
 
                                             finish();
