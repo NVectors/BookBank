@@ -121,12 +121,12 @@ public class NotificationsActivity extends AppCompatActivity {
                     if (userId.equals(user.getUid()) && !userId.equals(bookOwnerId)) { //Display books that only belong to that user
                         myNotifications.add(new Notification(id, userId, message, bookOwnerId)); // Add notification from FireStore
                     }
-                    /*
+
                     else if (userId.equals(user.getUid()) && userId.equals(bookOwnerId)){
                         otherNotifications.add(new Notification(id, userId, message, bookOwnerId)); // Add notification from FireStore
                     }
 
-                     */
+
                 }
                 myNotificationAdapter.notifyDataSetChanged(); //Notify the adapter of data change
                 otherNotificationAdapter.notifyDataSetChanged(); //Notify the adapter of data change

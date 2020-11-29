@@ -290,17 +290,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
-        /** Image add buton is clicked */
-        final Button addImage = findViewById(R.id.add_image_button);
-        addImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "Adding an image");
-
-                //Implement
-            }
-        });
-
 
         /** Image delete button is clicked */
         final Button deleteImage = findViewById(R.id.delete_image);
