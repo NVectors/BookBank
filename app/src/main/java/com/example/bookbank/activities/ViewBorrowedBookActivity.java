@@ -78,61 +78,42 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
             /** Method is executed whenever any new event occurs in the remote database */
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                title.setText(value.getString("title"));
-                author.setText("By: " + value.getString("author"));
-                isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
-                status.setText("Status: " + value.getString("status"));
+                if (value != null && value.exists()) {
+                    // Set the text views
+                    title.setText(value.getString("title"));
+                    author.setText("By: " + value.getString("author"));
+                    isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
+                    status.setText("Status: " + value.getString("status"));
 
+                    // Set the owner name text view next */
+                    if (value.getString("ownerId") == "") {
+                        owner.setText("Owner: None");
+                    } else {
+                        DocumentReference ownerRef = firestore.collection("User").document(value.getString("ownerId"));
+                        ownerRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        String name = document.getString("fullname");
+                                        // Test
+                                        Log.d("NAME", name);
 
+                                        owner.setText("Owner: " + name);
 
-                /*
-                testing purpose: Previous book don't have ownerScan/borrowerScan.
-                Should re-add all books again.
-                 */
-                borrowerID = value.getString("borrowerId");
-                ownerID = value.getString("ownerId");
-                try {
-                    ownerScan = value.getBoolean("ownerScanReturn");
-
-                    //borrowerScan = value.getBoolean("borrowerScanReturn");
-                    borrowerScan = value.getBoolean("ownerScanHandOver");
-                } catch (Exception e) {
-                    ownerScan = false;
-                    borrowerScan = false;
-                }
-
-
-                if (value.getString("ownerId") == "") {
-                    owner.setText("Owner: None");
-                } else { // Will have to test this later
-                    DocumentReference documentRef = firestore.collection("User").document(value.getString("ownerId"));
-                    documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        /**
-                         * Use DocumentSnapshot to find field value in the document
-                         * @param task
-                         */
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
-                                    String name = document.getString("fullname");
-                                    // Test
-                                    Log.d("NAME", name);
-
-                                    owner.setText("Owner: " + name);
-
+                                    } else {
+                                        Log.d("TAG", "No such document");
+                                        owner.setText("Owner: FAILED");
+                                    }
                                 } else {
-                                    Log.d("TAG", "No such document");
-                                    owner.setText("Owner: FAILED");
+                                    Log.d("TAG", "get failed with ", task.getException());
                                 }
-                            } else {
-                                Log.d("TAG", "get failed with ", task.getException());
                             }
-                        }
-                    });
+                        });
+                    }
+                    description.setText("Description: " + value.getString("description"));
                 }
-                description.setText("Description: " + value.getString("description"));
             }
         });
 
@@ -146,17 +127,6 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         DocumentSnapshot snapshot = task.getResult();
-                        //Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
-                        //Boolean ownerScanned changes to true when borrower scan
-
-                        //ownerScanned = snapshot.getBoolean("ownerScanHandOver");
-                        //if (!borrowerScan) {
-                            // scan barcode here, if good --> update
-
-
-                            //bookReference.update("ownerScanHandOver", true);
-                        //}
-                        //Scanning -- new Intent
                         String originalBookISBN = isbn.getText().toString();
 
                         Intent intent = new Intent(getBaseContext(), ScanBarCodeReturnBookActivity.class);

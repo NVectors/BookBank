@@ -25,6 +25,8 @@ import com.example.bookbank.R;
 import com.example.bookbank.models.Book;
 //import com.example.bookbank.models.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -90,71 +92,67 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
              */
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                title.setText(value.getString("title"));
-                author.setText("By: " + value.getString("author"));
-                isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
-                status.setText("Status: " + value.getString("status"));
+                if (value != null && value.exists()) {
+                    // Set the text views
+                    title.setText(value.getString("title"));
+                    author.setText("By: " + value.getString("author"));
+                    isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
+                    status.setText("Status: " + value.getString("status"));
 
-                Boolean ownerScanned = value.getBoolean("ownerScanHandOver");
-                String bookStatus = value.getString("status");
-                // first state of the button is Requests
+                    Boolean ownerScanned = value.getBoolean("ownerScanHandOver");
+                    String bookStatus = value.getString("status");
+                    // first state of the button is Requests
 
-                borrowerID = value.getString("borrowerId");
-                ownerID = value.getString("ownerId");
-                // changing request button to handOver
-                if (bookStatus.equals("Accepted") && !ownerScanned) {
-                    handOver.setText("HAND OVER");
-                }
-                else if (bookStatus.equals("Accepted") && ownerScanned) {
-                    handOver.setText("CANCEL HAND OVER");
-                }
-                // receiving book back from borrower
-                else if (bookStatus.equals("Borrowed") && ownerScanned) {
-                    handOver.setVisibility(View.VISIBLE);
-                    handOver.setText("RECEIVE BOOK");
-                }
-                // dont need button if no request or book is borrowed and not in middle of handover
-                else if ((bookStatus.equals("Borrowed") && !ownerScanned) || bookStatus.equals("Available")) {
-                    handOver.setVisibility(View.INVISIBLE);
-                }
-                else if (bookStatus.equals("Requested")) {
-                    handOver.setVisibility(View.VISIBLE);
-                }
+                    borrowerID = value.getString("borrowerId");
+                    ownerID = value.getString("ownerId");
+                    // changing request button to handOver
+                    if (bookStatus.equals("Accepted") && !ownerScanned) {
+                        handOver.setText("HAND OVER");
+                    } else if (bookStatus.equals("Accepted") && ownerScanned) {
+                        handOver.setText("CANCEL HAND OVER");
+                    }
+                    // receiving book back from borrower
+                    else if (bookStatus.equals("Borrowed") && ownerScanned) {
+                        handOver.setVisibility(View.VISIBLE);
+                        handOver.setText("RECEIVE BOOK");
+                    }
+                    // dont need button if no request or book is borrowed and not in middle of handover
+                    else if ((bookStatus.equals("Borrowed") && !ownerScanned) || bookStatus.equals("Available")) {
+                        handOver.setVisibility(View.INVISIBLE);
+                    } else if (bookStatus.equals("Requested")) {
+                        handOver.setVisibility(View.VISIBLE);
+                    }
 
-                // if borrowed and handOver != true --> set button to invisible
+                    // Set the borrower name text view next
+                    if (value.getString("borrowerId") == "") {
+                        borrower.setText("Borrower: None");
+                    } else {
+                        DocumentReference documentRef = db.collection("User").document(value.getString("borrowerId"));
+                        documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        String name = document.getString("fullname");
+                                        // Test
+                                        Log.d(tag, "Book name: " + name);
 
-                if (value.getString("borrowerId") == "") {
-                    borrower.setText("Borrower: None");
-                } else {
-                    DocumentReference documentRef = db.collection("User").document(value.getString("borrowerId"));
-                    documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        /**
-                         * Use DocumentSnapshot to find field value in the document
-                         * @param task
-                         */
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
-                                    String name = document.getString("fullname");
-                                    // Test
-                                    Log.d(tag,"Book name: " + name);
+                                        borrower.setVisibility(View.VISIBLE); // Default of Borrower text view
+                                        borrower.setText("Borrower: " + name);
 
-                                    borrower.setVisibility(View.VISIBLE); // Default of Borrower text view
-                                    borrower.setText("Borrower: " + name);
-
+                                    } else {
+                                        Log.d("TAG", "No such document");
+                                        borrower.setText("Borrower: FAILED");
+                                    }
                                 } else {
-                                    Log.d("TAG", "No such document");
-                                    borrower.setText("Borrower: FAILED");
+                                    Log.d("TAG", "Failed with ", task.getException());
                                 }
-                            } else {
-                                Log.d("TAG", "Failed with ", task.getException());
                             }
-                        }
-                    });
+                        });
+                    }
+                    description.setText("Description: " + value.getString("description"));
                 }
-                description.setText("Description: " + value.getString("description"));
             }
         });
 
@@ -196,14 +194,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                         }
                         // Owner receiving book from borrower. when borrower scans --> set ownerScanHandOver = true
                         else if (bookStatus.equals("Borrowed") && ownerScanned) {
-                            //Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
-                            //startActivity(intent);
-
-                            // wip scan barcode to verify then update -->
-                            //bookReference.update("status", "Available");
-                            //bookReference.update("borrowerId", "");
-                            //bookReference.update("ownerScanHandOver", false);
-
                             String originalBookISBN = isbn.getText().toString();
                             Intent intent = new Intent(getBaseContext(), ScanBarCodeReturnBookActivity.class);
                             Log.d("DEBUG5", "line 210");
@@ -215,8 +205,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                             intent.putExtra("OWNER_ID", ownerID); //string
                             startActivity(intent);
                             finish();
-
-
                         }
                     }
                 });
@@ -232,8 +220,22 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 /** Delete image first always */
                 StorageReference photoRef = FirebaseStorage.getInstance().getReference("images/" + bookID);
                 photoRef.delete();
+
                 /** Delete the document from the collection in firestore */
-                db.collection("Book").document(bookID).delete();
+                db.collection("Book").document(bookID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(getApplicationContext(), "Successfully deleted book", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "Did not delete book", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                });
             }
         });
 
