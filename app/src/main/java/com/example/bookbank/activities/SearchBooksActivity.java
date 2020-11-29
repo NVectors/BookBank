@@ -152,9 +152,8 @@ public class SearchBooksActivity extends AppCompatActivity {
                             keyWord = keyWord.trim().toLowerCase();
 
                             // searching with regex
-                            if(lowerTitle.matches(".*\\b"+keyWord+"\\b.*") ||
-                                    lowerAuthor.matches(".*\\b"+keyWord+"\\b.*") ||
-                                    String.valueOf(isbn).equals(keyWord))
+                            if( lowerTitle.contains(keyWord) || lowerAuthor.contains(keyWord)
+                                || String.valueOf(isbn).contains(keyWord))
                             {
                                 bookArrayList.add(book);
                             }
