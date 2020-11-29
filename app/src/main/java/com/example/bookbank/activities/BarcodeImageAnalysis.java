@@ -22,8 +22,9 @@ public class BarcodeImageAnalysis implements ImageAnalysis.Analyzer {
 
     private static final String TAG = "ANALYZE";
     private BarcodeScanner scanner;
+    private String returnKeyword;
 
-    public BarcodeImageAnalysis() {
+    public BarcodeImageAnalysis(String returnKeyword) {
         /** Configure the barcode scanner to recognize only ISBN format */
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()

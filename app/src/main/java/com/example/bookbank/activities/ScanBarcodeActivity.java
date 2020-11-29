@@ -2,6 +2,7 @@ package com.example.bookbank.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.os.Bundle;
@@ -47,12 +48,23 @@ public class ScanBarcodeActivity extends AppCompatActivity {
     private ExecutorService executor;
     private BarcodeImageAnalysis imageAnalysis;
 
+    private String returnKeyword;
+    private Intent returnIntent;
+
 
     @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_barcode);
+
+        /** getting the intent and checking the RETURN */
+        Intent intent = getIntent();
+        if(intent.hasExtra("RETURN")){
+            returnKeyword = intent.getStringExtra("RETURN");
+        }
+
+
 
         /** References to layout objects */
         previewView = findViewById(R.id.cameraPreview);
@@ -68,7 +80,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
         executor = Executors.newSingleThreadExecutor();
 
         /** Get instance of the Image Analyzer class */
-        imageAnalysis = new BarcodeImageAnalysis();
+        imageAnalysis = new BarcodeImageAnalysis(returnKeyword);
 
         /** Get instance of the */
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
