@@ -197,7 +197,9 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Task failed with an exception
-                        Log.d(TAG,"BARCODE SCAN FAILED");
+                        resultIntent.putExtra("RESULT", "Barcode scanner failed");
+                        setResult(Activity.RESULT_OK, resultIntent);
+                        finish();
                     }
                 });
     }
