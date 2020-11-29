@@ -137,7 +137,7 @@ public class AddBookActivity extends AppCompatActivity {
     }
 
     /**
-     * Gets the uri of the selected image
+     * Gets barcode on barcode scan and also Gets the uri of the selected image
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
