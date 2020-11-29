@@ -2,6 +2,7 @@ package com.example.bookbank.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
@@ -59,6 +60,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
 
     private String returnKeyword;
     private Intent returnIntent;
+    private Intent resultIntent;
 
 
     @SuppressLint("RestrictedApi")
@@ -175,13 +177,13 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                             String data = barcode.getRawValue();
                             Log.d(TAG,"BARCODE IS " + data );
 
-                            int valueType = barcode.getValueType();
-                            switch (valueType) {
-                                case Barcode.FORMAT_EAN_13:
+                            Integer type = barcode.getFormat();
 
-                                case Barcode.FORMAT_EAN_8:
-
-
+                            if ( (type != Barcode.FORMAT_EAN_8) && (type != Barcode.FORMAT_EAN_13) ) {
+                                resultIntent.putExtra("RESULT", "Not an ISBN barcode");
+                                setResult(Activity.RESULT_OK, resultIntent);
+                                resultIntent.putExtra("VALUE", "ERROR");
+                                finish();
                             }
                         }
 
