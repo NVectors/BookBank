@@ -81,6 +81,7 @@
             android:textColor="#000000"
             app:layout_constraintTop_toBottomOf="@+id/book_status"
             app:layout_constraintRight_toLeftOf="@+id/scan_book"
+            android:visibility="invisible"
             />
 
         <Button

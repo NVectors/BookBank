@@ -81,7 +81,7 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
         final TextView bookISBN = view.findViewById(R.id.book_isbn);
         final TextView bookStatus = view.findViewById(R.id.book_status);
         final ImageView bookImage = view.findViewById(R.id.book_image);
-        Button viewMap = view.findViewById(R.id.view_map);
+        final Button viewMap = view.findViewById(R.id.view_map);
         final Button scanBook = view.findViewById(R.id.scan_book);
         Log.d("debug", request.getBookId());
 
@@ -98,6 +98,9 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
 
                     String status = book.getStatus();
                     Boolean scannedOver = documentSnapshot.getBoolean("ownerScanHandOver");
+                    if(status.equals("Accepted")) {
+                        scanBook.setVisibility(view.VISIBLE);
+                    }
                     if(status.equals("Accepted") && scannedOver) {
                         scanBook.setVisibility(view.VISIBLE);
                     }
