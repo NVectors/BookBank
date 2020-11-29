@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,8 +27,16 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.example.bookbank.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.common.InputImage;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -122,7 +131,7 @@ public class ScanBarcodeActivity extends AppCompatActivity {
             @Override
             public void onCaptureSuccess(@NonNull ImageProxy image) {
                 Log.d(TAG, "Picture is taken!");
-                imageAnalysis.analyze(image);
+                analyze(image);
 
 
             }
@@ -133,6 +142,58 @@ public class ScanBarcodeActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Failed to capture the image", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+
+
+    @SuppressLint("UnsafeExperimentalUsageError")
+    public void analyze(@NonNull ImageProxy image) {
+
+        /** Image does not exists */
+        if(image == null || image.getImage() == null){
+            return;
+        }
+
+        Image barcodeImage = image.getImage();
+        int rotationDegrees = image.getImageInfo().getRotationDegrees();
+        InputImage inputImage = InputImage.fromMediaImage(barcodeImage,rotationDegrees);
+        BarcodeScanner scanner = BarcodeScanning.getClient();
+
+        /** Process the image captured */
+        Task<List<Barcode>> result = scanner.process(inputImage)
+                .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+                    @Override
+                    public void onSuccess(List<Barcode> barcodes) {
+                        // Task completed successfully
+                        Log.d(TAG,"Scanned the image!");
+
+                        image.close(); //Close the image, scanned successfully
+
+                        //Toast.makeText(getActivity().getApplicationContext(),"ScanningBarcode",Toast.LENGTH_LONG).show();
+
+                        for(Barcode barcode: barcodes){
+                            String data = barcode.getRawValue();
+                            Log.d(TAG,"BARCODE IS " + data );
+
+                            int valueType = barcode.getValueType();
+                            switch (valueType) {
+                                case Barcode.FORMAT_EAN_13:
+
+                                case Barcode.FORMAT_EAN_8:
+
+
+                            }
+                        }
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Task failed with an exception
+                        Log.d(TAG,"BARCODE SCAN FAILED");
+                    }
+                });
     }
 
     /**
