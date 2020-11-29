@@ -77,8 +77,15 @@ public class  ScanBarcodeActivity extends AppCompatActivity {
         /** Create intent to send back data to main activity later */
         resultIntent = new Intent();
 
-        /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
-        bookID = getIntent().getStringExtra("BOOK_ID");
+        /** Get book id of the book that clicked in the list view of OwnerBooksActivity if available */
+        Intent incomingIntent = getIntent();
+        if(incomingIntent.hasExtra("BOOK_ID")){
+            bookID = incomingIntent.getStringExtra("BOOK_ID");
+        }
+        else {
+            bookID = "";
+        }
+
 
         Log.d(TAG, "Start the scanner!");
 

@@ -47,6 +47,7 @@ public class AddBookActivity extends AppCompatActivity {
 
     private StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int SCAN_BARCODE_REQUEST = 2;
     private Uri uri;
 
     @Override
@@ -72,22 +73,14 @@ public class AddBookActivity extends AppCompatActivity {
 
         storageReference = FirebaseStorage.getInstance().getReference("images");
 
-        /** Get intent String of Barcode and set the fields, if passed */
-        Intent intent = getIntent();
-        if(intent.hasExtra("BARCODE")){
-            Barcode = intent.getStringExtra("BARCODE");
-            isbn.setText(Barcode);
-            searchBooks(Barcode);
-
-        }
 
         /** On click Listener for 'Scan Barcode' Button */
         scanBarcodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent barcodeActivity = new Intent(AddBookActivity.this,ScanBarcodeActivity.class);
-                intent.putExtra("RETURN","ADDBOOK");
-                startActivity(barcodeActivity);
+                startActivityForResult(barcodeActivity,SCAN_BARCODE_REQUEST);
+
 
             }
         });
@@ -131,6 +124,8 @@ public class AddBookActivity extends AppCompatActivity {
         new FetchBooks(title,author,description,barcode).execute(barcode);
     }
 
+
+
     /**
      * Creates a new intent to choose a image from the device
      */
@@ -148,6 +143,19 @@ public class AddBookActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if(requestCode == SCAN_BARCODE_REQUEST && resultCode == RESULT_OK && data != null ) {
+            String validity = data.getStringExtra("RESULT");
+
+            if(validity == "Valid ISBN barcode" && validity.length() == 13){
+                Barcode = data.getStringExtra("VALUE");
+                isbn.setText(Barcode);
+                searchBooks(Barcode);
+            }
+            else{
+                Toast.makeText(this, "Invalid ISBN Scan, Please try again.", Toast.LENGTH_LONG).show();
+            }
+
+        }
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null){
             uri = data.getData();
