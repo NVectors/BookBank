@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:app="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
@@ -28,10 +29,27 @@ tools:context=".activities.NotificationsActivity">
     android:orientation="vertical"
     android:padding="5dp">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My Requests"
+        android:textSize="20sp"/>
+
     <ListView
-        android:id="@+id/notification_list"
+        android:id="@+id/my_notification_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="290dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Requests for me"
+        android:textSize="20sp"/>
+
+    <ListView
+        android:id="@+id/others_notification_list"
+        android:layout_width="match_parent"
+        android:layout_height="290dp"/>
 </LinearLayout>
 
 </LinearLayout>

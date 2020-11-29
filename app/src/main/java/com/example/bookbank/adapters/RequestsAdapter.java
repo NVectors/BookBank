@@ -98,7 +98,7 @@ public class RequestsAdapter extends ArrayAdapter {
                         String Id;
                         Id = firestore.collection("Notification").document().getId();
                         DocumentReference requestAcceptedNotificationRef = firestore.collection("Notification").document(Id);
-                        transaction.set(requestAcceptedNotificationRef, new Notification(Id, request.getRequesterId(), "Your request for " + request.getBookTitle() + " has been rejected"));
+                        transaction.set(requestAcceptedNotificationRef, new Notification(Id, request.getRequesterId(), "Your request for " + request.getBookTitle() + " has been rejected", request.getOwnerId()));
                         return null;
                     };
                 }).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -135,11 +135,11 @@ public class RequestsAdapter extends ArrayAdapter {
                         String Id;
                         Id = firestore.collection("Notification").document().getId();
                         DocumentReference requestAcceptedNotificationRef = firestore.collection("Notification").document(Id);
-                        transaction.set(requestAcceptedNotificationRef, new Notification(Id, request.getRequesterId(), "Your request for " + request.getBookTitle() + " has been accepted"));
+                        transaction.set(requestAcceptedNotificationRef, new Notification(Id, request.getRequesterId(), "Your request for " + request.getBookTitle() + " has been accepted", request.getOwnerId()));
                         // send notification to owner that they accepted the request
                         Id = firestore.collection("Notification").document().getId();
                         DocumentReference bookAcceptedNotificationRef = firestore.collection("Notification").document(Id);
-                        transaction.set(bookAcceptedNotificationRef, new Notification(Id, request.getOwnerId(), "You accepted the request for " + request.getBookTitle() + " to be borrowed"));
+                        transaction.set(bookAcceptedNotificationRef, new Notification(Id, request.getOwnerId(), "You accepted the request for " + request.getBookTitle() + " to be borrowed", request.getOwnerId()));
                         // Success
                         return null;
                     }
@@ -166,7 +166,7 @@ public class RequestsAdapter extends ArrayAdapter {
                                                 // send notification to user saying that their request was denied
                                                 String Id = firestore.collection("Notification").document().getId();
                                                 DocumentReference requestDenied = firestore.collection("Notification").document(Id);
-                                                transaction.set(requestDenied, new Notification(Id, request.getOwnerId(), "You request for " + toDeleteRequest.getBookTitle() + " was denied"));
+                                                transaction.set(requestDenied, new Notification(Id, request.getOwnerId(), "You request for " + toDeleteRequest.getBookTitle() + " was denied", request.getOwnerId()));
                                             }
                                         }
                                         // Success
