@@ -112,8 +112,12 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
                 // get map coordinates from request
                 if (checkServices()) {
                     Intent intent = new Intent(context, ViewLocationActivity.class);
-                    String docId = request.getId();
-                    intent.putExtra("REQUEST_DOC", docId);
+                    Double latitude = request.getLatitude();
+                    Double longitude = request.getLongitude();
+
+                    intent.putExtra("LATITUDE", latitude);
+                    intent.putExtra("LONGITUDE", longitude);
+
                     context.startActivity(intent);
                 }
             }
