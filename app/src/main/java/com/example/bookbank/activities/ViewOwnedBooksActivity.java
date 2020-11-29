@@ -48,6 +48,8 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
     private String bookID;
     private static final String TAG = "SCANNED";
     private static final String tag = "VIEW OWNED BOOK";
+    private String borrowerID;
+    private String ownerID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +98,9 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                 Boolean ownerScanned = value.getBoolean("ownerScanHandOver");
                 String bookStatus = value.getString("status");
                 // first state of the button is Requests
+
+                borrowerID = value.getString("borrowerId");
+                ownerID = value.getString("ownerId");
                 // changing request button to handOver
                 if (bookStatus.equals("Accepted") && !ownerScanned) {
                     handOver.setText("HAND OVER");
@@ -153,6 +158,7 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
+        //CODE HERE FOR OWNER RECIEVING BOOK FROM BORROWER
         /** Hand Over button is clicked */
         handOver.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,12 +196,27 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                         }
                         // Owner receiving book from borrower. when borrower scans --> set ownerScanHandOver = true
                         else if (bookStatus.equals("Borrowed") && ownerScanned) {
-                            Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
-                            startActivity(intent);
+                            //Intent intent = new Intent(ViewOwnedBooksActivity.this, ScanBarcodeActivity.class);
+                            //startActivity(intent);
+
                             // wip scan barcode to verify then update -->
-                            bookReference.update("status", "Available");
-                            bookReference.update("borrowerId", "");
-                            bookReference.update("ownerScanHandOver", false);
+                            //bookReference.update("status", "Available");
+                            //bookReference.update("borrowerId", "");
+                            //bookReference.update("ownerScanHandOver", false);
+
+                            String originalBookISBN = isbn.getText().toString();
+                            Intent intent = new Intent(getBaseContext(), ScanBarCodeReturnBookActivity.class);
+                            Log.d("DEBUG5", "line 210");
+                            intent.putExtra("BOOK_ID", bookID); //string
+                            intent.putExtra("ISBN_OG", originalBookISBN); //string
+                            intent.putExtra("OWNER_SCAN", false); //bool. Borrower must scan first
+                            intent.putExtra("BORROWER_SCAN", ownerScanned);
+                            intent.putExtra("BORROWER_ID", borrowerID); //string
+                            intent.putExtra("OWNER_ID", ownerID); //string
+                            startActivity(intent);
+                            finish();
+
+
                         }
                     }
                 });

@@ -38,7 +38,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".activities.ViewSearchBookDetails"></activity>
+        <activity android:name=".activities.ScanBarCodeReturnBookActivity"></activity>
+        <activity android:name=".activities.ViewSearchBookDetails" />
         <activity
             android:name=".activities.MainNavigationActivity"
             android:theme="@style/AppTheme.NoActionBar.NoActionBar" />
@@ -80,6 +81,12 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".activities.CaptureBarCodeActivity"
+            android:screenOrientation="fullSensor"
+            android:stateNotNeeded="true"
+            android:windowSoftInputMode="stateAlwaysHidden">
         </activity>
     </application>
 

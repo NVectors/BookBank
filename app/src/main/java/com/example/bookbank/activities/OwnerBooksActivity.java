@@ -102,8 +102,8 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
 //
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     if (ownerID.equals(currentUser.getUid())) { //Display books that only belong to that user
-                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false)); // Add book from FireStore
-                        originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false));
+                        bookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false, false, false)); // Add book from FireStore
+                        originalBookDataList.add(new Book(id, title, author, isbn, description, status, ownerID, borrowerID, false, false, false));
                     }
                 }
                 bookAdapter.notifyDataSetChanged(); //Notify the adapter of data change

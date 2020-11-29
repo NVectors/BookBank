@@ -9,13 +9,15 @@ public class Book {
     private String ownerId;
     private String borrowerId;
     private String status;
+    private boolean borrowerScanReturn;
+    private boolean ownerScanReturn;
     private Boolean ownerScanHandOver;
 
     public Book() {
         // required for Firestore to be able to convert this object
     }
 
-    public Book(String id, String title, String author, long isbn, String description, String status, String ownerId, String borrowerId, Boolean ownerScanHandOver) {
+    public Book(String id, String title, String author, long isbn, String description, String status, String ownerId, String borrowerId, Boolean borrowerScanReturn, Boolean ownerScanReturn, Boolean ownerScanHandOver) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -24,8 +26,9 @@ public class Book {
         this.ownerId = ownerId;
         this.borrowerId = borrowerId;
         this.status = status;
-
-        // Boolean to keep track of handing book over scans */
+        //Boolean borrowerScanReturn, Boolean ownerScanReturn
+        this.borrowerScanReturn = borrowerScanReturn;
+        this.ownerScanReturn = ownerScanReturn;
         this.ownerScanHandOver = ownerScanHandOver;
     }
 
@@ -91,6 +94,22 @@ public class Book {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isOwnerScanReturn() {
+        return ownerScanReturn;
+    }
+
+    public void setOwnerScanReturn0(boolean ownerScanReturn) {
+        this.ownerScanReturn = ownerScanReturn;
+    }
+
+    public boolean isBorrowerScanReturn() {
+        return borrowerScanReturn;
+    }
+
+    public void setBorrowerScanReturn(boolean borrowerScanReturn) {
+        this.borrowerScanReturn = borrowerScanReturn;
     }
 
     public Boolean getOwnerScanHandOver() {

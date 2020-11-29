@@ -124,7 +124,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                         String title = (String) doc.getData().get("title");
 
                         // checking if user has that book requested already
-                        final Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId, false);
+                        final Book book = new Book(id,title,author,isbn,description,status,ownerId,borrowerId, false, false, false);
 
                         if(status.equals("Requested")) {
                             // check all books to see if they are on there

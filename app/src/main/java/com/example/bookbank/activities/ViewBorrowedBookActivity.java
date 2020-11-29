@@ -36,9 +36,14 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 public class ViewBorrowedBookActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private FirebaseAuth firebaseAuth;
+    private boolean ownerScan;
+    private boolean borrowerScan;
+    private String borrowerID;
+    private String ownerID;
     private DocumentReference bookReference;
     private String bookID;
     private static String TAG = "SCANNER";
+    private Boolean ownerScanned; //Phousanak added while merging with Dimitri's
 
 
     @Override
@@ -77,6 +82,25 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                 author.setText("By: " + value.getString("author"));
                 isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                 status.setText("Status: " + value.getString("status"));
+
+
+
+                /*
+                testing purpose: Previous book don't have ownerScan/borrowerScan.
+                Should re-add all books again.
+                 */
+                borrowerID = value.getString("borrowerId");
+                ownerID = value.getString("ownerId");
+                try {
+                    ownerScan = value.getBoolean("ownerScanReturn");
+
+                    //borrowerScan = value.getBoolean("borrowerScanReturn");
+                    borrowerScan = value.getBoolean("ownerScanHandOver");
+                } catch (Exception e) {
+                    ownerScan = false;
+                    borrowerScan = false;
+                }
+
 
                 if (value.getString("ownerId") == "") {
                     owner.setText("Owner: None");
@@ -122,13 +146,34 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         DocumentSnapshot snapshot = task.getResult();
-                        Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
-                        if (!ownerScanned) {
+                        //Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        //Boolean ownerScanned changes to true when borrower scan
+
+                        //ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+                        //if (!borrowerScan) {
                             // scan barcode here, if good --> update
 
 
                             //bookReference.update("ownerScanHandOver", true);
-                        }
+                        //}
+                        //Scanning -- new Intent
+                        String originalBookISBN = isbn.getText().toString();
+
+                        Intent intent = new Intent(getBaseContext(), ScanBarCodeReturnBookActivity.class);
+
+                        //Log.d("DEBUG OWNER SCAN",String.valueOf(ownerScan));
+                        //Log.d("DEBUG BORROWER SCAN", String.valueOf(borrowerScan));
+                        intent.putExtra("BOOK_ID", bookID); //string
+                        intent.putExtra("ISBN_OG", originalBookISBN); //string
+                        intent.putExtra("OWNER_SCAN", ownerScan); //bool
+
+                        //intent.putExtra("BORROWER_SCAN", borrowerScan); //bool
+                        intent.putExtra("BORROWER_SCAN", borrowerScan);
+                        intent.putExtra("BORROWER_ID", borrowerID); //string
+                        intent.putExtra("OWNER_ID", ownerID); //string
+                        startActivity(intent);
+                        finish();
+
                     }
                 });
             }
