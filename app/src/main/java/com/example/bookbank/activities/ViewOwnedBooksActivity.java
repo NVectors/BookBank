@@ -373,8 +373,11 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                                     db.collection("Book").document(bookID).update("ownerScanHandOver", true);
                                 }
 
+                                finish();
+
                                 /** Notify user the next steps in handing over the book */
                                 Toast.makeText(getApplicationContext(), "Success! Borrow must scan book now", Toast.LENGTH_LONG).show();
+
                             }
                             /** ISBN of the book scanned matches but status is not "Accepted" */
                             else if (!bookStatus.toLowerCase().equals("accepted")){

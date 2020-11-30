@@ -159,22 +159,6 @@ public class MyCurrentRequestsActivity extends AppCompatActivity {
                                 /** Update the boolean to False for the book */
                                 firestore.collection("Book").document(bookId).update("ownerScanHandOver", false);
 
-                                /** Find request document base on book id field and delete the doc */
-                                firestore.collection("Request").whereEqualTo("bookId", bookId).get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            for (DocumentSnapshot document : task.getResult()) {
-                                                firestore.collection("Request").document(document.getId()).delete();
-                                            }
-                                        }
-                                        else {
-                                            Log.d(TAG, "Error getting documents: ", task.getException());
-                                        }
-                                    }
-                                });
-
                                 /** Notify user handing off the book was a success*/
                                 Toast.makeText(getApplicationContext(), "Success! Borrower can loan the book now", Toast.LENGTH_LONG).show();
 
