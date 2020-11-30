@@ -148,9 +148,10 @@ public class AddBookActivity extends AppCompatActivity {
         if(requestCode == SCAN_BARCODE_REQUEST && resultCode == RESULT_OK && data != null ) {
             String validity = data.getStringExtra("RESULT");
             Barcode = data.getStringExtra("VALUE");
-            Log.d(TAG, "Barcode is: " + Barcode);
+            Log.d(TAG, "Barcode is: " + Barcode +",Length : " +String.valueOf(Barcode.length()));
+            Log.d(TAG,validity);
 
-            if(validity == "Valid ISBN barcode" && validity.length() == 13){
+            if(validity.equals("Valid ISBN barcode") && Barcode.length() == 13){
                 isbn.setText(Barcode);
                 searchBooks(Barcode);
             }
