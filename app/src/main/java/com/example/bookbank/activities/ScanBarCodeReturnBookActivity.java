@@ -28,6 +28,7 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
     private boolean borrowerScan;
     private boolean ownerScan;
     private FirebaseFirestore db;
+    private String tempMessage = "";
 
 
 
@@ -81,8 +82,8 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
                     builder.setMessage(result.getContents());
                 }
                 else {
-                    builder.setTitle("Scanning Result" + ": Fail!");
-                    ScanDescription = "\n Incorrect ISBN / Both borrower and owner must scan";
+                    builder.setTitle("Scanned!");
+                    ScanDescription = tempMessage + "\n";
                     builder.setMessage(result.getContents() + System.lineSeparator() + ScanDescription);
                 }
                 builder.setPositiveButton("Scan Again", new DialogInterface.OnClickListener() {
@@ -118,6 +119,7 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
         Log.d("UID DEBUG", currentUser);
 
         if (isbnCode.equals(globalISBN)){
+            tempMessage = "Correct ISBN!";
 
             if (currentUser.equals(ownerID)){
                 borrowerScan = false;
@@ -143,6 +145,10 @@ public class ScanBarCodeReturnBookActivity extends AppCompatActivity implements 
                 return true;
             }
         }
+        if (!isbnCode.equals(globalISBN)){
+            tempMessage = "Incorrect ISBN!";
+        }
+
         return false;
     }
 }

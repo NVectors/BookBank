@@ -89,6 +89,12 @@ public class ViewBorrowedBookActivity extends AppCompatActivity {
                     isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                     status.setText("Status: " + value.getString("status"));
 
+                    //DONT DELETE PLS
+                    borrowerID = value.getString("borrowerId");
+                    ownerID = value.getString("ownerId");
+                    ownerScan = value.getBoolean("ownerScanReturn");
+                    borrowerScan = value.getBoolean("ownerScanHandOver");
+
                     // Set the owner name text view next */
                     if (value.getString("ownerId") == "") {
                         owner.setText("Owner: None");
