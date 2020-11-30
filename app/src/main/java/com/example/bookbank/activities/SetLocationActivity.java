@@ -86,13 +86,13 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
         initMap();  //Initialize the map
         init();     //Initialize the search bar & current location button widgets
         /** Permissions is granted, go to device current location */
-        if (mLocationPermissionsGranted) {
-            getDeviceLocation();
-        }
-        else{
-            /** Hide the GPS widget that gets device current location */
-            mGPS.setVisibility(View.INVISIBLE); // Device location permission is not granted
-        }
+//        if (mLocationPermissionsGranted) {
+//            getDeviceLocation();
+//        }
+//        else{
+//            /** Hide the GPS widget that gets device current location */
+//            mGPS.setVisibility(View.INVISIBLE); // Device location permission is not granted
+//        }
 
 
         /** If the confirm button is clicked, store required data into the database and exit */
