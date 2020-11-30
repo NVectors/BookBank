@@ -142,12 +142,26 @@ public class MyCurrentRequestsActivity extends AppCompatActivity {
                         if (bookISBN.equals(barcodeValue)) {
                             /** Status of the book is correct should be "Accepted"*/
                             if(bookStatus.toLowerCase().equals("accepted")) {
+
                                 /** Check if the boolean to keep track of owner scanning first is false by default */
                                 Boolean check = (Boolean) document.getData().get("ownerScanHandOver");
                                 if (check == false){
                                     /** Notify user the correct steps in handing over the book */
                                     Toast.makeText(getApplicationContext(), "Owner of book must scan book first", Toast.LENGTH_LONG).show();
                                 }
+
+                                firestore.collection("Request").whereEqualTo("bookId", bookId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        System.out.println("HelloThere");
+
+                                        for (DocumentSnapshot document: queryDocumentSnapshots) {
+                                            String docId = document.getId();
+                                            DocumentReference documentReference = firestore.collection("Request").document(docId);
+                                            documentReference.delete();
+                                        }
+                                    }
+                                });
 
                                 /** Update the status of the book to "Borrowed" */
                                 firestore.collection("Book").document(bookId).update("status", "Borrowed");
@@ -159,11 +173,14 @@ public class MyCurrentRequestsActivity extends AppCompatActivity {
                                 /** Update the boolean to False for the book */
                                 firestore.collection("Book").document(bookId).update("ownerScanHandOver", false);
 
+
                                 /** Notify user handing off the book was a success*/
                                 Toast.makeText(getApplicationContext(), "Success! Borrower can loan the book now", Toast.LENGTH_LONG).show();
 
                                 /** Go to the Borrower Book List */
-                                startActivity(new Intent(MyCurrentRequestsActivity.this, ViewBorrowedBookActivity.class));
+                                Intent intent = new Intent(MyCurrentRequestsActivity.this, ViewBorrowedBookActivity.class);
+                                intent.putExtra("BOOK_ID", bookId);
+                                startActivity(intent);
 
 
                             }
