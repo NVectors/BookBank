@@ -99,7 +99,7 @@ public class MyCurrentRequestsAdapter extends ArrayAdapter {
                     String status = book.getStatus();
                     Boolean scannedOver = documentSnapshot.getBoolean("ownerScanHandOver");
                     if(status.equals("Accepted")) {
-                        scanBook.setVisibility(view.VISIBLE);
+                        viewMap.setVisibility(view.VISIBLE);
                     }
                     if(status.equals("Accepted") && scannedOver) {
                         scanBook.setVisibility(view.VISIBLE);
