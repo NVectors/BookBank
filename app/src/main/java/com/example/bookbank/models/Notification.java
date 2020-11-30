@@ -4,15 +4,17 @@ public class Notification {
     private String id;
     private String userId;
     private String message;
+    private String bookOwnerId;
 
     public Notification() {
         // required for Firestore to be able to convert this object
     }
 
-    public Notification(String id, String userId, String message) {
+    public Notification(String id, String userId, String message, String bookOwnerId) {
         this.id = id;
         this.userId = userId;
         this.message = message;
+        this.bookOwnerId = bookOwnerId;
     }
 
     public String getId() {
@@ -33,5 +35,13 @@ public class Notification {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getBookOwnerId() {
+        return bookOwnerId;
+    }
+
+    public void setBookOwnerId(String bookOwnerId) {
+        this.bookOwnerId = bookOwnerId;
     }
 }
