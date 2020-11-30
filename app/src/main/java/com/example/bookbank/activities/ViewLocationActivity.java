@@ -53,49 +53,16 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_location);
 
+        Bundle bundle = getIntent().getExtras();
+
         /** Get request document name from RequestsActivity */
-        final String requestDoc = getIntent().getStringExtra("REQUEST_DOC");
+        final Double getLatitude = bundle.getDouble("LATITUDE");
+        final Double getLongitude = bundle.getDouble("LONGITUDE");
 
-        /** Get instance of Firestore */
-        db = FirebaseFirestore.getInstance();
-
-        /** Get top level reference to the collection Request */
-        final DocumentReference requestReference = db.collection("Request").document(requestDoc);
+        bookLat = getLatitude;
+        bookLong = getLongitude;
 
         initMap();  //Initialize the map
-
-        requestReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null  && document.exists()) {
-                        String docLat = document.getData().get("latitude").toString();
-                        String docLong = document.getData().get("longitude").toString();
-
-                        // Tests
-                        Log.d(TAG, "BOOK LOCATION-> Latitude: " + String.valueOf(docLat)
-                                + " Longitude: " + String.valueOf(docLong));
-
-                        bookLat = (Double) Double.parseDouble(docLat.toString());
-                        bookLong = (Double) Double.parseDouble(docLong.toString());
-
-                        try {
-                            geoLocate(bookLat,bookLong);
-                        } catch (IOException e) {
-                            Toast.makeText(ViewLocationActivity.this, "No location is found in the database", Toast.LENGTH_SHORT).show();
-                        }
-
-                    } else { // Document is null
-                        finish();
-                        Toast.makeText(getApplicationContext(), "Location does not exist", Toast.LENGTH_LONG).show();
-                    }
-                } else { // Task is not successful
-                    Toast.makeText(getApplicationContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
 
         /** If exit button is clicked, close the activity */
         Button exit = (Button) findViewById(R.id.exit_button);
@@ -105,9 +72,7 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
                 finish();
             }
         });
-
     }
-
 
     /**
      *  Initialize the Map fragment
@@ -150,6 +115,12 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "Map is ready!");
         mMap = googleMap;
+        try {
+            geoLocate(bookLat,bookLong);
+        } catch (IOException e) {
+            finish();
+            Toast.makeText(getApplicationContext(), "Error " + e.getLocalizedMessage() , Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -177,7 +148,7 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
             String info = (address);
 
             /** Move to location retrieved from database */
-            moveCamera(new LatLng(bookLat, bookLong), DEFAULT_ZOOM, info);
+            moveCamera(new LatLng(latitude, longitude), DEFAULT_ZOOM, info);
 
         } catch (IOException e) {
             Log.e(TAG, "GeoLocating: IOException: " + e.getMessage());

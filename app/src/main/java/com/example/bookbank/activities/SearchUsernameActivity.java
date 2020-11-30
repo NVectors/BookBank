@@ -35,6 +35,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SearchUsernameActivity extends AppCompatActivity {
 
@@ -175,10 +177,19 @@ public class SearchUsernameActivity extends AppCompatActivity {
                     String loPhoneNumber = phoneNumber.toLowerCase();
                     String key = keyWord.trim().toLowerCase();
 
-                    // searching with regex
-                    if(loEmail.matches(".*\\b"+key+"\\b.*") ||
-                            loFullName.matches(".*\\b"+key+"\\b.*") ||
-                            loPhoneNumber.matches(".*\\b"+key+"\\b.*"))
+                    Pattern pattern;
+                    Matcher matcher1;
+                    Matcher matcher2;
+                    Matcher matcher3;
+
+                    pattern = Pattern.compile(key);
+                    matcher1 = pattern.matcher(loEmail);
+                    matcher2 = pattern.matcher(loFullName);
+                    matcher3 = pattern.matcher(loPhoneNumber);
+
+                    if(matcher1.lookingAt() ||
+                            matcher2.lookingAt() ||
+                            matcher3.lookingAt())
                     {
                         userDataList.add(user);
                     }

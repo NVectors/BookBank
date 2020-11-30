@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bookbank.R;
+import com.example.bookbank.models.Notification;
 import com.example.bookbank.models.Request;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -130,6 +131,11 @@ public class ViewSearchBookDetails extends AppCompatActivity {
                         HashMap<String, Object> map = new HashMap<String, Object>();
                         map.put("status", "Requested");
                         db.collection("Book").document(bookId).update(map);
+
+                        String Id;
+                        Id = db.collection("Notification").document().getId();
+                        DocumentReference notificationRef = db.collection("Notification").document(Id);
+                        notificationRef.set(new Notification(Id, request.getOwnerId(), "Your book " + request.getBookTitle() + " has been requested."));
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

@@ -133,30 +133,6 @@ public class RequestsActivity extends AppCompatActivity {
             }
         });
 
-        // Google Services are okay, can use Google Maps API now
-        if (checkServices()){
-//            Button location = (Button) findViewById(R.id.map_button);
-//            location.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
-//                    Intent intent = new Intent(RequestsActivity.this, SetLocationActivity.class);
-//                    intent.putExtra("REQUEST_DOC", requestDoc);
-//                    startActivity(intent);
-//                }
-//            });
-//
-//            Button viewLocation = (Button) findViewById(R.id.view_location);
-//            viewLocation.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    final String requestDoc = "iyijYWL2nsbRtuTwcnYc"; //Just to test for now
-//                    Intent intent = new Intent(RequestsActivity.this, ViewLocationActivity.class);
-//                    intent.putExtra("REQUEST_DOC", requestDoc);
-//                    startActivity(intent);
-//                }
-//            });
-        }
 
 
         // --------------------------Required for Toolbar---------------------------------//
@@ -164,32 +140,6 @@ public class RequestsActivity extends AppCompatActivity {
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(tb);
     }
-
-
-    /**
-     * Check Google Services to make sure map requests is possible for user
-     * @return
-     */
-    public boolean checkServices(){
-        Log.d("LOCATION", "Check Google Services Version!");
-
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(RequestsActivity.this);
-
-        if (available == ConnectionResult.SUCCESS){
-            Log.d("LOCATION", "Google Play Services is working!");
-            return  true;
-        }
-        else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)){
-            Log.d("Location", "Fixable error!");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(RequestsActivity.this, available, ERROR_DIALOG_REQUEST);
-            dialog.show();
-        }
-        else{
-            Toast.makeText(this, "We can't make map requests!", Toast.LENGTH_SHORT).show();
-        }
-        return false;
-    }
-
 
     // --------------------------Create Toolbar Menu---------------------------------//
     @Override

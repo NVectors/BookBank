@@ -110,6 +110,7 @@ public class OwnerBooksActivity extends AppCompatActivity implements AdapterView
             }
         });
 
+        /** Book in list is clicked */
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
