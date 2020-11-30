@@ -135,7 +135,7 @@ public class ViewSearchBookDetails extends AppCompatActivity {
                         String Id;
                         Id = db.collection("Notification").document().getId();
                         DocumentReference notificationRef = db.collection("Notification").document(Id);
-                        notificationRef.set(new Notification(Id, request.getOwnerId(), "Your book " + request.getBookTitle() + " has been requested."));
+                        notificationRef.set(new Notification(Id, request.getOwnerId(), "Your book " + request.getBookTitle() + " has been requested.", request.getOwnerId()));
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
