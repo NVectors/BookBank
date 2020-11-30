@@ -18,6 +18,7 @@ import com.example.bookbank.adapters.SearchBooksAdapter;
 import com.example.bookbank.models.Book;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -80,6 +81,7 @@ public class SearchBooksActivity extends AppCompatActivity {
         // getting a DB instance and getting a reference to the 'Book' collection.
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
         final CollectionReference collectionReference = db.collection("Book");
 
         // Adding onClickListener to the button to search a new Keyword with Intent data
@@ -139,25 +141,30 @@ public class SearchBooksActivity extends AppCompatActivity {
                             });
                         }
 
-                        // if keyword is empty string all available books are added as default
-                        if(keyWord.equals("")){
-                            bookArrayList.add(book);
-                        }
-
-                        // if there's a search keyword we search for the keyword in title, author and ISBN fields
-                        else{
-                            // making author, title and the keyword lowercase for both case searching
-                            String lowerTitle = title.toLowerCase();
-                            String lowerAuthor = author.toLowerCase();
-                            keyWord = keyWord.trim().toLowerCase();
-
-                            // searching with regex
-                            if( lowerTitle.contains(keyWord) || lowerAuthor.contains(keyWord)
-                                || String.valueOf(isbn).contains(keyWord))
-                            {
+                        // Add book only if it is not owner by the user using the app
+                        if(! (ownerId.equals(user.getUid())) ){
+                            Log.d(TAG, "Owner ID : " + ownerId + " " + "User ID: " + user.getUid());
+                            // if keyword is empty string all available books are added as default
+                            if(keyWord.equals("")){
                                 bookArrayList.add(book);
                             }
+
+                            // if there's a search keyword we search for the keyword in title, author and ISBN fields
+                            else{
+                                // making author, title and the keyword lowercase for both case searching
+                                String lowerTitle = title.toLowerCase();
+                                String lowerAuthor = author.toLowerCase();
+                                keyWord = keyWord.trim().toLowerCase();
+
+                                // searching with regex
+                                if( lowerTitle.contains(keyWord) || lowerAuthor.contains(keyWord)
+                                        || String.valueOf(isbn).contains(keyWord))
+                                {
+                                    bookArrayList.add(book);
+                                }
+                            }
                         }
+
                     }
                 }
                 // notifying the adapter for the change
