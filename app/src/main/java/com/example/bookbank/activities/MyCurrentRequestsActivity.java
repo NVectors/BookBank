@@ -150,6 +150,7 @@ public class MyCurrentRequestsActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Owner of book must scan book first", Toast.LENGTH_LONG).show();
                                 }
 
+                                /** Delete Request document */
                                 firestore.collection("Request").whereEqualTo("bookId", bookId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                     @Override
                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -178,10 +179,8 @@ public class MyCurrentRequestsActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "Success! Borrower can loan the book now", Toast.LENGTH_LONG).show();
 
                                 /** Go to the Borrower Book List */
-                                Intent intent = new Intent(MyCurrentRequestsActivity.this, ViewBorrowedBookActivity.class);
-                                intent.putExtra("BOOK_ID", bookId);
+                                Intent intent = new Intent(MyCurrentRequestsActivity.this, BorrowedBooksActivity.class);
                                 startActivity(intent);
-
 
                             }
                             /** ISBN of the book scanned matches but status is not "Accepted" */
