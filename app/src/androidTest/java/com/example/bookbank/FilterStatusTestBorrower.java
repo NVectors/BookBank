@@ -18,6 +18,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -58,27 +60,18 @@ public class FilterStatusTestBorrower {
         BorrowedBooksActivity activity0 = (BorrowedBooksActivity) solo.getCurrentActivity();
         final ListView bookList0 = activity0.bookList;
 
-        int availableCount = 0;
-        int BorrowedCount = 0;
+        int totalCount = bookList0.getCount();
+        ArrayList<Book> totalBookList = new ArrayList<Book>();
 
         for (int i = 0; i < bookList0.getCount(); i++){
             Book tempBook = (Book) bookList0.getItemAtPosition(i);
-            if (tempBook.getStatus().equals("Borrowed") || tempBook.getStatus().equals("Available")){
-                availableCount += 1;
-            }
-            /*if (tempBook.getStatus() == "Borrowed"){
-                Log.d("tag", "HERE "+ String.valueOf(BorrowedCount));
-                BorrowedCount += 1;
-            }*/
+            totalBookList.add(tempBook);
         }
-        Log.d("tag", "HERE "+ String.valueOf(availableCount));
-        assertTrue(availableCount > 0);
-        //assertTrue(BorrowedCount > 0);
+        assertTrue(totalBookList.size() == totalCount);
     }
 
     @Test
     public void checkStatusBorrowed(){
-        //Log.d("tag" , "Tes333t");
         solo.assertCurrentActivity("Wrong Activity", BorrowedBooksActivity.class);
         solo.pressSpinnerItem(0, 1);
         Boolean actual = solo.isSpinnerTextSelected(0, "Borrowed");
@@ -87,20 +80,21 @@ public class FilterStatusTestBorrower {
 
         BorrowedBooksActivity activity0 = (BorrowedBooksActivity) solo.getCurrentActivity();
         final ListView bookList0 = activity0.bookList;
+        ArrayList<Book> borrowedBookList = new ArrayList<Book>();
 
         int BorrowedCount = 0;
-
         for (int i = 0; i < bookList0.getCount(); i++){
             Book tempBook = (Book) bookList0.getItemAtPosition(i);
             if (tempBook.getStatus().equals("Borrowed")){
-                Log.d("tag", "HERE "+ String.valueOf(BorrowedCount));
+                borrowedBookList.add(tempBook);
                 BorrowedCount += 1;
             }
         }
-        Log.d("tag", "HERE44"+ String.valueOf(BorrowedCount));
-
-        //Since there is no borrowed books at the current time of testing
-        assertTrue(BorrowedCount == 0);
+        assertTrue(BorrowedCount == borrowedBookList.size());
+        for(int i = 0; i<borrowedBookList.size(); i ++){
+            Book tempBook = (Book) bookList0.getItemAtPosition(i);
+            assertTrue(tempBook.getStatus().equals("Borrowed"));
+        }
     }
 
     @Test
@@ -114,20 +108,23 @@ public class FilterStatusTestBorrower {
 
         BorrowedBooksActivity activity0 = (BorrowedBooksActivity) solo.getCurrentActivity();
         final ListView bookList0 = activity0.bookList;
-
         int RequestedCount = 0;
+        ArrayList<Book> RequestBookList = new ArrayList<Book>();
 
         for (int i = 0; i < bookList0.getCount(); i++){
             Book tempBook = (Book) bookList0.getItemAtPosition(i);
-            if (tempBook.getStatus().equals("Borrowed")){
-                Log.d("tag", "HERE "+ String.valueOf(RequestedCount));
+            if (tempBook.getStatus().equals("Requested")){
                 RequestedCount += 1;
+                RequestBookList.add(tempBook);
             }
         }
-        Log.d("tag", "HERE44"+ String.valueOf(RequestedCount));
+        assertTrue(RequestedCount == RequestBookList.size());
 
-        //Since there is no requested books at the current time of testing
-        assertTrue(RequestedCount == 0);
+        for (int i = 0; i < RequestBookList.size(); i ++){
+            Book tempBook = (Book) bookList0.getItemAtPosition(i);
+            assertTrue(tempBook.getStatus().equals("Requested"));
+
+        }
     }
 
     @Test
@@ -141,19 +138,22 @@ public class FilterStatusTestBorrower {
 
         BorrowedBooksActivity activity0 = (BorrowedBooksActivity) solo.getCurrentActivity();
         final ListView bookList0 = activity0.bookList;
+        ArrayList<Book> AcceptBookList = new ArrayList<Book>();
 
         int AcceptedCount = 0;
 
         for (int i = 0; i < bookList0.getCount(); i++){
             Book tempBook = (Book) bookList0.getItemAtPosition(i);
             if (tempBook.getStatus().equals("Accepted")){
-                Log.d("tag", "HERE "+ String.valueOf(AcceptedCount));
+                AcceptBookList.add(tempBook);
                 AcceptedCount += 1;
             }
         }
-        Log.d("tag", "HERE44"+ String.valueOf(AcceptedCount));
+        assertTrue(AcceptedCount == AcceptBookList.size());
 
-        //Since there is no requested books at the current time of testing
-        assertTrue(AcceptedCount == 0);
+        for (int i = 0; i < AcceptBookList.size(); i ++){
+            Book tempBook = (Book) bookList0.getItemAtPosition(i);
+            assertTrue(tempBook.getStatus().equals("Accepted"));
+        }
     }
 }
