@@ -182,6 +182,8 @@ public class MyCurrentRequestsActivity extends AppCompatActivity {
                                 Intent intent = new Intent(MyCurrentRequestsActivity.this, BorrowedBooksActivity.class);
                                 startActivity(intent);
 
+                                finish();
+
                             }
                             /** ISBN of the book scanned matches but status is not "Accepted" */
                             else if (!bookStatus.toLowerCase().equals("accepted")){
