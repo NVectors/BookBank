@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -31,6 +32,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.UUID;
 
 public class AddBookActivity extends AppCompatActivity {
+    private static final String TAG = "ADD_BOOK";
 
     /** Barcode String*/
     private String Barcode;
@@ -47,6 +49,7 @@ public class AddBookActivity extends AppCompatActivity {
 
     private StorageReference storageReference;
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int SCAN_BARCODE_REQUEST = 2;
     private Uri uri;
 
     @Override
@@ -72,22 +75,14 @@ public class AddBookActivity extends AppCompatActivity {
 
         storageReference = FirebaseStorage.getInstance().getReference("images");
 
-        /** Get intent String of Barcode and set the fields, if passed */
-        Intent intent = getIntent();
-        if(intent.hasExtra("BARCODE")){
-            Barcode = intent.getStringExtra("BARCODE");
-            isbn.setText(Barcode);
-            searchBooks(Barcode);
-
-        }
 
         /** On click Listener for 'Scan Barcode' Button */
         scanBarcodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent barcodeActivity = new Intent(AddBookActivity.this,ScanBarcodeActivity.class);
-                intent.putExtra("RETURN","ADDBOOK");
-                startActivity(barcodeActivity);
+                startActivityForResult(barcodeActivity,SCAN_BARCODE_REQUEST);
+
 
             }
         });
@@ -131,6 +126,8 @@ public class AddBookActivity extends AppCompatActivity {
         new FetchBooks(title,author,description,barcode).execute(barcode);
     }
 
+
+
     /**
      * Creates a new intent to choose a image from the device
      */
@@ -142,12 +139,27 @@ public class AddBookActivity extends AppCompatActivity {
     }
 
     /**
-     * Gets the uri of the selected image
+     * Gets barcode on barcode scan and also Gets the uri of the selected image
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if(requestCode == SCAN_BARCODE_REQUEST && resultCode == RESULT_OK && data != null ) {
+            String validity = data.getStringExtra("RESULT");
+            Barcode = data.getStringExtra("VALUE");
+            Log.d(TAG, "Barcode is: " + Barcode +",Length : " +String.valueOf(Barcode.length()));
+            Log.d(TAG,validity);
+
+            if(validity.equals("Valid ISBN barcode") && Barcode.length() == 13){
+                isbn.setText(Barcode);
+                searchBooks(Barcode);
+            }
+            else{
+                Toast.makeText(this, "Invalid ISBN Scan, Please try again.", Toast.LENGTH_LONG).show();
+            }
+
+        }
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null){
             uri = data.getData();
