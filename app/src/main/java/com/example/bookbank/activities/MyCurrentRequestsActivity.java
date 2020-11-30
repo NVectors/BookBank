@@ -154,8 +154,6 @@ public class MyCurrentRequestsActivity extends AppCompatActivity {
                                 firestore.collection("Request").whereEqualTo("bookId", bookId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                     @Override
                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                        System.out.println("HelloThere");
-
                                         for (DocumentSnapshot document: queryDocumentSnapshots) {
                                             String docId = document.getId();
                                             DocumentReference documentReference = firestore.collection("Request").document(docId);

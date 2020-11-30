@@ -100,27 +100,32 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
                     isbn.setText("ISBN: " + String.valueOf(value.getData().get("isbn")));
                     status.setText("Status: " + value.getString("status"));
 
+                    // Get values from database
                     Boolean ownerScanned = value.getBoolean("ownerScanHandOver");
                     String bookStatus = value.getString("status");
-                    // first state of the button is Requests
-
                     borrowerID = value.getString("borrowerId");
                     ownerID = value.getString("ownerId");
-                    // changing request button to handOver
+
+                    // First state of the button is Requests
+                    // Changing Request button to handOver
                     if (bookStatus.equals("Accepted") && !ownerScanned) {
                         handOver.setText("HAND OVER");
-                    } else if (bookStatus.equals("Accepted") && ownerScanned) {
+                    }
+                    // Book is in handing over process, the owner scanned
+                    else if (bookStatus.equals("Accepted") && ownerScanned) {
                         handOver.setText("CANCEL HAND OVER");
                     }
-                    // receiving book back from borrower
+                    // Receiving book back from the borrower
                     else if (bookStatus.equals("Borrowed") && ownerScanned) {
                         handOver.setVisibility(View.VISIBLE);
                         handOver.setText("RECEIVE BOOK");
                     }
-                    // dont need button if no request or book is borrowed and not in middle of handover
+                    // Don't need button if no request or book is borrowed and not in the middle of handover
                     else if ((bookStatus.equals("Borrowed") && !ownerScanned) || bookStatus.equals("Available")) {
                         handOver.setVisibility(View.INVISIBLE);
-                    } else if (bookStatus.equals("Requested")) {
+                    }
+                    // Book is requested
+                    else if (bookStatus.equals("Requested")) {
                         handOver.setVisibility(View.VISIBLE);
                         handOver.setText("Requests");
                     }
@@ -158,17 +163,19 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
-        /** Hand Over button is clicked */
+        /** Hand Over button is clicked, check the status of the book to determine button action */
         handOver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // check status of book
+                Log.d("HAND OVER BUTTON", "INSIDE ON CLICK");
                 bookReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        Log.d("HAND OVER BUTTON", "INSIDE ON COMPLETE");
                         DocumentSnapshot snapshot = task.getResult();
                         String bookStatus =  snapshot.getString("status");
                         Boolean ownerScanned = snapshot.getBoolean("ownerScanHandOver");
+
                         // to check all requests for book
                         if (bookStatus.equals("Requested")) {
                             Intent intent = new Intent(ViewOwnedBooksActivity.this, RequestsActivity.class);

@@ -77,6 +77,7 @@ public class RequestsActivity extends AppCompatActivity {
         final TextView bookTitle = findViewById(R.id.book_title);
         final TextView bookAuthor = findViewById(R.id.book_author);
         final TextView bookISBN = findViewById(R.id.book_isbn);
+        requestsList = findViewById(R.id.requests_list);
 
         /** Get book id of the book that clicked in the list view of OwnerBooksActivity */
         final String bookID = getIntent().getStringExtra("BOOK_ID");
@@ -84,14 +85,14 @@ public class RequestsActivity extends AppCompatActivity {
         /** Get instance of Firestore */
         firestore = FirebaseFirestore.getInstance();
 
+        /** Get instance of Firebase Authentication */
+        firebaseAuth = FirebaseAuth.getInstance();
+
         /** Get top level reference to the book in collection  by ID */
         bookReference = firestore.collection("Book").document(bookID);
 
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        requestsList = findViewById(R.id.requests_list);
+        /** Create a list view of requests on the same book*/
         requestsDataList = new ArrayList<>();
-
         requestsAdapter = new RequestsAdapter(this, R.layout.activity_requests, requestsDataList);
         requestsList.setAdapter(requestsAdapter);
 
@@ -99,6 +100,7 @@ public class RequestsActivity extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.exists()) {
+                    // Set the text view
                     Book book = documentSnapshot.toObject(Book.class);
                     bookTitle.setText(book.getTitle());
                     bookAuthor.setText(book.getAuthor());
@@ -106,34 +108,24 @@ public class RequestsActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Update collection here, get only Request doc(s) containing the book id
         final CollectionReference collectionReference = firestore.collection("Request");
-        // update collection here
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        collectionReference.whereEqualTo("bookId", bookID).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                // Clear the old list
                 requestsDataList.clear();
 
-                collectionReference.whereEqualTo("bookId", bookID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Request newRequest = document.toObject(Request.class);
-                                String docId = document.getId();
-                                newRequest.setId(docId);
-                                requestsDataList.add(newRequest);
-                            }
-                            requestsAdapter.notifyDataSetChanged();
-                        } else {
-                            Log.d("debug", "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
+                for (DocumentSnapshot document: queryDocumentSnapshots) {
+                    Request newRequest = document.toObject(Request.class);
+                    String docId = document.getId();
+                    newRequest.setId(docId);
+                    requestsDataList.add(newRequest);
+                }
                 requestsAdapter.notifyDataSetChanged();
             }
         });
-
-
 
         // --------------------------Required for Toolbar---------------------------------//
         // set tool bar
