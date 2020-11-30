@@ -18,6 +18,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -59,21 +61,18 @@ public class FilterStatusTestOwner {
         OwnerBooksActivity activity0 = (OwnerBooksActivity) solo.getCurrentActivity();
         final ListView bookList0 = activity0.bookList;
 
-        int showAllCount = 0;
+        int totalCount = bookList0.getCount();
+        ArrayList<Book> totalBookList = new ArrayList<Book>();
 
         for (int i = 0; i < bookList0.getCount(); i++){
             Book tempBook = (Book) bookList0.getItemAtPosition(i);
-            if (tempBook.getStatus().equals("Borrowed") || tempBook.getStatus().equals("Available")){
-                showAllCount += 1;
-            }
+            totalBookList.add(tempBook);
         }
-        Log.d("tag", "HERE "+ String.valueOf(showAllCount));
-        assertTrue(showAllCount > 0);
+        assertTrue(totalBookList.size() == totalCount);
     }
 
     @Test
     public void checkStatusAvailable(){
-        //Log.d("tag" , "Tes333t");
         solo.assertCurrentActivity("Wrong Activity", OwnerBooksActivity.class);
         solo.pressSpinnerItem(0, 1);
         Boolean actual = solo.isSpinnerTextSelected(0, "Available");
@@ -84,23 +83,20 @@ public class FilterStatusTestOwner {
         final ListView bookList0 = activity0.bookList;
 
         int AvailableCount = 0;
+        ArrayList<Book> AvailableBookList = new ArrayList<Book>();
 
         for (int i = 0; i < bookList0.getCount(); i++){
             Book tempBook = (Book) bookList0.getItemAtPosition(i);
             if (tempBook.getStatus().equals("Available")){
-                Log.d("tag", "HERE "+ String.valueOf(AvailableCount));
                 AvailableCount += 1;
+                AvailableBookList.add(tempBook);
             }
         }
-        Log.d("tag", "HERE44"+ String.valueOf(AvailableCount));
-
-        //Since there is 0 available books at the current time of testing
-        assertTrue(AvailableCount == 0);
+        assertTrue(AvailableCount == AvailableBookList.size());
     }
 
     @Test
     public void checkStatusBorrowed(){
-        //Log.d("tag" , "Tes333t");
         solo.assertCurrentActivity("Wrong Activity", OwnerBooksActivity.class);
         solo.pressSpinnerItem(0, 2);
         Boolean actual = solo.isSpinnerTextSelected(0, "Borrowed");
@@ -111,18 +107,16 @@ public class FilterStatusTestOwner {
         final ListView bookList0 = activity0.bookList;
 
         int BorrowedCount = 0;
+        ArrayList<Book> BorrowedBookList = new ArrayList<Book>();
 
         for (int i = 0; i < bookList0.getCount(); i++){
             Book tempBook = (Book) bookList0.getItemAtPosition(i);
             if (tempBook.getStatus().equals("Borrowed")){
-                Log.d("tag", "HERE "+ String.valueOf(BorrowedCount));
+                BorrowedBookList.add(tempBook);
                 BorrowedCount += 1;
             }
         }
-        Log.d("tag", "HERE44"+ String.valueOf(BorrowedCount));
-
-        //Since there is 1 borrowed books at the current time of testing
-        assertTrue(BorrowedCount > 0);
+        assertTrue(BorrowedCount == BorrowedBookList.size());
     }
 
     @Test
@@ -138,18 +132,17 @@ public class FilterStatusTestOwner {
         final ListView bookList0 = activity0.bookList;
 
         int RequestedCount = 0;
+        ArrayList<Book> RequestBookList = new ArrayList<Book>();
 
         for (int i = 0; i < bookList0.getCount(); i++){
             Book tempBook = (Book) bookList0.getItemAtPosition(i);
             if (tempBook.getStatus().equals("Requested")){
                 Log.d("tag", "HERE "+ String.valueOf(RequestedCount));
                 RequestedCount += 1;
+                RequestBookList.add(tempBook);
             }
         }
-        Log.d("tag", "HERE44"+ String.valueOf(RequestedCount));
-
-        //Since there is no requested books at the current time of testing
-        assertTrue(RequestedCount == 0);
+        assertTrue(RequestedCount == RequestBookList.size());
     }
 
     @Test
@@ -165,17 +158,16 @@ public class FilterStatusTestOwner {
         final ListView bookList0 = activity0.bookList;
 
         int AcceptedCount = 0;
+        ArrayList<Book> AcceptBookList = new ArrayList<Book>();
 
         for (int i = 0; i < bookList0.getCount(); i++){
             Book tempBook = (Book) bookList0.getItemAtPosition(i);
             if (tempBook.getStatus().equals("Accepted")){
-                Log.d("tag", "HERE "+ String.valueOf(AcceptedCount));
+                AcceptBookList.add(tempBook);
                 AcceptedCount += 1;
             }
         }
-        Log.d("tag", "HERE44"+ String.valueOf(AcceptedCount));
 
-        //Since there is no requested books at the current time of testing
-        assertTrue(AcceptedCount == 0);
+        assertTrue(AcceptedCount == AcceptBookList.size());
     }
 }
