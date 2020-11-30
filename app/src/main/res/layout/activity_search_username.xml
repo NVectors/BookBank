@@ -39,7 +39,8 @@
             android:id="@+id/search_user_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Search Username"/>
+            android:background="@android:color/holo_blue_light"
+            android:text="Search Username" />
 
         <ListView
             android:id="@+id/search_user_list"
