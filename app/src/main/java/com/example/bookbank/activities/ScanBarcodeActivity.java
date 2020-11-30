@@ -235,6 +235,73 @@ public class  ScanBarcodeActivity extends AppCompatActivity {
         /** Create a surface for the camera preview layout that's connected to the preview stream*/
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
+        /** setiing Image analysis object for barcode scan */
+        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build();
+
+        /** adding an analyzer for continuos scan */
+        imageAnalysis.setAnalyzer(executor, new ImageAnalysis.Analyzer() {
+            @SuppressLint("UnsafeExperimentalUsageError")
+            @Override
+            public void analyze(@NonNull ImageProxy image) {
+                /** Image does not exists */
+                if(image == null || image.getImage() == null){
+                    return;
+                }
+
+                Image barcodeImage = image.getImage();
+                int rotationDegrees = image.getImageInfo().getRotationDegrees();
+                InputImage inputImage = InputImage.fromMediaImage(barcodeImage,rotationDegrees);
+                BarcodeScanner scanner = BarcodeScanning.getClient();
+
+                /** Process the image captured */
+                Task<List<Barcode>> result = scanner.process(inputImage)
+                        .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+                            @Override
+                            public void onSuccess(List<Barcode> barcodes) {
+                                // Task completed successfully
+                                Log.d(TAG,"Scanned the image!");
+
+                                for (Barcode barcode: barcodes){
+                                    String rawValue = barcode.getRawValue();
+                                    Integer type = barcode.getFormat();
+                                    Log.d(TAG, "BAR CODE IS " + rawValue);
+                                    Log.d(TAG, "BAR CODE TYPE IS " + type.toString());
+
+                                    /** Not the correct ISBN barcode format */
+                                    if ( (type != Barcode.FORMAT_EAN_8) && (type != Barcode.FORMAT_EAN_13) ) {
+                                        /** Pass back data to activity that called ScanBarcodeActivity */
+                                        resultIntent.putExtra("RESULT", "Not an ISBN barcode");
+                                        resultIntent.putExtra("VALUE", "ERROR");
+                                        resultIntent.putExtra("BOOK", bookID);
+                                        setResult(Activity.RESULT_OK, resultIntent);
+                                        finish();
+                                    }
+                                    /** Pass back data to activity that called ScanBarcodeActivity */
+                                    resultIntent.putExtra("RESULT", "Valid ISBN barcode");
+                                    resultIntent.putExtra("VALUE", rawValue);
+                                    resultIntent.putExtra("BOOK", bookID);
+                                    setResult(Activity.RESULT_OK, resultIntent);
+                                    finish();
+                                }
+                                Log.d(TAG,"Done analyzing");
+                                image.close();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Task failed with an exception
+                                resultIntent.putExtra("RESULT", "Barcode scanner failed");
+                                setResult(Activity.RESULT_OK, resultIntent);
+                                finish();
+                            }
+                        });
+
+            }
+        });
+
         /** Bind the lifecycle of camera to LifecycleOwner within application's process */
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) this,
                 cameraSelector,

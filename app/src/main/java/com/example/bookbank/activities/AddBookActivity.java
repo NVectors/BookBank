@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -31,6 +32,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.UUID;
 
 public class AddBookActivity extends AppCompatActivity {
+    private static final String TAG = "ADD_BOOK";
 
     /** Barcode String*/
     private String Barcode;
@@ -145,9 +147,10 @@ public class AddBookActivity extends AppCompatActivity {
 
         if(requestCode == SCAN_BARCODE_REQUEST && resultCode == RESULT_OK && data != null ) {
             String validity = data.getStringExtra("RESULT");
+            Barcode = data.getStringExtra("VALUE");
+            Log.d(TAG, "Barcode is: " + Barcode);
 
             if(validity == "Valid ISBN barcode" && validity.length() == 13){
-                Barcode = data.getStringExtra("VALUE");
                 isbn.setText(Barcode);
                 searchBooks(Barcode);
             }
