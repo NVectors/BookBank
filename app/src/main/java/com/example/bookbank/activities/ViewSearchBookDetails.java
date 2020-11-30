@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,6 +53,9 @@ public class ViewSearchBookDetails extends AppCompatActivity {
         TextView textAuthor = findViewById(R.id.text_author);
         TextView textStatus = findViewById(R.id.text_status);
         ImageView bookImage = findViewById(R.id.image_book);
+
+        /** Make TextView of description scrollable for big text */
+        textDescription.setMovementMethod(new ScrollingMovementMethod());
 
         // fetching the intent
         Intent intent = getIntent();
@@ -195,7 +199,7 @@ public class ViewSearchBookDetails extends AppCompatActivity {
                 break;
             case R.id.nav_sign_out:
                 firebaseAuth.signOut();
-                Toast.makeText(ViewSearchBookDetails.this, "succcessfully signed out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewSearchBookDetails.this, "Successfully signed out", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(ViewSearchBookDetails.this, LoginActivity.class));
                 break;
             default:

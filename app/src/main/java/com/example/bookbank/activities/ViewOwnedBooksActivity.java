@@ -158,7 +158,6 @@ public class ViewOwnedBooksActivity extends AppCompatActivity {
             }
         });
 
-        //CODE HERE FOR OWNER RECIEVING BOOK FROM BORROWER
         /** Hand Over button is clicked */
         handOver.setOnClickListener(new View.OnClickListener() {
             @Override
